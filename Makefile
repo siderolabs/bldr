@@ -3,7 +3,7 @@ USERNAME ?= autonomy
 TAG = $(shell gitmeta image tag)
 REGISTRY_AND_USERNAME := $(REGISTRY)/$(USERNAME)
 
-PLATFORM ?= linux/amd64,linux/arm64
+PLATFORM ?= linux/amd64
 PROGRESS ?= auto
 PUSH ?= false
 

@@ -44,7 +44,7 @@ The general format of a target triple is:
 See https://gcc.gnu.org/onlinedocs/gccint/Configure-Terms.html for a detailed description of target triples.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		pkg, err := v1alpha1.NewPkg(pkgFile)
+		pkg, err := v1alpha1.NewPkg(pkgFile, nil)
 		if err != nil {
 			log.Fatal(err)
 		}
