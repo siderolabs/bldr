@@ -12,7 +12,7 @@ COMMON_ARGS := --progress=$(PROGRESS)
 COMMON_ARGS += --platform=$(PLATFORM)
 COMMON_ARGS += --build-arg=VERSION=$(TAG)
 
-PKGS := alpine scratch bldr
+PKGS := alpine bldr-scratch bldr
 
 all: $(PKGS)
 
@@ -25,9 +25,8 @@ bldr:
 	-f ./Dockerfile \
 	.
 
-.PHONY: scratch
-scratch:
-
+.PHONY: bldr-scratch
+bldr-scratch:
 	$(BUILD) $(COMMON_ARGS) \
 	--push=$(PUSH) \
 	--target=$@ \

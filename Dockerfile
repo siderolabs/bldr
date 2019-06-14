@@ -1,14 +1,10 @@
-FROM alpine:3.9 AS base
-RUN apk add build-base ca-certificates go
+FROM golang:1.12 AS base
 WORKDIR /src
 COPY ./go.mod ./
 COPY ./go.sum ./
 ENV GO111MODULE on
 ENV GOPROXY https://proxy.golang.org
 ENV CGO_ENABLED 0
-WORKDIR /src
-COPY ./go.mod ./
-COPY ./go.sum ./
 RUN go mod download
 RUN go mod verify
 COPY . .
@@ -21,7 +17,7 @@ RUN GOOS=linux CGO_ENABLED=0 go build  -a -ldflags "-extldflags \"-static\" -s -
 FROM scratch AS bldr
 COPY --from=build /bldr /bldr
 
-FROM scratch AS scratch
+FROM scratch AS bldr-scratch
 ARG TARGETPLATFORM
 ENV TARGETPLATFORM ${TARGETPLATFORM}
 ARG BUILDPLATFORM

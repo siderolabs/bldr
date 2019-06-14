@@ -1,0 +1,57 @@
+---
+kind: pipeline
+name: amd64
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build
+  image: autonomy/build-container:latest
+  pull: always
+  environment:
+    PLATFORM: linux/amd64
+  commands:
+    - docker buildx create --name ci --driver docker-container --use tcp://docker-amd64.ci.svc:2375
+    - docker buildx create --name ci --driver docker-container --append tcp://docker-arm64.ci.svc:2375
+    - make
+    - mv /drone/src/out/bldr /drone/src/out/bldr-linux-amd64
+
+- name: release
+  image: plugins/github-release
+  settings:
+    api_key:
+      from_secret: github_token
+    draft: true
+    files:
+    - /drone/src/out/bldr-linux-amd64
+    checksum:
+    - sha256
+    - sha512
+  when:
+    event: tag
+
+#---
+#kind: pipeline
+#name: notify
+#
+#clone:
+#  disable: true
+#
+#steps:
+#- name: slack
+#  image: plugins/slack
+#  settings:
+#    webhook:
+#      from_secret: slack_webhook
+#    channel: proj-talos-maint
+#  when:
+#    status:
+#    - success
+#    - failure
+#
+#trigger:
+#  status:
+#  - success
+#  - failure
