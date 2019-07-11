@@ -1,6 +1,5 @@
 FROM alpine:3.9 AS base
-RUN sed -i -e 's/dl-cdn.alpinelinux.org/ewr.edge.kernel.org/g' /etc/apk/repositories \
-    && apk add build-base ca-certificates go
+RUN apk add build-base ca-certificates go
 WORKDIR /src
 COPY ./go.mod ./
 COPY ./go.sum ./
@@ -37,8 +36,7 @@ ARG TARGETPLATFORM
 ENV TARGETPLATFORM ${TARGETPLATFORM}
 ARG BUILDPLATFORM
 ENV BUILDPLATFORM ${BUILDPLATFORM}
-RUN sed -i -e 's/dl-cdn.alpinelinux.org/ewr.edge.kernel.org/g' /etc/apk/repositories \
-    && apk --no-cache add bash ca-certificates
+RUN apk --no-cache add bash ca-certificates
 RUN [ "ln", "-svf", "/bin/bash", "/bin/sh" ]
 COPY --from=bldr /bldr /bldr
 WORKDIR /pkg

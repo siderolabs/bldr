@@ -8,6 +8,8 @@ services:
     privileged: true
     command:
       - --dns=8.8.8.8
+      - --dns=8.8.4.4
+      - --mtu=1440
     volumes:
       - name: docker-socket
         path: /var/run
