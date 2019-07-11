@@ -100,7 +100,6 @@ func (p *Pkg) Pack() error {
 		"--push=" + p.Options.Push,
 		"--tag=" + strings.Join([]string{p.Options.Registry, p.Options.Organization, p.Name}, "/") + ":" + p.Metadata.Container.Image.Tag,
 		"--file=" + tmpfile.Name(),
-		".",
 	}
 
 	if p.Options.CacheTo != "" {
@@ -110,6 +109,8 @@ func (p *Pkg) Pack() error {
 	if p.Options.CacheFrom != "" {
 		args = append(args, "--cache-from="+p.Options.CacheFrom)
 	}
+
+	args = append(args, "--cache-from="+p.Options.CacheFrom)
 
 	return cmd("docker", args...)
 }
