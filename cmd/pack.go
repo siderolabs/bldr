@@ -36,6 +36,8 @@ func init() {
 	packCmd.Flags().StringVarP(&options.Platform, "platform", "", "linux/amd64", "Passed through to docker build command")
 	packCmd.Flags().StringVarP(&options.Progress, "progress", "", "auto", "Passed through to docker build command")
 	packCmd.Flags().StringVarP(&options.Push, "push", "", "false", "Passed through to docker build command")
+	packCmd.Flags().StringVarP(&options.CacheTo, "cache-to", "", "", "Passed through to docker build command")
+	packCmd.Flags().StringVarP(&options.CacheFrom, "cache-from", "", "", "Passed through to docker build command")
 	packCmd.MarkFlagRequired("organization")
 	rootCmd.AddCommand(packCmd)
 }

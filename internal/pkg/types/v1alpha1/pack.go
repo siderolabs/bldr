@@ -98,11 +98,17 @@ func (p *Pkg) Pack() error {
 		"--platform=" + p.Options.Platform,
 		"--progress=" + p.Options.Progress,
 		"--push=" + p.Options.Push,
-		"--cache-from=" + getenv("CACHE_FROM", strings.Join([]string{p.Options.Registry, p.Options.Organization, p.Name}, "/")+":cache"),
-		"--cache-to=" + getenv("CACHE_TO", strings.Join([]string{p.Options.Registry, p.Options.Organization, p.Name}, "/")+":cache"),
 		"--tag=" + strings.Join([]string{p.Options.Registry, p.Options.Organization, p.Name}, "/") + ":" + p.Metadata.Container.Image.Tag,
 		"--file=" + tmpfile.Name(),
 		".",
+	}
+
+	if p.Options.CacheTo != "" {
+		args = append(args, p.Options.CacheTo)
+	}
+
+	if p.Options.CacheFrom != "" {
+		args = append(args, p.Options.CacheFrom)
 	}
 
 	return cmd("docker", args...)
