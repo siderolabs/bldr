@@ -7,6 +7,10 @@ import (
 	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha1"
 )
 
+var (
+	options = &v1alpha1.Options{}
+)
+
 // packCmd represents the pack command
 var packCmd = &cobra.Command{
 	Use:   "pack",
@@ -15,7 +19,7 @@ var packCmd = &cobra.Command{
 about a number of things.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		pkg, err := v1alpha1.NewPkg(pkgFile)
+		pkg, err := v1alpha1.NewPkg(pkgFile, options)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -27,5 +31,11 @@ about a number of things.
 }
 
 func init() {
+	packCmd.Flags().StringVarP(&options.Registry, "registry", "r", "docker.io", "Docker registry to tag the image with")
+	packCmd.Flags().StringVarP(&options.Organization, "organization", "o", "", "Docker organization to tag the image with")
+	packCmd.Flags().StringVarP(&options.Platform, "platform", "", "linux/amd64", "Passed through to docker build command")
+	packCmd.Flags().StringVarP(&options.Progress, "progress", "", "auto", "Passed through to docker build command")
+	packCmd.Flags().StringVarP(&options.Push, "push", "", "false", "Passed through to docker build command")
+	packCmd.MarkFlagRequired("organization")
 	rootCmd.AddCommand(packCmd)
 }

@@ -32,6 +32,7 @@ func (p *Pkg) Build() error {
 			if os.IsNotExist(err) {
 				// TODO(andrewrynhard): Remove this directory.
 				log.Println("Creating /tmp")
+				// nolint: errcheck
 				os.MkdirAll("/tmp", 0777)
 			}
 		}

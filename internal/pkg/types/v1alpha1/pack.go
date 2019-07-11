@@ -8,7 +8,6 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/talos-systems/bldr/internal/pkg/config"
 	"github.com/talos-systems/bldr/internal/pkg/constants"
 	"github.com/talos-systems/gitmeta/pkg/git"
 	"github.com/talos-systems/gitmeta/pkg/metadata"
@@ -16,14 +15,13 @@ import (
 )
 
 const tpl = `
-{{- $config := .Config -}}
-{{ $metadata := .Metadata -}}
+{{- $metadata := .Metadata -}}
 FROM {{ .Bldr }} AS build
 SHELL [ "{{ .Shell }}", "-c" ]
 {{ with .Install -}}
 {{ .AsDockerRun }}
 {{ end -}}{{ range $dep := .Dependencies -}}
-{{ $dep.AsDockerCopy $config $metadata }}
+{{ $dep.AsDockerCopy $metadata }}
 {{ end -}}
 COPY . .
 RUN /bldr build
@@ -37,11 +35,6 @@ COPY --from=build {{ $f.From }} {{ $f.To }}
 `
 
 func (p *Pkg) Pack() error {
-	c, err := config.Open()
-	if err != nil {
-		return err
-	}
-
 	if p.Variant == Scratch && p.Install != nil {
 		return xerrors.New("scratch variant does not support installs, you may want a dependency instead")
 	}
@@ -67,13 +60,10 @@ func (p *Pkg) Pack() error {
 		return err
 	}
 
-	p.Config = c
 	p.Metadata = m
-
 	if p.Bldr == "" {
-		p.Bldr = fmt.Sprintf("%s/%s/%s:%s", p.Config.Repository, p.Config.Username, "bldr", constants.Version)
+		p.Bldr = fmt.Sprintf("%s/%s/%s:%s", p.Options.Registry, p.Options.Organization, "bldr", constants.Version)
 	}
-
 	p.Bldr = p.Bldr + "-" + p.Variant.String()
 
 	dockerfile, err := render(p)
@@ -105,12 +95,12 @@ func (p *Pkg) Pack() error {
 	args := []string{
 		"buildx",
 		"build",
-		"--platform=" + getenv("PLATFORM", "linux/amd64,linux/arm64,linux/arm/7"),
-		"--progress=" + getenv("PROGRESS", "auto"),
-		"--push=" + getenv("PUSH", push(p.Metadata)),
-		"--cache-from=" + getenv("CACHE_FROM", strings.Join([]string{p.Config.Repository, p.Config.Username, p.Name}, "/")+":cache"),
-		"--cache-to=" + getenv("CACHE_TO", strings.Join([]string{p.Config.Repository, p.Config.Username, p.Name}, "/")+":cache"),
-		"--tag=" + strings.Join([]string{p.Config.Repository, p.Config.Username, p.Name}, "/") + ":" + p.Metadata.Container.Image.Tag,
+		"--platform=" + p.Options.Platform,
+		"--progress=" + p.Options.Progress,
+		"--push=" + p.Options.Push,
+		"--cache-from=" + getenv("CACHE_FROM", strings.Join([]string{p.Options.Registry, p.Options.Organization, p.Name}, "/")+":cache"),
+		"--cache-to=" + getenv("CACHE_TO", strings.Join([]string{p.Options.Registry, p.Options.Organization, p.Name}, "/")+":cache"),
+		"--tag=" + strings.Join([]string{p.Options.Registry, p.Options.Organization, p.Name}, "/") + ":" + p.Metadata.Container.Image.Tag,
 		"--file=" + tmpfile.Name(),
 		".",
 	}
@@ -122,16 +112,12 @@ func (i Install) AsDockerRun() string {
 	return fmt.Sprintf("RUN apk add --no-cache %s", strings.Join(i, " "))
 }
 
-func (d *Dependency) AsDockerCopy(c *config.Config, m *metadata.Metadata) string {
-	if d.Version == "" {
-		d.Version = m.Container.Image.Tag
-	}
-
+func (d *Dependency) AsDockerCopy(m *metadata.Metadata) string {
 	if d.To == "" {
 		d.To = "/"
 	}
 
-	return fmt.Sprintf("COPY --from=%s/%s/%s:%s / %s", c.Repository, c.Username, d.Name, d.Version, d.To)
+	return fmt.Sprintf("COPY --from=%s / %s", d.Image, d.To)
 }
 
 func push(m *metadata.Metadata) string {

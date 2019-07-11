@@ -10,19 +10,25 @@ import (
 	"sync"
 
 	"github.com/hashicorp/go-multierror"
-	"github.com/talos-systems/bldr/internal/pkg/config"
 	"github.com/talos-systems/gitmeta/pkg/metadata"
 	"golang.org/x/xerrors"
 
 	"gopkg.in/yaml.v2"
 )
 
+type Options struct {
+	Organization string
+	Platform     string
+	Progress     string
+	Push         string
+	Registry     string
+}
+
 type Install []string
 
 type Dependency struct {
-	Name    string `yaml:"name,omitempty"`
-	Version string `yaml:"version,omitempty"`
-	To      string `yaml:"to,omitempty"`
+	Image string `yaml:"image,omitempty"`
+	To    string `yaml:"to,omitempty"`
 }
 
 type Instruction string
@@ -92,11 +98,11 @@ type Pkg struct {
 	Shell        Shell         `yaml:"shell,omitempty"`
 
 	Version  string
-	Config   *config.Config
 	Metadata *metadata.Metadata
+	Options  *Options
 }
 
-func NewPkg(file string) (*Pkg, error) {
+func NewPkg(file string, options *Options) (*Pkg, error) {
 	if err := os.Chdir(filepath.Dir(file)); err != nil {
 		return nil, err
 	}
@@ -113,6 +119,8 @@ func NewPkg(file string) (*Pkg, error) {
 	if p.Shell == "" {
 		p.Shell = "/bin/sh"
 	}
+
+	p.Options = options
 
 	return p, nil
 }
