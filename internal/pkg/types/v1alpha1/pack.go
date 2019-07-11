@@ -110,7 +110,7 @@ func (p *Pkg) Pack() error {
 		args = append(args, "--cache-from="+p.Options.CacheFrom)
 	}
 
-	args = append(args, "--cache-from="+p.Options.CacheFrom)
+	args = append(args, ".")
 
 	return cmd("docker", args...)
 }
