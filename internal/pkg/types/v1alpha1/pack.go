@@ -104,11 +104,11 @@ func (p *Pkg) Pack() error {
 	}
 
 	if p.Options.CacheTo != "" {
-		args = append(args, p.Options.CacheTo)
+		args = append(args, "--cache-to="+p.Options.CacheTo)
 	}
 
 	if p.Options.CacheFrom != "" {
-		args = append(args, p.Options.CacheFrom)
+		args = append(args, "--cache-from="+p.Options.CacheFrom)
 	}
 
 	return cmd("docker", args...)
