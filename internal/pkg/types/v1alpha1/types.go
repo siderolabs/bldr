@@ -17,6 +17,8 @@ import (
 )
 
 type Options struct {
+	CacheTo      string
+	CacheFrom    string
 	Organization string
 	Platform     string
 	Progress     string
