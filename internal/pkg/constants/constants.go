@@ -1,5 +1,7 @@
 package constants
 
 var (
-	Version string
+	DefaultRegistry     string
+	DefaultOrganization string
+	Version             string
 )

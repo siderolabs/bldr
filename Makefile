@@ -11,6 +11,8 @@ BUILD := docker buildx build
 COMMON_ARGS := --progress=$(PROGRESS)
 COMMON_ARGS += --platform=$(PLATFORM)
 COMMON_ARGS += --build-arg=VERSION=$(TAG)
+COMMON_ARGS += --build-arg=USERNAME=$(USERNAME)
+COMMON_ARGS += --build-arg=REGISTRY=$(REGISTRY)
 
 PKGS := alpine scratch bldr
 
