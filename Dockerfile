@@ -17,7 +17,9 @@ RUN go list -mod=readonly all >/dev/null
 FROM base AS build
 COPY . .
 ARG VERSION
-RUN GOOS=linux CGO_ENABLED=0 go build  -a -ldflags "-extldflags \"-static\" -s -w -X github.com/talos-systems/bldr/internal/pkg/constants.Version=${VERSION}" -o /bldr .
+ARG USERNAME
+ARG REGISTRY
+RUN GOOS=linux CGO_ENABLED=0 go build  -a -ldflags "-extldflags \"-static\" -s -w -X github.com/talos-systems/bldr/internal/pkg/constants.Version=${VERSION} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultOrganization=${USERNAME} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultRegistry=${REGISTRY}" -o /bldr .
 FROM scratch AS bldr
 COPY --from=build /bldr /bldr
 

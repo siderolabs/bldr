@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/spf13/cobra"
+	"github.com/talos-systems/bldr/internal/pkg/constants"
 	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha1"
 )
 
@@ -31,13 +32,12 @@ about a number of things.
 }
 
 func init() {
-	packCmd.Flags().StringVarP(&options.Registry, "registry", "r", "docker.io", "Docker registry to tag the image with")
-	packCmd.Flags().StringVarP(&options.Organization, "organization", "o", "", "Docker organization to tag the image with")
+	packCmd.Flags().StringVarP(&options.Registry, "registry", "r", constants.DefaultRegistry, "Docker registry to tag the image with")
+	packCmd.Flags().StringVarP(&options.Organization, "organization", "o", constants.DefaultOrganization, "Docker organization to tag the image with")
 	packCmd.Flags().StringVarP(&options.Platform, "platform", "", "linux/amd64", "Passed through to docker build command")
 	packCmd.Flags().StringVarP(&options.Progress, "progress", "", "auto", "Passed through to docker build command")
 	packCmd.Flags().StringVarP(&options.Push, "push", "", "false", "Passed through to docker build command")
 	packCmd.Flags().StringVarP(&options.CacheTo, "cache-to", "", "", "Passed through to docker build command")
 	packCmd.Flags().StringVarP(&options.CacheFrom, "cache-from", "", "", "Passed through to docker build command")
-	packCmd.MarkFlagRequired("organization")
 	rootCmd.AddCommand(packCmd)
 }
