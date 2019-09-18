@@ -11,7 +11,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"sync"
 
 	"github.com/hashicorp/go-multierror"
 	"golang.org/x/sys/unix"
@@ -156,62 +155,58 @@ func download(url, filepath string) error {
 }
 
 func verify(filepath string, s256, s512 string) error {
-	var (
-		result *multierror.Error
-		wg     sync.WaitGroup
-	)
-
-	wg.Add(2)
+	errCh := make(chan error)
 
 	// Verify SHA256
-
 	go func(filepath string) {
-		defer wg.Done()
-		f, err := os.Open(filepath)
-		if err != nil {
-			result = multierror.Append(result, xerrors.Errorf("%w", err))
-			return
-		}
+		errCh <- func() error {
+			f, err := os.Open(filepath)
+			if err != nil {
+				return xerrors.Errorf("%w", err)
+			}
+			defer f.Close()
 
-		hash256 := sha256.New()
-		if _, err := io.Copy(hash256, f); err != nil {
-			result = multierror.Append(result, xerrors.Errorf("%w", err))
-			return
-		}
-		sum256 := hash256.Sum(nil)
-		sha256 := hex.EncodeToString(sum256)
-		if sha256 != s256 {
-			result = multierror.Append(result, xerrors.Errorf("sha256 checksum mismatch, %s != %s", sha256, s256))
-			return
-		}
+			hash256 := sha256.New()
+			if _, err := io.Copy(hash256, f); err != nil {
+				return xerrors.Errorf("%w", err)
+			}
+			sum256 := hash256.Sum(nil)
+			sha256 := hex.EncodeToString(sum256)
+			if sha256 != s256 {
+				return xerrors.Errorf("sha256 checksum mismatch, %s != %s", sha256, s256)
+			}
 
+			return nil
+		}()
 	}(filepath)
 
 	// Verify SHA512
-
 	go func(filepath string) {
-		defer wg.Done()
-		f, err := os.Open(filepath)
-		if err != nil {
-			result = multierror.Append(result, xerrors.Errorf("%w", err))
-			return
-		}
+		errCh <- func() error {
+			f, err := os.Open(filepath)
+			if err != nil {
+				return xerrors.Errorf("%w", err)
+			}
 
-		hash512 := sha512.New()
-		if _, err := io.Copy(hash512, f); err != nil {
-			result = multierror.Append(result, xerrors.Errorf("%w", err))
-			return
-		}
-		sum512 := hash512.Sum(nil)
-		sha512 := hex.EncodeToString(sum512)
-		if sha512 != s512 {
-			result = multierror.Append(result, xerrors.Errorf("sha512 checksum mismatch, %s != %s", sha512, s512))
-			return
-		}
+			hash512 := sha512.New()
+			if _, err := io.Copy(hash512, f); err != nil {
+				return xerrors.Errorf("%w", err)
+			}
+			sum512 := hash512.Sum(nil)
+			sha512 := hex.EncodeToString(sum512)
+			if sha512 != s512 {
+				return xerrors.Errorf("sha512 checksum mismatch, %s != %s", sha512, s512)
+			}
 
+			return nil
+		}()
 	}(filepath)
 
-	wg.Wait()
+	var result *multierror.Error
+
+	for i := 0; i < 2; i++ {
+		result = multierror.Append(result, <-errCh)
+	}
 
 	return result.ErrorOrNil()
 }
