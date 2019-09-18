@@ -4,8 +4,10 @@ name: default
 
 services:
   - name: docker
-    image: docker:19.03.0-rc3-dind
+    image: docker:19.03-dind
     privileged: true
+    entrypoint:
+    - dockerd
     command:
       - --dns=8.8.8.8
       - --dns=8.8.4.4
