@@ -1,4 +1,4 @@
-FROM alpine:3.9 AS base
+FROM alpine:3.10 AS base
 RUN apk add build-base ca-certificates go
 WORKDIR /src
 COPY ./go.mod ./
@@ -33,7 +33,7 @@ WORKDIR /pkg
 ENTRYPOINT ["/bldr"]
 CMD ["build"]
 
-FROM alpine:3.9 AS alpine
+FROM alpine:3.10 AS alpine
 ARG TARGETPLATFORM
 ENV TARGETPLATFORM ${TARGETPLATFORM}
 ARG BUILDPLATFORM
