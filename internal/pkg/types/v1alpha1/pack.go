@@ -8,6 +8,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/talos-systems/bldr/internal/pkg/cached"
 	"github.com/talos-systems/bldr/internal/pkg/constants"
 	"github.com/talos-systems/gitmeta/pkg/git"
 	"github.com/talos-systems/gitmeta/pkg/metadata"
@@ -16,12 +17,13 @@ import (
 
 const tpl = `
 {{- $metadata := .Metadata -}}
+{{- $options := .Options -}}
 FROM {{ .Bldr }} AS build
 SHELL [ "{{ .Shell }}", "-c" ]
 {{ with .Install -}}
 {{ .AsDockerRun }}
 {{ end -}}{{ range $dep := .Dependencies -}}
-{{ $dep.AsDockerCopy $metadata }}
+{{ $dep.AsDockerCopy $metadata $options }}
 {{ end -}}
 COPY . .
 RUN /bldr build
@@ -33,6 +35,8 @@ COPY --from=build {{ $f.From }} {{ $f.To }}
 {{ end -}}
 {{ end -}}
 `
+
+var templateEngine cached.StringTemplate
 
 func (p *Pkg) Pack() error {
 	if p.Variant == Scratch && p.Install != nil {
@@ -119,12 +123,14 @@ func (i Install) AsDockerRun() string {
 	return fmt.Sprintf("RUN apk add --no-cache %s", strings.Join(i, " "))
 }
 
-func (d *Dependency) AsDockerCopy(m *metadata.Metadata) string {
+func (d *Dependency) AsDockerCopy(m *metadata.Metadata, opt *Options) string {
 	if d.To == "" {
 		d.To = "/"
 	}
 
-	return fmt.Sprintf("COPY --from=%s / %s", d.Image, d.To)
+	return fmt.Sprintf("COPY --from=%s / %s",
+		templateEngine.MustExecute(d.Image, opt),
+		d.To)
 }
 
 func push(m *metadata.Metadata) string {
