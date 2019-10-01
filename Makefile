@@ -14,7 +14,7 @@ COMMON_ARGS += --build-arg=VERSION=$(TAG)
 COMMON_ARGS += --build-arg=USERNAME=$(USERNAME)
 COMMON_ARGS += --build-arg=REGISTRY=$(REGISTRY)
 
-PKGS := alpine scratch bldr
+PKGS := frontend bldr
 
 all: $(PKGS)
 
@@ -27,18 +27,9 @@ bldr:
 	-f ./Dockerfile \
 	.
 
-.PHONY: scratch
-scratch:
+.PHONY: frontend
+frontend:
 
-	$(BUILD) $(COMMON_ARGS) \
-	--push=$(PUSH) \
-	--target=$@ \
-	--tag $(REGISTRY_AND_USERNAME)/bldr:$(TAG)-$@ \
-	-f ./Dockerfile \
-	.
-
-.PHONY: alpine
-alpine:
 	$(BUILD) $(COMMON_ARGS) \
 	--push=$(PUSH) \
 	--target=$@ \

@@ -5,10 +5,15 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/talos-systems/bldr/internal/pkg/environment"
 )
 
 var (
-	pkgFile string
+	pkgRoot string
+	options = &environment.Options{
+		BuildPlatform:  environment.LinuxAmd64,
+		TargetPlatform: environment.LinuxAmd64,
+	}
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -37,5 +42,5 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	rootCmd.PersistentFlags().StringVarP(&pkgFile, "file", "f", "pkg.yaml", "The path to a pkg YAML")
+	rootCmd.PersistentFlags().StringVarP(&pkgRoot, "root", "", ".", "The path to a pkg root")
 }
