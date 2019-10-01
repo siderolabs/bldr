@@ -1,0 +1,21 @@
+package environment
+
+import (
+	"fmt"
+
+	"github.com/talos-systems/bldr/internal/pkg/constants"
+	"github.com/talos-systems/bldr/internal/pkg/types"
+)
+
+// Default returns default values for environment variables
+func Default() types.Variables {
+	return types.Variables{
+		"CFLAGS":    "-g0 -Os",
+		"CXXFLAGS":  "-g0 -Os",
+		"LDFLAGS":   "-s",
+		"VENDOR":    "talos",
+		"SYSROOT":   "/talos",
+		"TOOLCHAIN": "/toolchain",
+		"PATH":      fmt.Sprintf("/toolchain/bin:%s", constants.DefaultPath),
+	}
+}
