@@ -4,7 +4,7 @@ name: default
 
 services:
   - name: docker
-    image: docker:19.03-dind
+    image: docker:19.03.3-rc1-dind
     privileged: true
     entrypoint:
     - dockerd
@@ -28,6 +28,7 @@ steps:
     image: autonomy/build-container:latest
     pull: always
     commands:
+      - docker buildx create --driver docker-container --platform linux/amd64 --name local --use
       - make PLATFORM=linux/amd64 PUSH=false
     volumes:
       - name: docker-socket
@@ -46,6 +47,7 @@ steps:
       DOCKER_PASSWORD:
         from_secret: docker_password
     commands:
+      - docker buildx create --driver docker-container --platform linux/amd64 --name local --use
       - docker login --username "$${DOCKER_USERNAME}" --password "$${DOCKER_PASSWORD}"
       - make PLATFORM=linux/amd64 PUSH=true
     volumes:
