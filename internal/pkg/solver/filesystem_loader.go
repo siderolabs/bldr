@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 package solver
 
 import (
@@ -19,27 +23,11 @@ type FilesystemPackageLoader struct {
 	Context types.Variables
 
 	absRootPath string
+	pkgs        []*v1alpha2.Pkg
 }
 
-// Load implements PackageLoader
-func (fspl *FilesystemPackageLoader) Load() ([]*v1alpha2.Pkg, error) {
-	if fspl.Logger == nil {
-		fspl.Logger = log.New(log.Writer(), "[loader] ", log.Flags())
-	}
-
-	if fspl.Root == "" {
-		fspl.Root = "."
-	}
-
-	var err error
-	fspl.absRootPath, err = filepath.Abs(fspl.Root)
-	if err != nil {
-		return nil, err
-	}
-
-	var pkgs []*v1alpha2.Pkg
-
-	err = filepath.Walk(fspl.Root, func(path string, info os.FileInfo, err error) error {
+func (fspl *FilesystemPackageLoader) walkFunc() filepath.WalkFunc {
+	return func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			fspl.Logger.Printf("error walking %q: %s", path, err)
 			return nil
@@ -60,13 +48,35 @@ func (fspl *FilesystemPackageLoader) Load() ([]*v1alpha2.Pkg, error) {
 				return nil
 			}
 			fspl.Logger.Printf("loaded pkg %q from %q", pkg.Name, path)
-			pkgs = append(pkgs, pkg)
+			fspl.pkgs = append(fspl.pkgs, pkg)
 		}
 
 		return nil
-	})
+	}
+}
 
-	return pkgs, err
+// Load implements PackageLoader
+func (fspl *FilesystemPackageLoader) Load() ([]*v1alpha2.Pkg, error) {
+	if fspl.Logger == nil {
+		fspl.Logger = log.New(log.Writer(), "[loader] ", log.Flags())
+	}
+
+	if fspl.Root == "" {
+		fspl.Root = "."
+	}
+
+	var err error
+
+	fspl.absRootPath, err = filepath.Abs(fspl.Root)
+	if err != nil {
+		return nil, err
+	}
+
+	fspl.pkgs = nil
+
+	err = filepath.Walk(fspl.Root, fspl.walkFunc())
+
+	return fspl.pkgs, err
 }
 
 func (fspl *FilesystemPackageLoader) loadPkg(path string) (*v1alpha2.Pkg, error) {
@@ -84,7 +94,8 @@ func (fspl *FilesystemPackageLoader) loadPkg(path string) (*v1alpha2.Pkg, error)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+
+	defer f.Close() //nolint: errcheck
 
 	contents, err := ioutil.ReadAll(f)
 	if err != nil {

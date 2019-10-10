@@ -1,3 +1,8 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+// Package cmd contains definitions of CLI commands.
 package cmd
 
 import (
@@ -19,16 +24,14 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "bldr",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "A tool to build and manage software via Pkgfile and pkg.yaml",
+	Long: `bldr usually works in buildkit frontend mode when it's not directly
+exposed as a CLI tool. In that mode of operation bldr loads root Pkgfile and
+a set of pkg.yamls, processes them, builds dependency graph and outputs it
+as LLB graph to buildkit backend.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+bldr can be also used to procude graph of dependencies between build steps and
+output LLB directly which is useful for development or debugging.`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

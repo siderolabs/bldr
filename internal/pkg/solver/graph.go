@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 package solver
 
 import (
@@ -18,6 +22,7 @@ type PackageNode struct {
 // DumpDot dumps node and dependencies
 func (node *PackageNode) DumpDot(g *dot.Graph) dot.Node {
 	n := g.Node(node.Name)
+
 	for _, dep := range node.DependsOn {
 		n.Edge(dep.DumpDot(g))
 	}

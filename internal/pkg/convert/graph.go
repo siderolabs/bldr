@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 package convert
 
 import (
@@ -54,6 +58,7 @@ func (graph *GraphLLB) buildBaseImages() {
 		for key := range vars {
 			keys = append(keys, key)
 		}
+
 		sort.Strings(keys)
 
 		for _, key := range keys {

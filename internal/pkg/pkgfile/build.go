@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 package pkgfile
 
 import (
@@ -27,11 +31,11 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 	options.Target = opts[keyTarget]
 
 	if opts[keyBuildPlatform] != "" {
-		options.BuildPlatform.Set(opts[keyBuildPlatform])
+		options.BuildPlatform.Set(opts[keyBuildPlatform]) //nolint: errcheck
 	}
 
 	if opts[keyTargetPlatform] != "" {
-		options.TargetPlatform.Set(opts[keyTargetPlatform])
+		options.TargetPlatform.Set(opts[keyTargetPlatform]) //nolint: errcheck
 	}
 
 	pkgRef, err := fetchPkgs(ctx, c)
@@ -64,6 +68,7 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal local source: %q", err)
 	}
+
 	res, err := c.Solve(ctx, client.SolveRequest{
 		Definition: def.ToPB(),
 	})

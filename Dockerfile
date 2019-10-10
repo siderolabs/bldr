@@ -4,12 +4,16 @@ FROM golang:1.13.1-alpine AS base
 ENV GO111MODULE on
 ENV GOPROXY https://proxy.golang.org
 ENV CGO_ENABLED 0
+RUN apk --update --no-cache add bash curl
+RUN curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b /bin v1.20.0
 WORKDIR /src
 COPY ./go.mod ./
 COPY ./go.sum ./
 RUN go mod download
 RUN go mod verify
-COPY . .
+COPY ./cmd ./cmd
+COPY ./internal ./internal
+COPY ./main.go ./main.go
 RUN go list -mod=readonly all >/dev/null
 
 FROM base AS build
@@ -20,6 +24,10 @@ RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux CGO_ENABLED=0 \
     go build \
     -ldflags "-extldflags \"-static\" -s -w -X github.com/talos-systems/bldr/internal/pkg/constants.Version=${VERSION} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultOrganization=${USERNAME} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultRegistry=${REGISTRY}" \
     -o /bldr .
+
+FROM base AS lint
+COPY hack/golang/golangci-lint.yaml .
+RUN --mount=type=cache,target=/root/.cache/go-build golangci-lint run --config golangci-lint.yaml
 
 FROM scratch AS bldr
 COPY --from=build /bldr /bldr

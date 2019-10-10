@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 package cmd
 
 import (
@@ -70,7 +74,7 @@ See https://gcc.gnu.org/onlinedocs/gccint/Configure-Terms.html for a detailed de
 
 func init() {
 	llbCmd.Flags().StringVarP(&options.Target, "target", "t", "", "Target image to build")
-	llbCmd.MarkFlagRequired("target")
+	llbCmd.MarkFlagRequired("target") //nolint: errcheck
 	llbCmd.Flags().Var(&options.BuildPlatform, "build-platform", "Build platform")
 	llbCmd.Flags().Var(&options.TargetPlatform, "target-platform", "Target platform")
 	rootCmd.AddCommand(llbCmd)

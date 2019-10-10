@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 package solver
 
 import (
@@ -24,6 +28,7 @@ func NewPackages(loader PackageLoader) (*Packages, error) {
 
 	for _, pkg := range pkgs {
 		name := pkg.Name
+
 		if dup, exists := result.packages[name]; exists {
 			return nil, fmt.Errorf("package %q already exists, duplicate in dirs %q and %q", name, pkg.BaseDir, dup.BaseDir)
 		}

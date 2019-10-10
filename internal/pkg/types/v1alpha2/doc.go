@@ -2,16 +2,5 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+// Package v1alpha2 contains type definitions for `pkg.yaml`
 package v1alpha2
-
-// Shell is a path to the shell used to execute Instructions
-type Shell string
-
-// Get returns current shell
-func (sh Shell) Get() string {
-	if sh == "" {
-		return "/bin/sh"
-	}
-
-	return string(sh)
-}
