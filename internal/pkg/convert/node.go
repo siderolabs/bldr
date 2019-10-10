@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 package convert
 
 import (
@@ -57,13 +61,13 @@ func (node *NodeLLB) install(root llb.State) llb.State {
 	return root
 }
 
-func (node *NodeLLB) context(root llb.State) (llb.State, error) {
+func (node *NodeLLB) context(root llb.State) llb.State {
 	relPath := node.Pkg.BaseDir
 
 	return root.File(
 		llb.Copy(node.Graph.LocalContext, filepath.Join("/", relPath), pkgDir, defaultCopyOptions),
 		llb.WithCustomNamef(node.Prefix+"context %s -> %s", relPath, pkgDir),
-	), nil
+	)
 }
 
 func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
@@ -72,6 +76,7 @@ func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
 			depState llb.State
 			srcName  string
 		)
+
 		if dep.IsInternal() {
 			for _, depNode := range node.DependsOn {
 				if depNode.Name != dep.Stage {
@@ -79,11 +84,14 @@ func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
 				}
 
 				var err error
+
 				depState, err = NewNodeLLB(depNode, node.Graph).Build()
 				if err != nil {
 					return llb.Scratch(), err
 				}
+
 				srcName = depNode.Name
+
 				break
 			}
 		} else {
@@ -103,6 +111,7 @@ func (node *NodeLLB) stepTmpDir(root llb.State, i int, step *v1alpha2.Step) llb.
 	if step.TmpDir == "" {
 		step.TmpDir = fmt.Sprintf(tmpDirTemplate, i)
 	}
+
 	return root.File(
 		llb.Mkdir(step.TmpDir, constants.DefaultDirMode, llb.WithParents(true)),
 		llb.WithCustomName(node.Prefix+"mkdir "+step.TmpDir),
@@ -145,6 +154,7 @@ func (node *NodeLLB) stepEnvironment(root llb.State, step v1alpha2.Step) llb.Sta
 	for key := range vars {
 		keys = append(keys, key)
 	}
+
 	sort.Strings(keys)
 
 	for _, key := range keys {
@@ -173,7 +183,6 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 				llb.WithCustomName(fmt.Sprintf("%s%s-%d", node.Prefix, script.Desc, i)),
 			).Root()
 		}
-
 	}
 
 	return root
@@ -197,6 +206,7 @@ func (node *NodeLLB) finalize(root llb.State) llb.State {
 			llb.WithCustomNamef(node.Prefix+"finalize %s -> %s", fin.From, fin.To),
 		)
 	}
+
 	return newroot
 }
 
@@ -206,10 +216,8 @@ func (node *NodeLLB) Build() (llb.State, error) {
 
 	root := node.base()
 	root = node.install(root)
-	root, err = node.context(root)
-	if err != nil {
-		return llb.Scratch(), err
-	}
+	root = node.context(root)
+
 	root, err = node.dependencies(root)
 	if err != nil {
 		return llb.Scratch(), err

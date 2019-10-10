@@ -16,7 +16,7 @@ COMMON_ARGS += --build-arg=REGISTRY=$(REGISTRY)
 
 PKGS := frontend bldr
 
-all: $(PKGS)
+all: $(PKGS) lint
 
 .PHONY: bldr
 bldr:
@@ -24,6 +24,13 @@ bldr:
 	$(BUILD) $(COMMON_ARGS) \
 	--target=$@ \
 	--output=type=local,dest=./out \
+	-f ./Dockerfile \
+	.
+
+.PHONY: lint
+lint:
+	$(BUILD) $(COMMON_ARGS) \
+	--target=$@ \
 	-f ./Dockerfile \
 	.
 
