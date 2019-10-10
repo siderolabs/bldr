@@ -24,7 +24,21 @@ func (node *PackageNode) DumpDot(g *dot.Graph) dot.Node {
 	n := g.Node(node.Name)
 
 	for _, dep := range node.DependsOn {
-		n.Edge(dep.DumpDot(g))
+		depNode := dep.DumpDot(g)
+		if len(depNode.EdgesTo(n)) == 0 {
+			depNode.Edge(n)
+		}
+	}
+
+	for _, dep := range node.Pkg.ExternalDependencies() {
+		imageNode := g.Node(dep)
+		imageNode.Box()
+		imageNode.Attr("fillcolor", "lemonchiffon")
+		imageNode.Attr("style", "filled")
+
+		if len(imageNode.EdgesTo(n)) == 0 {
+			imageNode.Edge(n)
+		}
 	}
 
 	return n

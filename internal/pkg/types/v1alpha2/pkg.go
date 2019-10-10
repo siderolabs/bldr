@@ -55,3 +55,8 @@ func NewPkg(baseDir string, contents []byte, vars types.Variables) (*Pkg, error)
 func (p *Pkg) InternalDependencies() []string {
 	return p.Dependencies.GetInternal()
 }
+
+// ExternalDependencies returns list of external images
+func (p *Pkg) ExternalDependencies() []string {
+	return p.Dependencies.GetExternal()
+}
