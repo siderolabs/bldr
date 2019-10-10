@@ -43,3 +43,14 @@ func (deps Dependencies) GetInternal() (internalDeps []string) {
 
 	return
 }
+
+// GetExternal returns list of all the external dependencies (images)
+func (deps Dependencies) GetExternal() (images []string) {
+	for _, dep := range deps {
+		if !dep.IsInternal() {
+			images = append(images, dep.Image)
+		}
+	}
+
+	return
+}
