@@ -24,20 +24,30 @@ starting from target to all the dependencies.
 			Root:    pkgRoot,
 			Context: options.GetVariables(),
 		}
+
 		packages, err := solver.NewPackages(&loader)
 		if err != nil {
 			log.Fatal(err)
 		}
-		graph, err := packages.Resolve(options.Target)
-		if err != nil {
-			log.Fatal(err)
+
+		var packageSet solver.PackageSet
+
+		if options.Target != "" {
+			graph, err := packages.Resolve(options.Target)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			packageSet = graph.ToSet()
+		} else {
+			packageSet = packages.ToSet()
 		}
-		graph.DumpDot(os.Stdout)
+
+		packageSet.DumpDot(os.Stdout)
 	},
 }
 
 func init() {
-	graphCmd.Flags().StringVarP(&options.Target, "target", "t", "", "Target image to build")
-	graphCmd.MarkFlagRequired("target") //nolint: errcheck
+	graphCmd.Flags().StringVarP(&options.Target, "target", "t", "", "Target image to graph, if not set - graph all stages")
 	rootCmd.AddCommand(graphCmd)
 }

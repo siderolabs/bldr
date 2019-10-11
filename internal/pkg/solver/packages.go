@@ -39,7 +39,11 @@ func NewPackages(loader PackageLoader) (*Packages, error) {
 	return result, nil
 }
 
-func (pkgs *Packages) resolve(name string, path []string) (*PackageNode, error) {
+func (pkgs *Packages) resolve(name string, path []string, cache map[string]*PackageNode) (*PackageNode, error) {
+	if node := cache[name]; node != nil {
+		return node, nil
+	}
+
 	pkg := pkgs.packages[name]
 	if pkg == nil {
 		return nil, fmt.Errorf("package %q not defined", name)
@@ -60,7 +64,7 @@ func (pkgs *Packages) resolve(name string, path []string) (*PackageNode, error) 
 
 	deps := pkg.InternalDependencies()
 	for _, dep := range deps {
-		depPkg, err := pkgs.resolve(dep, path)
+		depPkg, err := pkgs.resolve(dep, path, cache)
 		if err != nil {
 			return nil, fmt.Errorf("error resolving dependency %q of %q: %w", dep, name, err)
 		}
@@ -68,15 +72,29 @@ func (pkgs *Packages) resolve(name string, path []string) (*PackageNode, error) 
 		node.DependsOn = append(node.DependsOn, depPkg)
 	}
 
+	cache[name] = node
+
 	return node, nil
 }
 
 // Resolve trims down the package tree to have only deps of the target
 func (pkgs *Packages) Resolve(target string) (*PackageGraph, error) {
-	root, err := pkgs.resolve(target, nil)
+	root, err := pkgs.resolve(target, nil, make(map[string]*PackageNode))
 	if err != nil {
 		return nil, err
 	}
 
 	return &PackageGraph{root}, nil
+}
+
+// ToSet converts to set of package nodes
+func (pkgs *Packages) ToSet() (set PackageSet) {
+	for name, pkg := range pkgs.packages {
+		set = append(set, &PackageNode{
+			Name: name,
+			Pkg:  pkg,
+		})
+	}
+
+	return
 }

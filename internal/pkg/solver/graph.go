@@ -5,8 +5,6 @@
 package solver
 
 import (
-	"io"
-
 	"github.com/emicklei/dot"
 
 	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
@@ -23,11 +21,9 @@ type PackageNode struct {
 func (node *PackageNode) DumpDot(g *dot.Graph) dot.Node {
 	n := g.Node(node.Name)
 
-	for _, dep := range node.DependsOn {
-		depNode := dep.DumpDot(g)
-		if len(depNode.EdgesTo(n)) == 0 {
-			depNode.Edge(n)
-		}
+	for _, dep := range node.Pkg.InternalDependencies() {
+		depNode := g.Node(dep)
+		depNode.Edge(n)
 	}
 
 	for _, dep := range node.Pkg.ExternalDependencies() {
@@ -36,9 +32,7 @@ func (node *PackageNode) DumpDot(g *dot.Graph) dot.Node {
 		imageNode.Attr("fillcolor", "lemonchiffon")
 		imageNode.Attr("style", "filled")
 
-		if len(imageNode.EdgesTo(n)) == 0 {
-			imageNode.Edge(n)
-		}
+		imageNode.Edge(n)
 	}
 
 	return n
@@ -49,10 +43,22 @@ type PackageGraph struct {
 	Root *PackageNode
 }
 
-// DumpDot dumps whole graph in dot format
-func (graph *PackageGraph) DumpDot(w io.Writer) {
-	g := dot.NewGraph(dot.Directed)
-	graph.Root.DumpDot(g)
+func (graph *PackageGraph) flatten(set PackageSet, node *PackageNode, skip map[*PackageNode]struct{}) PackageSet {
+	if _, exists := skip[node]; exists {
+		return set
+	}
 
-	g.Write(w)
+	set = append(set, node)
+	skip[node] = struct{}{}
+
+	for _, dep := range node.DependsOn {
+		set = graph.flatten(set, dep, skip)
+	}
+
+	return set
+}
+
+// ToSet converts graph to set of nodes
+func (graph *PackageGraph) ToSet() PackageSet {
+	return graph.flatten(nil, graph.Root, make(map[*PackageNode]struct{}))
 }

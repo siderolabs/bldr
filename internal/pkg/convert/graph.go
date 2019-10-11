@@ -25,6 +25,8 @@ type GraphLLB struct {
 	BaseImages   map[v1alpha2.Variant]llb.State
 	Checksummer  llb.State
 	LocalContext llb.State
+
+	cache map[*solver.PackageNode]llb.State
 }
 
 // NewGraphLLB creates new GraphLLB and initializes shared images.
@@ -32,6 +34,7 @@ func NewGraphLLB(graph *solver.PackageGraph, options *environment.Options) *Grap
 	result := &GraphLLB{
 		PackageGraph: graph,
 		Options:      options,
+		cache:        make(map[*solver.PackageNode]llb.State),
 	}
 
 	result.buildBaseImages()
