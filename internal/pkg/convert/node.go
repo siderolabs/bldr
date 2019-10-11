@@ -6,6 +6,7 @@ package convert
 
 import (
 	"fmt"
+	"log"
 	"path/filepath"
 	"sort"
 
@@ -214,6 +215,11 @@ func (node *NodeLLB) finalize(root llb.State) llb.State {
 func (node *NodeLLB) Build() (llb.State, error) {
 	var err error
 
+	if state, ok := node.Graph.cache[node.PackageNode]; ok {
+		log.Printf("cached node %s", node.Name)
+		return state, nil
+	}
+
 	root := node.base()
 	root = node.install(root)
 	root = node.context(root)
@@ -228,6 +234,8 @@ func (node *NodeLLB) Build() (llb.State, error) {
 	}
 
 	root = node.finalize(root)
+
+	node.Graph.cache[node.PackageNode] = root
 
 	return root, nil
 }
