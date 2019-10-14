@@ -23,6 +23,8 @@ type BuildkitFrontendLoader struct {
 	Context types.Variables
 	Ref     client.Reference
 	Ctx     context.Context
+
+	pkgFile *v1alpha2.Pkgfile
 }
 
 type packageProcess func(baseDir string, contents []byte)
@@ -63,12 +65,28 @@ func (bkfl *BuildkitFrontendLoader) Load() ([]*v1alpha2.Pkg, error) {
 		bkfl.Logger = log.New(log.Writer(), "[loader] ", log.Flags())
 	}
 
+	contents, err := bkfl.Ref.ReadFile(bkfl.Ctx, client.ReadRequest{
+		Filename: constants.Pkgfile,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error loading %q: %w", constants.Pkgfile, err)
+	}
+
+	bkfl.pkgFile, err = v1alpha2.NewPkgfile(contents)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing %q: %w", constants.Pkgfile, err)
+	}
+
+	log.Printf("loaded %q", constants.Pkgfile)
+
+	bkfl.Context.Merge(bkfl.pkgFile.Vars)
+
 	var pkgs []*v1alpha2.Pkg
 
 	process := func(baseDir string, contents []byte) {
-		pkg, err := v1alpha2.NewPkg(baseDir, contents, bkfl.Context)
-		if err != nil {
-			log.Printf("skipping %q: %s", baseDir, err)
+		pkg, err2 := v1alpha2.NewPkg(baseDir, contents, bkfl.Context)
+		if err2 != nil {
+			log.Printf("skipping %q: %s", baseDir, err2)
 			return
 		}
 
@@ -76,7 +94,7 @@ func (bkfl *BuildkitFrontendLoader) Load() ([]*v1alpha2.Pkg, error) {
 		pkgs = append(pkgs, pkg)
 	}
 
-	err := bkfl.walk("/", process)
+	err = bkfl.walk("/", process)
 
 	return pkgs, err
 }

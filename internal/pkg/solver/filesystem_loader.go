@@ -5,6 +5,7 @@
 package solver
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -24,6 +25,7 @@ type FilesystemPackageLoader struct {
 
 	absRootPath string
 	pkgs        []*v1alpha2.Pkg
+	pkgFile     *v1alpha2.Pkgfile
 }
 
 func (fspl *FilesystemPackageLoader) walkFunc() filepath.WalkFunc {
@@ -72,6 +74,10 @@ func (fspl *FilesystemPackageLoader) Load() ([]*v1alpha2.Pkg, error) {
 		return nil, err
 	}
 
+	if err = fspl.loadPkgfile(); err != nil {
+		return nil, err
+	}
+
 	fspl.pkgs = nil
 
 	err = filepath.Walk(fspl.Root, fspl.walkFunc())
@@ -103,4 +109,33 @@ func (fspl *FilesystemPackageLoader) loadPkg(path string) (*v1alpha2.Pkg, error)
 	}
 
 	return v1alpha2.NewPkg(filepath.Dir(basePath), contents, fspl.Context)
+}
+
+func (fspl *FilesystemPackageLoader) loadPkgfile() error {
+	f, err := os.Open(filepath.Join(fspl.Root, constants.Pkgfile))
+	if err != nil {
+		if os.IsNotExist(err) {
+			fspl.Logger.Printf("skipping %q: %s", constants.Pkgfile, err)
+			return nil
+		}
+
+		return err
+	}
+
+	defer f.Close() //nolint: errcheck
+
+	contents, err := ioutil.ReadAll(f)
+	if err != nil {
+		return err
+	}
+
+	fspl.pkgFile, err = v1alpha2.NewPkgfile(contents)
+	if err != nil {
+		return fmt.Errorf("error parsing %q: %w", constants.Pkgfile, err)
+	}
+
+	fspl.Context.Merge(fspl.pkgFile.Vars)
+	fspl.Logger.Printf("loaded %q", constants.Pkgfile)
+
+	return nil
 }
