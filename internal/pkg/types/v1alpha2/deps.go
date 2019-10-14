@@ -4,11 +4,18 @@
 
 package v1alpha2
 
+import (
+	"fmt"
+
+	"github.com/hashicorp/go-multierror"
+)
+
 // Dependency on another image or stage
 type Dependency struct {
-	Image string `yaml:"image,omitempty"`
-	Stage string `yaml:"stage,omitempty"`
-	To    string `yaml:"to,omitempty"`
+	Image   string `yaml:"image,omitempty"`
+	Stage   string `yaml:"stage,omitempty"`
+	To      string `yaml:"to,omitempty"`
+	Runtime bool   `yaml:"runtime,omitempty"`
 }
 
 // IsInternal checks whether dependency is internal to some stage
@@ -30,27 +37,29 @@ func (d *Dependency) Dest() string {
 	return "/"
 }
 
+// Validate the dependency
+func (d *Dependency) Validate() error {
+	if d.Image != "" && d.Stage != "" {
+		return fmt.Errorf("dependency can't have both image & stage set: %q, %q", d.Image, d.Stage)
+	}
+
+	if d.Image == "" && d.Stage == "" {
+		return fmt.Errorf("either image or stage should be set for the dependency")
+	}
+
+	return nil
+}
+
 // Dependencies is a list of Depency
 type Dependencies []Dependency
 
-// GetInternal returns list of all the internal dependencies
-func (deps Dependencies) GetInternal() (internalDeps []string) {
+// Validate dependencies
+func (deps Dependencies) Validate() error {
+	var multiErr *multierror.Error
+
 	for _, dep := range deps {
-		if dep.IsInternal() {
-			internalDeps = append(internalDeps, dep.Stage)
-		}
+		multiErr = multierror.Append(multiErr, dep.Validate())
 	}
 
-	return
-}
-
-// GetExternal returns list of all the external dependencies (images)
-func (deps Dependencies) GetExternal() (images []string) {
-	for _, dep := range deps {
-		if !dep.IsInternal() {
-			images = append(images, dep.Image)
-		}
-	}
-
-	return
+	return multiErr.ErrorOrNil()
 }

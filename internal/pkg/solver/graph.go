@@ -5,34 +5,55 @@
 package solver
 
 import (
+	"fmt"
+
 	"github.com/emicklei/dot"
 
 	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
 )
 
+// PackageDependency wraps v1alpha2.Depency with resolved internal deps
+type PackageDependency struct {
+	v1alpha2.Dependency
+
+	// Pkg is set only for Internal dependencies
+	Node *PackageNode
+}
+
+// ID returns unique string for dependency
+func (dep PackageDependency) ID() string {
+	return fmt.Sprintf("%s-%s-%s", dep.Image, dep.Stage, dep.To)
+}
+
 // PackageNode is a Pkg with associated dependencies
 type PackageNode struct {
-	Pkg       *v1alpha2.Pkg
-	Name      string
-	DependsOn []*PackageNode
+	Pkg          *v1alpha2.Pkg
+	Name         string
+	Dependencies []PackageDependency
 }
 
 // DumpDot dumps node and dependencies
 func (node *PackageNode) DumpDot(g *dot.Graph) dot.Node {
 	n := g.Node(node.Name)
 
-	for _, dep := range node.Pkg.InternalDependencies() {
-		depNode := g.Node(dep)
-		depNode.Edge(n)
-	}
+	for _, dep := range node.Dependencies {
+		var depNode dot.Node
 
-	for _, dep := range node.Pkg.ExternalDependencies() {
-		imageNode := g.Node(dep)
-		imageNode.Box()
-		imageNode.Attr("fillcolor", "lemonchiffon")
-		imageNode.Attr("style", "filled")
+		if dep.IsInternal() {
+			depNode = g.Node(dep.Stage)
+		} else {
+			depNode = g.Node(dep.Image)
+			depNode.Box()
+			depNode.Attr("fillcolor", "lemonchiffon")
+			depNode.Attr("style", "filled")
+		}
 
-		imageNode.Edge(n)
+		edge := depNode.Edge(n)
+
+		if dep.Runtime {
+			edge.Attr("style", "bold")
+			edge.Attr("color", "forestgreen")
+		}
 	}
 
 	for _, dep := range node.Pkg.Install {
@@ -45,6 +66,22 @@ func (node *PackageNode) DumpDot(g *dot.Graph) dot.Node {
 	}
 
 	return n
+}
+
+// RuntimeDependencies returns (recursively) all the runtime dependencies for the package
+func (node *PackageNode) RuntimeDependencies() (deps []PackageDependency) {
+	for _, dep := range node.Dependencies {
+		if !dep.Runtime {
+			continue
+		}
+
+		deps = append(deps, dep)
+		if dep.Node != nil {
+			deps = append(deps, dep.Node.RuntimeDependencies()...)
+		}
+	}
+
+	return
 }
 
 // PackageGraph capture root of the DAG
@@ -60,8 +97,10 @@ func (graph *PackageGraph) flatten(set PackageSet, node *PackageNode, skip map[*
 	set = append(set, node)
 	skip[node] = struct{}{}
 
-	for _, dep := range node.DependsOn {
-		set = graph.flatten(set, dep, skip)
+	for _, dep := range node.Dependencies {
+		if dep.Node != nil {
+			set = graph.flatten(set, dep.Node, skip)
+		}
 	}
 
 	return set

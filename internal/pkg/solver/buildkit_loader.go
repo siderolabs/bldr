@@ -69,6 +69,7 @@ func (bkfl *BuildkitFrontendLoader) Load() ([]*v1alpha2.Pkg, error) {
 		pkg, err := v1alpha2.NewPkg(baseDir, contents, bkfl.Context)
 		if err != nil {
 			log.Printf("skipping %q: %s", baseDir, err)
+			return
 		}
 
 		log.Printf("loaded pkg %q from %q", pkg.Name, baseDir)
