@@ -8,9 +8,10 @@ import (
 	"bytes"
 	"text/template"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/talos-systems/bldr/internal/pkg/constants"
 	"github.com/talos-systems/bldr/internal/pkg/types"
-	"gopkg.in/yaml.v2"
 )
 
 // Pkg represents build instructions for a single package
