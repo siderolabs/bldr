@@ -62,14 +62,21 @@ func (pkgs *Packages) resolve(name string, path []string, cache map[string]*Pack
 		Name: name,
 	}
 
-	deps := pkg.InternalDependencies()
-	for _, dep := range deps {
-		depPkg, err := pkgs.resolve(dep, path, cache)
-		if err != nil {
-			return nil, fmt.Errorf("error resolving dependency %q of %q: %w", dep, name, err)
+	for _, dep := range pkg.Dependencies {
+		nodeDep := PackageDependency{
+			Dependency: dep,
 		}
 
-		node.DependsOn = append(node.DependsOn, depPkg)
+		if dep.IsInternal() {
+			depPkg, err := pkgs.resolve(dep.Stage, path, cache)
+			if err != nil {
+				return nil, fmt.Errorf("error resolving dependency %q of %q: %w", dep.Stage, name, err)
+			}
+
+			nodeDep.Node = depPkg
+		}
+
+		node.Dependencies = append(node.Dependencies, nodeDep)
 	}
 
 	cache[name] = node
@@ -90,9 +97,15 @@ func (pkgs *Packages) Resolve(target string) (*PackageGraph, error) {
 // ToSet converts to set of package nodes
 func (pkgs *Packages) ToSet() (set PackageSet) {
 	for name, pkg := range pkgs.packages {
+		dependencies := make([]PackageDependency, len(pkg.Dependencies))
+		for i := range pkg.Dependencies {
+			dependencies[i].Dependency = pkg.Dependencies[i]
+		}
+
 		set = append(set, &PackageNode{
-			Name: name,
-			Pkg:  pkg,
+			Name:         name,
+			Pkg:          pkg,
+			Dependencies: dependencies,
 		})
 	}
 

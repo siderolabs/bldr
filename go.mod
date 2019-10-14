@@ -4,9 +4,9 @@ go 1.13
 
 require (
 	github.com/emicklei/dot v0.10.1
+	github.com/hashicorp/go-multierror v1.0.0
 	github.com/moby/buildkit v0.6.2-0.20190921015714-10cef0c6e178
 	github.com/opencontainers/go-digest v1.0.0-rc1
-	github.com/otiai10/copy v1.0.2
 	github.com/spf13/cobra v0.0.4
 	golang.org/x/text v0.3.2 // indirect
 	golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7

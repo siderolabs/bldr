@@ -48,15 +48,14 @@ func NewPkg(baseDir string, contents []byte, vars types.Variables) (*Pkg, error)
 		return nil, err
 	}
 
+	if err := p.Validate(); err != nil {
+		return nil, err
+	}
+
 	return p, nil
 }
 
-// InternalDependencies returns list of internal dependencies names
-func (p *Pkg) InternalDependencies() []string {
-	return p.Dependencies.GetInternal()
-}
-
-// ExternalDependencies returns list of external images
-func (p *Pkg) ExternalDependencies() []string {
-	return p.Dependencies.GetExternal()
+// Validate the Pkg
+func (p *Pkg) Validate() error {
+	return p.Dependencies.Validate()
 }

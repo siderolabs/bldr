@@ -72,29 +72,45 @@ func (node *NodeLLB) context(root llb.State) llb.State {
 }
 
 func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
-	for _, dep := range node.Pkg.Dependencies {
+	deps := make([]solver.PackageDependency, 0, len(node.Dependencies))
+
+	// collect all the dependencies including transitive runtime dependencies
+	// into a list, and then build LLB deduplicating dependencies on the fly
+
+	// order is preserved in general with runtime dependencies following direct dependency,
+	// but due to deduplication all the duplicates are removed (only first appearance
+	// stays in the list)
+
+	for _, dep := range node.Dependencies {
+		deps = append(deps, dep)
+		if dep.Node != nil {
+			deps = append(deps, dep.Node.RuntimeDependencies()...)
+		}
+	}
+
+	seen := map[string]struct{}{}
+
+	for _, dep := range deps {
+		if _, alreadyProcessed := seen[dep.ID()]; alreadyProcessed {
+			continue
+		}
+
+		seen[dep.ID()] = struct{}{}
+
 		var (
 			depState llb.State
 			srcName  string
 		)
 
 		if dep.IsInternal() {
-			for _, depNode := range node.DependsOn {
-				if depNode.Name != dep.Stage {
-					continue
-				}
+			var err error
 
-				var err error
-
-				depState, err = NewNodeLLB(depNode, node.Graph).Build()
-				if err != nil {
-					return llb.Scratch(), err
-				}
-
-				srcName = depNode.Name
-
-				break
+			depState, err = NewNodeLLB(dep.Node, node.Graph).Build()
+			if err != nil {
+				return llb.Scratch(), err
 			}
+
+			srcName = dep.Node.Name
 		} else {
 			depState = llb.Image(dep.Image)
 			srcName = dep.Image
