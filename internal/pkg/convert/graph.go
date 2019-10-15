@@ -75,7 +75,7 @@ func (graph *GraphLLB) buildBaseImages() {
 		constants.DefaultBaseImage,
 		llb.WithCustomName("base"),
 	).Run(
-		llb.Shlex("apk --no-cache add bash ca-certificates"),
+		llb.Shlex("apk --no-cache --update add bash"),
 		llb.WithCustomName("base-apkinstall"),
 	).Run(
 		llb.Args([]string{"ln", "-svf", "/bin/bash", "/bin/sh"}),
@@ -90,7 +90,7 @@ func (graph *GraphLLB) buildChecksummer() {
 		constants.DefaultBaseImage,
 		llb.WithCustomName("cksum"),
 	).Run(
-		llb.Shlex("apk --no-cache add coreutils"),
+		llb.Shlex("apk --no-cache --update add coreutils"),
 		llb.WithCustomName("cksum-apkinstall"),
 	).Root()
 }
