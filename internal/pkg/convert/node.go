@@ -189,6 +189,7 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 		{"prepare", step.Prepare},
 		{"build", step.Build},
 		{"install", step.Install},
+		{"test", step.Test},
 	} {
 		for _, instruction := range script.Instructions {
 			root = root.Run(
