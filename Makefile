@@ -1,6 +1,6 @@
 REGISTRY ?= docker.io
 USERNAME ?= autonomy
-TAG = $(shell gitmeta image tag)
+TAG = $(shell git describe --tags --dirty --always)
 REGISTRY_AND_USERNAME := $(REGISTRY)/$(USERNAME)
 
 PLATFORM ?= linux/amd64
