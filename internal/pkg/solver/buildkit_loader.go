@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/moby/buildkit/frontend/gateway/client"
 	"github.com/talos-systems/bldr/internal/pkg/constants"
 	"github.com/talos-systems/bldr/internal/pkg/types"
@@ -83,13 +84,18 @@ func (bkfl *BuildkitFrontendLoader) Load() ([]*v1alpha2.Pkg, error) {
 
 	bkfl.Context.Merge(bkfl.pkgFile.Vars)
 
-	var pkgs []*v1alpha2.Pkg
+	var (
+		pkgs     []*v1alpha2.Pkg
+		multiErr *multierror.Error
+	)
 
 	process := func(baseDir string, contents []byte) error {
 		pkg, err2 := v1alpha2.NewPkg(baseDir, contents, bkfl.Context)
 		if err2 != nil {
 			log.Printf("error loading %q: %s", baseDir, err2)
-			return fmt.Errorf("error loading %q: %w", baseDir, err2)
+			multiErr = multierror.Append(multiErr, fmt.Errorf("error loading %q: %w", baseDir, err2))
+
+			return nil
 		}
 
 		log.Printf("loaded pkg %q from %q", pkg.Name, baseDir)
@@ -100,5 +106,5 @@ func (bkfl *BuildkitFrontendLoader) Load() ([]*v1alpha2.Pkg, error) {
 
 	err = bkfl.walk("/", process)
 
-	return pkgs, err
+	return pkgs, multierror.Append(multiErr, err).ErrorOrNil()
 }
