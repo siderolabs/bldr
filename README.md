@@ -71,7 +71,9 @@ Most common output type is pushing to the registry:
 
 Graph of dependencies could be generated via `bldr` CLI:
 
-  bldr graph
+```shell
+bldr graph
+```
 
 This command also accepts `--target` flag to graph only part of the tree
 leading to the target:
@@ -89,6 +91,15 @@ This renders graph like:
 Boxes with yellow background are external images as dependencies, white
 nodes are internal stages. Arrows present dependencies: regular arrows
 for build dependencies and green bold arrows for runtime dependencies.
+
+### Validating pkg.yaml files
+
+`bldr` always validates `pkg.yaml` files while loading them and fails the build on errors.
+Validation step could also be executed separately as the first step before running actual build:
+
+```shell
+bldr validate
+```
 
 ## Format
 

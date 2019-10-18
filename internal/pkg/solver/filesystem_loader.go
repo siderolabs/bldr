@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/talos-systems/bldr/internal/pkg/constants"
 	"github.com/talos-systems/bldr/internal/pkg/types"
 	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
@@ -25,6 +26,7 @@ type FilesystemPackageLoader struct {
 
 	absRootPath string
 	pkgs        []*v1alpha2.Pkg
+	multiErr    *multierror.Error
 	pkgFile     *v1alpha2.Pkgfile
 }
 
@@ -47,7 +49,9 @@ func (fspl *FilesystemPackageLoader) walkFunc() filepath.WalkFunc {
 			pkg, e := fspl.loadPkg(path)
 			if e != nil {
 				fspl.Logger.Printf("error loading %q: %s", path, e)
-				return fmt.Errorf("error loading %q: %w", path, e)
+				fspl.multiErr = multierror.Append(fspl.multiErr, fmt.Errorf("error loading %q: %w", path, e))
+
+				return nil
 			}
 			fspl.Logger.Printf("loaded pkg %q from %q", pkg.Name, path)
 			fspl.pkgs = append(fspl.pkgs, pkg)
@@ -82,7 +86,7 @@ func (fspl *FilesystemPackageLoader) Load() ([]*v1alpha2.Pkg, error) {
 
 	err = filepath.Walk(fspl.Root, fspl.walkFunc())
 
-	return fspl.pkgs, err
+	return fspl.pkgs, multierror.Append(fspl.multiErr, err).ErrorOrNil()
 }
 
 func (fspl *FilesystemPackageLoader) loadPkg(path string) (*v1alpha2.Pkg, error) {
