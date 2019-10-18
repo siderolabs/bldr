@@ -6,7 +6,6 @@ package convert
 
 import (
 	"fmt"
-	"log"
 	"path/filepath"
 	"sort"
 
@@ -233,7 +232,6 @@ func (node *NodeLLB) Build() (llb.State, error) {
 	var err error
 
 	if state, ok := node.Graph.cache[node.PackageNode]; ok {
-		log.Printf("cached node %s", node.Name)
 		return state, nil
 	}
 

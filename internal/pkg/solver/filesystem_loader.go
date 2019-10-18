@@ -46,8 +46,8 @@ func (fspl *FilesystemPackageLoader) walkFunc() filepath.WalkFunc {
 		if info.Name() == constants.PkgYaml {
 			pkg, e := fspl.loadPkg(path)
 			if e != nil {
-				fspl.Logger.Printf("skipping %q: %s", path, e)
-				return nil
+				fspl.Logger.Printf("error loading %q: %s", path, e)
+				return fmt.Errorf("error loading %q: %w", path, e)
 			}
 			fspl.Logger.Printf("loaded pkg %q from %q", pkg.Name, path)
 			fspl.pkgs = append(fspl.pkgs, pkg)
