@@ -1,0 +1,11 @@
+name: stage-a
+steps:
+- prepare:
+    - mkdir -p /root
+
+  build:
+    - touch /root/a
+
+finalize:
+  - from: /root
+    to: /stage-a

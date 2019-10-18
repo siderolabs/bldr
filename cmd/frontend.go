@@ -20,6 +20,14 @@ var frontendCmd = &cobra.Command{
 	Use:   "frontend",
 	Short: "Buildkit frontend for Pkgfile",
 	Long: `This command implements buildkit frontend.
+
+To activate, put following line as the first line of Pkgfile:
+
+# syntax = docker.io/autonomy/bldr:<version>-frontend
+
+Run with:
+
+  docker buildx build -f ./Pkgfile --target <target> .
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := grpcclient.RunFromEnvironment(

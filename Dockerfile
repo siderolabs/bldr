@@ -24,6 +24,10 @@ RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux CGO_ENABLED=0 \
     go build \
     -ldflags "-extldflags \"-static\" -s -w -X github.com/talos-systems/bldr/internal/pkg/constants.Version=${VERSION} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultOrganization=${USERNAME} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultRegistry=${REGISTRY}" \
     -o /bldr .
+RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux \
+    go test -c \
+    -ldflags "-extldflags \"-static\" -s -w -X github.com/talos-systems/bldr/internal/pkg/constants.Version=${VERSION} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultOrganization=${USERNAME} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultRegistry=${REGISTRY}" \
+    ./internal/pkg/integration
 
 FROM base AS lint
 COPY hack/golang/golangci-lint.yaml .
@@ -31,6 +35,9 @@ RUN --mount=type=cache,target=/root/.cache/go-build golangci-lint run --config g
 
 FROM scratch AS bldr
 COPY --from=build /bldr /bldr
+
+FROM scratch AS integration.test
+COPY --from=build /src/integration.test /integration.test
 
 FROM bldr AS frontend
 ENTRYPOINT ["/bldr", "frontend"]

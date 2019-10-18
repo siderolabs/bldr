@@ -369,7 +369,7 @@ Due to the way LLB is executed, some steps might be executed out of order if the
 When developing `bldr`, going via `dockerfile` frontend mode is not always the best way as it requires pushing frontend image each time any change is done. To help with development flow, `bldr` CLI supports `llb` command which emits LLB directly which can be piped into `buildctl`:
 
 ```shell
-bldr llb --root . --target tools | buildctl ...
+bldr llb --root . --target tools | buildctl build --local context=.
 ```
 
 LLB generated in this mode is equivalent to the LLB generated via dockerfile frontend.

@@ -18,6 +18,10 @@ var graphCmd = &cobra.Command{
 	Short: "Graph dependencies between pkgs",
 	Long: `This command outputs 'dot' formatted DAG of dependencies
 starting from target to all the dependencies.
+
+Typical usage:
+
+  bldr graph | dot -Tpng > graph.png
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		loader := solver.FilesystemPackageLoader{

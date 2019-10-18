@@ -21,23 +21,6 @@ var llbCmd = &cobra.Command{
 	Short: "Dump buildkit LLB for the build",
 	Long: `This command parses build instructions from pkg.yaml files,
 and outputs buildkit LLB to stdout. This can be used as 'bldr pack ... | buildctl ...'.
-
-A pkg.yaml can contain any number of steps that will be executed in order.
-A set of evnironment variables are available in each step:
-
-- ARCH: The architecture of the current machine.
-- BUILD: The target triple for the build machine.
-- HOST: The target triple for the intended machine where the resulting binaries will be executed.
-- TARGET: The target triple that the compiler will produce code for.
-- VENDOR: An arbitrary string used to identify the vendor of the toolchain.
-- SYSROOT:
-- CFLAGS: A preset set of flags to optimize builds.
-- CXXFLAGS: A preset set of flags to optimize builds.
-- LDFLAGS: A preset set of flags to optimize builds.
-
-The general format of a target triple is:
-	<arch><sub>-<vendor>-<sys>-<abi>
-See https://gcc.gnu.org/onlinedocs/gccint/Configure-Terms.html for a detailed description of target triples.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		loader := solver.FilesystemPackageLoader{

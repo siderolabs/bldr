@@ -1,0 +1,22 @@
+name: go
+steps:
+- sources:
+  - url: https://dl.google.com/go/go1.12.5.src.tar.gz
+    destination: go1.12.5.src.tar.gz
+    sha256: 2aa5f088cbb332e73fc3def546800616b38d3bfe6b8713b8a6404060f22503e8
+    sha512: ce64105ff71615f9d235cc7c8656b6409fc40cc90d15a28d355fadd9072d2eab842af379dd8bba0f1181715753143e4a07491e0f9e5f8df806327d7c95a34fae
+
+  prepare:
+    -  echo prepare
+
+  build:
+    - echo build
+
+  # test:
+
+  install:
+    -  echo install
+
+finalize:
+  - from: /pkg
+    to: /
