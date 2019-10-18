@@ -6,10 +6,12 @@ package v1alpha2
 
 import (
 	"bytes"
+	"errors"
 	"text/template"
 
 	"gopkg.in/yaml.v2"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/talos-systems/bldr/internal/pkg/constants"
 	"github.com/talos-systems/bldr/internal/pkg/types"
 )
@@ -21,7 +23,7 @@ type Pkg struct {
 	Shell        Shell        `yaml:"shell,omitempty"`
 	Install      Install      `yaml:"install,omitempty"`
 	Dependencies Dependencies `yaml:"dependencies,omitempty"`
-	Steps        []Step       `yaml:"steps,omitempty"`
+	Steps        Steps        `yaml:"steps,omitempty"`
 	Finalize     []Finalize   `yaml:"finalize,omitempty"`
 
 	BaseDir string `yaml:"-"`
@@ -58,5 +60,13 @@ func NewPkg(baseDir string, contents []byte, vars types.Variables) (*Pkg, error)
 
 // Validate the Pkg
 func (p *Pkg) Validate() error {
-	return p.Dependencies.Validate()
+	var multiErr *multierror.Error
+
+	if p.Name == "" {
+		multiErr = multierror.Append(multiErr, errors.New("package name can't be empty"))
+	}
+
+	multiErr = multierror.Append(multiErr, p.Steps.Validate(), p.Dependencies.Validate())
+
+	return multiErr.ErrorOrNil()
 }
