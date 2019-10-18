@@ -66,6 +66,10 @@ func (p *Pkg) Validate() error {
 		multiErr = multierror.Append(multiErr, errors.New("package name can't be empty"))
 	}
 
+	if len(p.Finalize) == 0 {
+		multiErr = multierror.Append(multiErr, errors.New("finalize steps are missing, this is going to lead to empty build"))
+	}
+
 	multiErr = multierror.Append(multiErr, p.Steps.Validate(), p.Dependencies.Validate())
 
 	return multiErr.ErrorOrNil()

@@ -1,0 +1,15 @@
+name: stage-d
+dependencies:
+- stage: stage-c
+steps:
+- prepare:
+    - mkdir -p /root
+
+  build:
+    - touch /root/d
+
+finalize:
+  - from: /root
+    to: /stage-d
+  - from: /stage-c
+    to: /stage-d

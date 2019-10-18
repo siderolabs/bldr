@@ -30,7 +30,7 @@ exposed as a CLI tool. In that mode of operation bldr loads root Pkgfile and
 a set of pkg.yamls, processes them, builds dependency graph and outputs it
 as LLB graph to buildkit backend.
 
-bldr can be also used to procude graph of dependencies between build steps and
+bldr can be also used to produce graph of dependencies between build steps and
 output LLB directly which is useful for development or debugging.`,
 }
 

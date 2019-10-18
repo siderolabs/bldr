@@ -1,0 +1,11 @@
+name: stage-c
+steps:
+- prepare:
+    - mkdir -p /root
+
+  build:
+    - cp /pkg/c /root
+
+finalize:
+  - from: /root
+    to: /stage-c

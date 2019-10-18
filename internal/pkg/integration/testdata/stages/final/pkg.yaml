@@ -1,0 +1,14 @@
+name: final
+dependencies:
+- stage: stage-a
+- stage: stage-b
+- stage: stage-d
+steps:
+- test:
+    - test -f /stage-a/a
+    - test -f /stage-b/b
+    - test -f /stage-d/c
+    - test -f /stage-d/d
+finalize:
+  - from: /
+    to: /

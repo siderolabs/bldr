@@ -27,6 +27,15 @@ bldr:
 	-f ./Dockerfile \
 	.
 
+.PHONY: integration.test
+integration.test:
+	mkdir -p out
+	$(BUILD) $(COMMON_ARGS) \
+	--target=$@ \
+	--output=type=local,dest=./out \
+	-f ./Dockerfile \
+	.
+
 .PHONY: lint
 lint:
 	$(BUILD) $(COMMON_ARGS) \
@@ -36,10 +45,13 @@ lint:
 
 .PHONY: frontend
 frontend:
-
 	$(BUILD) $(COMMON_ARGS) \
 	--push=$(PUSH) \
 	--target=$@ \
 	--tag $(REGISTRY_AND_USERNAME)/bldr:$(TAG)-$@ \
 	-f ./Dockerfile \
 	.
+
+.PHONY: integration
+integration: integration.test bldr
+	cd internal/pkg/integration && PATH="$$PWD/../../../out:$$PATH"  integration.test -test.v

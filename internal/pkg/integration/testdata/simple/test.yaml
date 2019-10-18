@@ -1,0 +1,17 @@
+---
+run:
+  - name: docker
+    runner: docker
+    target: go
+    expect: success
+  - name: buildkit
+    runner: buildkit
+    target: go
+    expect: success
+  - name: llb
+    runner: llb
+    target: go
+    expect: success
+  - name: validate
+    runner: validate
+    expect: success
