@@ -11,7 +11,9 @@ import (
 
 	"gopkg.in/yaml.v2"
 
+	"github.com/Masterminds/sprig"
 	"github.com/hashicorp/go-multierror"
+
 	"github.com/talos-systems/bldr/internal/pkg/constants"
 	"github.com/talos-systems/bldr/internal/pkg/types"
 )
@@ -37,7 +39,9 @@ func NewPkg(baseDir string, contents []byte, vars types.Variables) (*Pkg, error)
 		Variant: Alpine,
 	}
 
-	tmpl, err := template.New(constants.PkgYaml).Parse(string(contents))
+	tmpl, err := template.New(constants.PkgYaml).
+		Funcs(sprig.HermeticTxtFuncMap()).
+		Parse(string(contents))
 	if err != nil {
 		return nil, err
 	}

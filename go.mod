@@ -3,9 +3,15 @@ module github.com/talos-systems/bldr
 go 1.13
 
 require (
+	github.com/Masterminds/goutils v1.1.0 // indirect
+	github.com/Masterminds/semver v1.5.0 // indirect
+	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/alessio/shellescape v0.0.0-20190409004728-b115ca0f9053
 	github.com/emicklei/dot v0.10.1
+	github.com/google/uuid v1.1.1 // indirect
 	github.com/hashicorp/go-multierror v1.0.0
+	github.com/huandu/xstrings v1.2.0 // indirect
+	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/moby/buildkit v0.6.2-0.20190921015714-10cef0c6e178
 	github.com/opencontainers/go-digest v1.0.0-rc1
 	github.com/otiai10/copy v1.0.2

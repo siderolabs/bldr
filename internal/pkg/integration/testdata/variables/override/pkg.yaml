@@ -1,0 +1,21 @@
+name: override
+steps:
+- prepare:
+    - mkdir -p /root
+
+- test:
+    - test "x${SYSROOT:-x}" == x/talos # global vars can't override standard vars
+
+- env:
+    SYSROOT: /test2
+  test:
+    - test "x${SYSROOT:-x}" == x/test2 # local vars can override standard vars
+
+- env:
+    A: test3
+  test:
+    - test "x${A:-x}" == xtest3 # local vars can override global vars
+
+finalize:
+  - from: /root
+    to: /result

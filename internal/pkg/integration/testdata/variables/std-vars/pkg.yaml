@@ -1,0 +1,16 @@
+name: std-vars
+steps:
+-
+  prepare:
+    - mkdir -p /root
+
+  build:
+    - touch /root/{{ .VENDOR }} # std vars are available for templates
+    - mkdir  /root$TOOLCHAIN  # std vars are available as env vars
+
+  test:
+    - test "${PATH:-x}" = "{{ .PATH }}" # std vars are available as env vars and templates
+
+finalize:
+  - from: /root
+    to: /result

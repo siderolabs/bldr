@@ -2,6 +2,7 @@ REGISTRY ?= docker.io
 USERNAME ?= autonomy
 TAG = $(shell gitmeta image tag)
 REGISTRY_AND_USERNAME := $(REGISTRY)/$(USERNAME)
+RUN_TESTS ?= TestIntegration
 
 PLATFORM ?= linux/amd64
 PROGRESS ?= auto
@@ -54,4 +55,4 @@ frontend:
 
 .PHONY: integration
 integration: integration.test bldr
-	cd internal/pkg/integration && PATH="$$PWD/../../../out:$$PATH"  integration.test -test.v
+	cd internal/pkg/integration && PATH="$$PWD/../../../out:$$PATH"  integration.test -test.v -test.run $(RUN_TESTS)
