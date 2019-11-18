@@ -1,0 +1,15 @@
+name: final
+dependencies:
+  - stage: global-vars
+  - stage: std-vars
+  - stage: local-vars
+  - stage: override
+steps:
+- test:
+    - test -f /result/global_A
+    - test -f /result/global_B
+    - test -f /result/talos
+    - test -d /result/toolchain
+finalize:
+  - from: /
+    to: /

@@ -202,7 +202,7 @@ finalize:
     to: /
 ```
 
-Before loading `pkg.yaml`, `bldr` runs file contents through [Go template engine](https://godoc.org/text/template) providing merged list of built-in variables (see below) and variables provided in `Pkgfile`. Most common syntax is to render variable value with `{{ .<variable_name> }}`. Due to the YAML syntax limitations, such constructs should be quoted if they start YAML value: `"{{ .VARIABLE }}"`.
+Before loading `pkg.yaml`, `bldr` runs file contents through [Go template engine](https://godoc.org/text/template) providing merged list of built-in variables (see below) and variables provided in `Pkgfile`. Most common syntax is to render variable value with `{{ .<variable_name> }}`. Due to the YAML syntax limitations, such constructs should be quoted if they start YAML value: `"{{ .VARIABLE }}"`. Additionally, hermetic text functions from [Sprig](http://masterminds.github.io/sprig/) collection are available.
 
 On the root level, following properties are available:
 

@@ -1,0 +1,21 @@
+name: local-vars
+steps:
+- prepare:
+    - mkdir -p /root
+
+- test:
+    - test "x${lA:-x}" == xx # local vars are not available before defined
+
+- env:
+    lA: local_A
+    lB: local_B
+  build:
+    - touch /root/${lA} # local vars are available as env vars
+    - test "{{ .lA | default "bar" }}" == "bar"  # local vars are not available for templating
+
+- build:
+    - touch /root/${lB} # local vars leak into the next step
+
+finalize:
+  - from: /root
+    to: /result

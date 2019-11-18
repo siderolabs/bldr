@@ -1,0 +1,23 @@
+name: global-vars
+steps:
+- prepare:
+    - mkdir -p /root
+
+  build:
+    - touch /root/{{ .A }} # global vars are available for templating
+
+  test:
+    - test "${B:-x}" = "x" # global vars are not available as env vars
+
+- env:
+    B_copy: "{{ .B }}" # global vars can be pushed into the environment
+
+  build:
+    - touch /root/${B_copy}
+
+- test:
+    - test "${B_copy:-x}" = "global_B" # env vars leak into the next step (bug/feature?)
+
+finalize:
+  - from: /root
+    to: /result
