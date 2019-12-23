@@ -8,6 +8,7 @@ import (
 	"log"
 
 	"github.com/spf13/cobra"
+	"github.com/talos-systems/bldr/internal/pkg/environment"
 	"github.com/talos-systems/bldr/internal/pkg/solver"
 )
 
@@ -18,12 +19,17 @@ var validateCmd = &cobra.Command{
 	Long: `This command scans directory tree for pkg.yaml files,
 loads them and validates for errors. `,
 	Run: func(cmd *cobra.Command, args []string) {
-		loader := solver.FilesystemPackageLoader{
-			Root:    pkgRoot,
-			Context: options.GetVariables(),
+		options, err := environment.NewOptions()
+		if err != nil {
+			log.Fatal(err)
 		}
 
-		_, err := solver.NewPackages(&loader)
+		loader := solver.FilesystemPackageLoader{
+			Root:    pkgRoot,
+			Context: options.ToolchainPlatform.GetVariables(),
+		}
+
+		_, err = solver.NewPackages(&loader)
 		if err != nil {
 			log.Fatal(err)
 		}

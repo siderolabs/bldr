@@ -111,7 +111,7 @@ func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
 
 			srcName = dep.Node.Name
 		} else {
-			depState = llb.Image(dep.Image)
+			depState = llb.Image(dep.Image, llb.Platform(node.Graph.Options.Platform))
 			srcName = dep.Image
 		}
 

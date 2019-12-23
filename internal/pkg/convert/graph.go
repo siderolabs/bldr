@@ -55,7 +55,7 @@ func (graph *GraphLLB) buildBaseImages() {
 	}
 
 	addEnv := func(root llb.State) llb.State {
-		vars := graph.Options.GetVariables()
+		vars := graph.Options.ToolchainPlatform.GetVariables()
 		keys := make([]string, 0, len(vars))
 
 		for key := range vars {
@@ -73,6 +73,7 @@ func (graph *GraphLLB) buildBaseImages() {
 
 	graph.BaseImages[v1alpha2.Alpine] = addEnv(addPkg(llb.Image(
 		constants.DefaultBaseImage,
+		llb.Platform(graph.Options.Platform),
 		llb.WithCustomName("base"),
 	).Run(
 		llb.Shlex("apk --no-cache --update add bash"),
@@ -88,6 +89,7 @@ func (graph *GraphLLB) buildBaseImages() {
 func (graph *GraphLLB) buildChecksummer() {
 	graph.Checksummer = llb.Image(
 		constants.DefaultBaseImage,
+		llb.Platform(graph.Options.Platform),
 		llb.WithCustomName("cksum"),
 	).Run(
 		llb.Shlex("apk --no-cache --update add coreutils"),

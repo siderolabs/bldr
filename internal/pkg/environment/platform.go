@@ -12,8 +12,8 @@ import (
 	"github.com/talos-systems/bldr/internal/pkg/types"
 )
 
-// Platform describes build & target platforms
-type Platform struct {
+// ToolchainPlatform describes build & target platforms
+type ToolchainPlatform struct {
 	ID          string
 	Arch        string
 	Target      string
@@ -22,8 +22,15 @@ type Platform struct {
 	LLBPlatform llb.ConstraintsOpt
 }
 
+// GetVariables returns set of variables set for options
+func (p ToolchainPlatform) GetVariables() types.Variables {
+	return Default().
+		Merge(p.BuildVariables()).
+		Merge(p.TargetVariables())
+}
+
 // BuildVariables returns build env variables
-func (p Platform) BuildVariables() types.Variables {
+func (p ToolchainPlatform) BuildVariables() types.Variables {
 	return types.Variables{
 		"BUILD": p.Build,
 		"HOST":  p.Host,
@@ -31,19 +38,19 @@ func (p Platform) BuildVariables() types.Variables {
 }
 
 // TargetVariables returns target env variables
-func (p Platform) TargetVariables() types.Variables {
+func (p ToolchainPlatform) TargetVariables() types.Variables {
 	return types.Variables{
 		"ARCH":   p.Arch,
 		"TARGET": p.Target,
 	}
 }
 
-func (p Platform) String() string {
+func (p ToolchainPlatform) String() string {
 	return p.ID
 }
 
 // Set implements pflag.Value interface
-func (p *Platform) Set(id string) error {
+func (p *ToolchainPlatform) Set(id string) error {
 	if _, exists := Platforms[id]; !exists {
 		return fmt.Errorf("platform %q is not defined", id)
 	}
@@ -54,13 +61,13 @@ func (p *Platform) Set(id string) error {
 }
 
 // Type implements pflag.Value interface
-func (p *Platform) Type() string {
+func (p *ToolchainPlatform) Type() string {
 	return "platform"
 }
 
 // Platform definitions
 var (
-	LinuxAmd64 = Platform{
+	LinuxAmd64 = ToolchainPlatform{
 		ID:          "linux/amd64",
 		Arch:        "x86_64",
 		Target:      "x86_64-talos-linux-musl",
@@ -69,7 +76,7 @@ var (
 		LLBPlatform: llb.LinuxAmd64,
 	}
 
-	LinuxArm64 = Platform{
+	LinuxArm64 = ToolchainPlatform{
 		ID:          "linux/arm64",
 		Arch:        "aarch64",
 		Target:      "aarch64-talos-linux-musl",
@@ -78,7 +85,7 @@ var (
 		LLBPlatform: llb.LinuxArm64,
 	}
 
-	LinuxArmv7 = Platform{
+	LinuxArmv7 = ToolchainPlatform{
 		ID:          "linux/armv7",
 		Arch:        "armv7",
 		Target:      "armv7-talos-linux-musl",
@@ -89,10 +96,10 @@ var (
 )
 
 // Platforms is mapping of platform ID to Platform
-var Platforms = map[string]Platform{}
+var Platforms = map[string]ToolchainPlatform{}
 
 func init() {
-	for _, platform := range []Platform{
+	for _, platform := range []ToolchainPlatform{
 		LinuxAmd64,
 		LinuxArm64,
 		LinuxArmv7,

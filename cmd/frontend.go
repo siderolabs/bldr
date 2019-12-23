@@ -33,7 +33,7 @@ Run with:
 		if err := grpcclient.RunFromEnvironment(
 			appcontext.Context(),
 			func(ctx context.Context, c client.Client) (*client.Result, error) {
-				return pkgfile.Build(ctx, c, options)
+				return pkgfile.Build(ctx, c, platform)
 			},
 		); err != nil {
 			log.Fatal(err)

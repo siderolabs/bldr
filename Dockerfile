@@ -5,7 +5,7 @@ ENV GO111MODULE on
 ENV GOPROXY https://proxy.golang.org
 ENV CGO_ENABLED 0
 RUN apk --update --no-cache add bash curl
-RUN curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b /bin v1.20.0
+RUN curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b /bin v1.21.0
 WORKDIR /src
 COPY ./go.mod ./
 COPY ./go.sum ./
@@ -21,13 +21,13 @@ ARG VERSION
 ARG USERNAME
 ARG REGISTRY
 RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux CGO_ENABLED=0 \
-    go build \
-    -ldflags "-extldflags \"-static\" -s -w -X github.com/talos-systems/bldr/internal/pkg/constants.Version=${VERSION} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultOrganization=${USERNAME} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultRegistry=${REGISTRY}" \
-    -o /bldr .
+  go build \
+  -ldflags "-extldflags \"-static\" -s -w -X github.com/talos-systems/bldr/internal/pkg/constants.Version=${VERSION} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultOrganization=${USERNAME} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultRegistry=${REGISTRY}" \
+  -o /bldr .
 RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux \
-    go test -c \
-    -ldflags "-extldflags \"-static\" -s -w -X github.com/talos-systems/bldr/internal/pkg/constants.Version=${VERSION} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultOrganization=${USERNAME} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultRegistry=${REGISTRY}" \
-    ./internal/pkg/integration
+  go test -c \
+  -ldflags "-extldflags \"-static\" -s -w -X github.com/talos-systems/bldr/internal/pkg/constants.Version=${VERSION} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultOrganization=${USERNAME} -X github.com/talos-systems/bldr/internal/pkg/constants.DefaultRegistry=${REGISTRY}" \
+  ./internal/pkg/integration
 
 FROM base AS lint
 COPY hack/golang/golangci-lint.yaml .

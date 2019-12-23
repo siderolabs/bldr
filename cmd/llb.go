@@ -12,7 +12,13 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/talos-systems/bldr/internal/pkg/convert"
+	"github.com/talos-systems/bldr/internal/pkg/environment"
 	"github.com/talos-systems/bldr/internal/pkg/solver"
+)
+
+var (
+	target   string
+	platform string
 )
 
 // llbCmd represents the llb command
@@ -23,9 +29,24 @@ var llbCmd = &cobra.Command{
 and outputs buildkit LLB to stdout. This can be used as 'bldr pack ... | buildctl ...'.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		options, err := environment.NewOptions()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if target != "" {
+			options.Target = target
+		}
+
+		if platform != "" {
+			if err = options.Set(platform); err != nil {
+				log.Fatal(err)
+			}
+		}
+
 		loader := solver.FilesystemPackageLoader{
 			Root:    pkgRoot,
-			Context: options.GetVariables(),
+			Context: options.ToolchainPlatform.GetVariables(),
 		}
 
 		packages, err := solver.NewPackages(&loader)
@@ -43,7 +64,7 @@ and outputs buildkit LLB to stdout. This can be used as 'bldr pack ... | buildct
 			log.Fatal(err)
 		}
 
-		dt, err := out.Marshal(options.BuildPlatform.LLBPlatform)
+		dt, err := out.Marshal(options.ToolchainPlatform.LLBPlatform)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -56,9 +77,8 @@ and outputs buildkit LLB to stdout. This can be used as 'bldr pack ... | buildct
 }
 
 func init() {
-	llbCmd.Flags().StringVarP(&options.Target, "target", "t", "", "Target image to build")
+	llbCmd.Flags().StringVarP(&target, "target", "t", "", "Target image to build")
 	llbCmd.MarkFlagRequired("target") //nolint: errcheck
-	llbCmd.Flags().Var(&options.BuildPlatform, "build-platform", "Build platform")
-	llbCmd.Flags().Var(&options.TargetPlatform, "target-platform", "Target platform")
+	llbCmd.Flags().StringVar(&platform, "platform", environment.LinuxAmd64.String(), "Target platform")
 	rootCmd.AddCommand(llbCmd)
 }
