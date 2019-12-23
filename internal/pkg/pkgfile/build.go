@@ -18,24 +18,26 @@ import (
 
 const (
 	keyTarget         = "target"
-	keyBuildPlatform  = "build-platform"
-	keyTargetPlatform = "target-platform"
+	keyTargetPlatform = "platform"
 
 	localNameDockerfile = "dockerfile"
 	sharedKeyHint       = constants.PkgYaml
 )
 
 // Build is an entrypoint for buildkit frontend
-func Build(ctx context.Context, c client.Client, options *environment.Options) (*client.Result, error) {
+func Build(ctx context.Context, c client.Client, platform string) (*client.Result, error) {
+	options, err := environment.NewOptions()
+	if err != nil {
+		return nil, err
+	}
+
 	opts := c.BuildOpts().Opts
 	options.Target = opts[keyTarget]
 
-	if opts[keyBuildPlatform] != "" {
-		options.BuildPlatform.Set(opts[keyBuildPlatform]) //nolint: errcheck
-	}
-
 	if opts[keyTargetPlatform] != "" {
-		options.TargetPlatform.Set(opts[keyTargetPlatform]) //nolint: errcheck
+		if err = options.Set(opts[keyTargetPlatform]); err != nil {
+			return nil, err
+		}
 	}
 
 	pkgRef, err := fetchPkgs(ctx, c)
@@ -44,7 +46,7 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 	}
 
 	loader := solver.BuildkitFrontendLoader{
-		Context: options.GetVariables(),
+		Context: options.ToolchainPlatform.GetVariables(),
 		Ref:     pkgRef,
 		Ctx:     ctx,
 	}

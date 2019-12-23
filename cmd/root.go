@@ -10,15 +10,10 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/talos-systems/bldr/internal/pkg/environment"
 )
 
 var (
 	pkgRoot string
-	options = &environment.Options{
-		BuildPlatform:  environment.LinuxAmd64,
-		TargetPlatform: environment.LinuxAmd64,
-	}
 )
 
 // rootCmd represents the base command when called without any subcommands

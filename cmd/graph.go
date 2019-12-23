@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/talos-systems/bldr/internal/pkg/environment"
 	"github.com/talos-systems/bldr/internal/pkg/solver"
 )
 
@@ -24,9 +25,18 @@ Typical usage:
   bldr graph | dot -Tpng > graph.png
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		options, err := environment.NewOptions()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if target != "" {
+			options.Target = target
+		}
+
 		loader := solver.FilesystemPackageLoader{
 			Root:    pkgRoot,
-			Context: options.GetVariables(),
+			Context: options.ToolchainPlatform.GetVariables(),
 		}
 
 		packages, err := solver.NewPackages(&loader)
@@ -52,6 +62,6 @@ Typical usage:
 }
 
 func init() {
-	graphCmd.Flags().StringVarP(&options.Target, "target", "t", "", "Target image to graph, if not set - graph all stages")
+	graphCmd.Flags().StringVarP(&target, "target", "t", "", "Target image to graph, if not set - graph all stages")
 	rootCmd.AddCommand(graphCmd)
 }

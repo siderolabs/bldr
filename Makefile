@@ -17,7 +17,7 @@ COMMON_ARGS += --build-arg=REGISTRY=$(REGISTRY)
 
 PKGS := frontend bldr
 
-all: $(PKGS) lint
+all: lint $(PKGS)
 
 .PHONY: bldr
 bldr:
