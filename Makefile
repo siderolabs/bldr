@@ -1,6 +1,6 @@
 REGISTRY ?= docker.io
 USERNAME ?= autonomy
-TAG = $(shell gitmeta image tag)
+TAG ?= $(shell git describe --tag --always --dirty)
 REGISTRY_AND_USERNAME := $(REGISTRY)/$(USERNAME)
 RUN_TESTS ?= TestIntegration
 
