@@ -129,7 +129,7 @@ names are ignored.
 ### `Pkgfile`
 
 ```yaml
-# syntax = docker.io/autonomy/bldr:1289eba-frontend
+# syntax = docker.io/autonomy/bldr:v0.1.0-alpha.0-frontend
 
 format: v1alpha2
 
@@ -137,7 +137,7 @@ vars:
   TOOLCHAIN_IMAGE: docker.io/autonomy/toolchain:0714f82
 ```
 
-First line of the file should always be shebang which is picked up by
+First line of the file should always be magic comment which is picked up by
 dockerfile frontend of buildkit and redirects build to the `bldr` frontend.
 Version tag should match version of the `bldr` you want to use.
 
