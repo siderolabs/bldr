@@ -12,7 +12,7 @@ import (
 	"github.com/talos-systems/bldr/internal/pkg/solver"
 )
 
-// graphCmd represents the graph command
+// graphCmd represents the graph command.
 var graphCmd = &cobra.Command{
 	Use:   "graph",
 	Short: "Graph dependencies between pkgs",

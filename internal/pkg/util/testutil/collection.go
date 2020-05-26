@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-// TestCollection is a set of integration tests
+// TestCollection is a set of integration tests.
 type TestCollection struct {
 	Tests []IntegrationTest
 }

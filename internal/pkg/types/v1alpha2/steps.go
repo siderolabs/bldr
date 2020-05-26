@@ -9,10 +9,10 @@ import "github.com/hashicorp/go-multierror"
 // Environment is a set of environment variables to be set in the step.
 type Environment map[string]string
 
-// Steps is a collection of Step
+// Steps is a collection of Step.
 type Steps []Step
 
-// Validate steps
+// Validate steps.
 func (steps Steps) Validate() error {
 	var multiErr *multierror.Error
 
@@ -38,7 +38,7 @@ type Step struct {
 	TmpDir string `yaml:"-"`
 }
 
-// Validate the step
+// Validate the step.
 func (step *Step) Validate() error {
 	return step.Sources.Validate()
 }

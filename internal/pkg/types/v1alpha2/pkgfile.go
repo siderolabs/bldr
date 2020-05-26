@@ -12,13 +12,13 @@ import (
 	"github.com/talos-systems/bldr/internal/pkg/types"
 )
 
-// Pkgfile describes structure of 'Pkgfile'
+// Pkgfile describes structure of 'Pkgfile'.
 type Pkgfile struct {
 	Format string          `yaml:"format"`
 	Vars   types.Variables `yaml:"vars,omitempty"`
 }
 
-// NewPkgfile loads Pkgfile from `[]byte` contents
+// NewPkgfile loads Pkgfile from `[]byte` contents.
 func NewPkgfile(contents []byte) (*Pkgfile, error) {
 	var pkgfile Pkgfile
 

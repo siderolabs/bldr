@@ -1,0 +1,17 @@
+---
+run:
+  - name: docker-arm64
+    runner: docker
+    platform: linux/arm64
+    target: final
+    expect: success
+  - name: llb-arm64
+    runner: llb
+    platform: linux/arm64
+    target: final
+    expect: success
+  - name: buildkit-arm64
+    runner: buildkit
+    platform: linux/arm64
+    target: final
+    expect: success

@@ -84,7 +84,7 @@ func convertFinalize(old []*v1alpha1.Finalize) []v1alpha2.Finalize {
 	return new
 }
 
-// FromV1Alpha1 upgrades v1alpha1 format -> v1alpha2
+// FromV1Alpha1 upgrades v1alpha1 format -> v1alpha2.
 func FromV1Alpha1(oldPkg *v1alpha1.Pkg, stageNames []string) *v1alpha2.Pkg {
 	if oldPkg.Shell == "/bin/sh" {
 		oldPkg.Shell = ""

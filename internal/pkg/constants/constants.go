@@ -5,7 +5,7 @@
 // Package constants provides basic constants for the program
 package constants
 
-// Set of variables set during the build
+// Set of variables set during the build.
 var (
 	DefaultRegistry     string
 	DefaultOrganization string

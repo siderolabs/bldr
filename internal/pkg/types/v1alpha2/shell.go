@@ -4,10 +4,10 @@
 
 package v1alpha2
 
-// Shell is a path to the shell used to execute Instructions
+// Shell is a path to the shell used to execute Instructions.
 type Shell string
 
-// Get returns current shell
+// Get returns current shell.
 func (sh Shell) Get() string {
 	if sh == "" {
 		return "/bin/sh"

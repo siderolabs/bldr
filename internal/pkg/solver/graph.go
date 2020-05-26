@@ -12,27 +12,27 @@ import (
 	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
 )
 
-// PackageDependency wraps v1alpha2.Depency with resolved internal deps
+// PackageDependency wraps v1alpha2.Depency with resolved internal dependencies.
 type PackageDependency struct {
 	v1alpha2.Dependency
 
-	// Pkg is set only for Internal dependencies
+	// Pkg is set only for Internal dependencies.
 	Node *PackageNode
 }
 
-// ID returns unique string for dependency
+// ID returns unique string for dependency.
 func (dep PackageDependency) ID() string {
 	return fmt.Sprintf("%s-%s-%s", dep.Image, dep.Stage, dep.To)
 }
 
-// PackageNode is a Pkg with associated dependencies
+// PackageNode is a Pkg with associated dependencies.
 type PackageNode struct {
 	Pkg          *v1alpha2.Pkg
 	Name         string
 	Dependencies []PackageDependency
 }
 
-// DumpDot dumps node and dependencies
+// DumpDot dumps node and dependencies.
 func (node *PackageNode) DumpDot(g *dot.Graph) dot.Node {
 	n := g.Node(node.Name)
 
@@ -68,7 +68,7 @@ func (node *PackageNode) DumpDot(g *dot.Graph) dot.Node {
 	return n
 }
 
-// RuntimeDependencies returns (recursively) all the runtime dependencies for the package
+// RuntimeDependencies returns (recursively) all the runtime dependencies for the package.
 func (node *PackageNode) RuntimeDependencies() (deps []PackageDependency) {
 	for _, dep := range node.Dependencies {
 		if !dep.Runtime {
@@ -84,7 +84,7 @@ func (node *PackageNode) RuntimeDependencies() (deps []PackageDependency) {
 	return
 }
 
-// PackageGraph capture root of the DAG
+// PackageGraph capture root of the DAG.
 type PackageGraph struct {
 	Root *PackageNode
 }
@@ -106,7 +106,7 @@ func (graph *PackageGraph) flatten(set PackageSet, node *PackageNode, skip map[*
 	return set
 }
 
-// ToSet converts graph to set of nodes
+// ToSet converts graph to set of nodes.
 func (graph *PackageGraph) ToSet() PackageSet {
 	return graph.flatten(nil, graph.Root, make(map[*PackageNode]struct{}))
 }

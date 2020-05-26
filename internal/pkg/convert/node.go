@@ -27,7 +27,7 @@ var defaultCopyOptions = &llb.CopyInfo{
 	FollowSymlinks:      true,
 }
 
-// NodeLLB wraps PackageNode to provide LLB conversion
+// NodeLLB wraps PackageNode to provide LLB conversion.
 type NodeLLB struct {
 	*solver.PackageNode
 
@@ -35,13 +35,13 @@ type NodeLLB struct {
 	Prefix string
 }
 
-// NewNodeLLB wraps PackageNode for LLB conversion
+// NewNodeLLB wraps PackageNode for LLB conversion.
 func NewNodeLLB(node *solver.PackageNode, graph *GraphLLB) *NodeLLB {
 	return &NodeLLB{
 		PackageNode: node,
 
 		Graph:  graph,
-		Prefix: node.Name + ":",
+		Prefix: graph.Options.CommonPrefix + node.Name + ":",
 	}
 }
 
@@ -227,7 +227,7 @@ func (node *NodeLLB) finalize(root llb.State) llb.State {
 	return newroot
 }
 
-// Build converts PackageNode to buildkit LLB
+// Build converts PackageNode to buildkit LLB.
 func (node *NodeLLB) Build() (llb.State, error) {
 	var err error
 

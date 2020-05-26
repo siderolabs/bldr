@@ -12,10 +12,10 @@ import (
 	"github.com/hashicorp/go-multierror"
 )
 
-// Sources is a collection of Source
+// Sources is a collection of Source.
 type Sources []Source
 
-// Validate sources
+// Validate sources.
 func (sources Sources) Validate() error {
 	var multiErr *multierror.Error
 
@@ -26,7 +26,7 @@ func (sources Sources) Validate() error {
 	return multiErr.ErrorOrNil()
 }
 
-// Source describe build source to be downloaded
+// Source describe build source to be downloaded.
 type Source struct {
 	URL         string `yaml:"url,omitempty"`
 	Destination string `yaml:"destination,omitempty"`
@@ -34,12 +34,12 @@ type Source struct {
 	SHA512      string `yaml:"sha512,omitempty"`
 }
 
-// ToSHA512Sum returns in format of line expected by 'sha512sum'
+// ToSHA512Sum returns in format of line expected by 'sha512sum'.
 func (source *Source) ToSHA512Sum() []byte {
 	return []byte(source.SHA512 + " *" + source.Destination + "\n")
 }
 
-// Validate source
+// Validate source.
 func (source *Source) Validate() error {
 	var multiErr *multierror.Error
 

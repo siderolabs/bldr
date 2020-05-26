@@ -1,0 +1,12 @@
+---
+name: final
+steps:
+- test:
+    - test "${BUILD:-x}" = "aarch64-linux-musl"
+    - test "${HOST:-x}" = "aarch64-linux-musl"
+    - test "${ARCH:-x}" = "aarch64"
+    - test "${TARGET:-x}" = "aarch64-talos-linux-musl"
+    - test `uname -m` = "aarch64"
+finalize:
+  - from: /
+    to: /

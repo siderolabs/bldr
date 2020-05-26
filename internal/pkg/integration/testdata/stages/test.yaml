@@ -1,15 +1,32 @@
 ---
 run:
-  - name: docker
+  - name: docker-amd64
     runner: docker
+    platform: linux/amd64
+    target: final
+    expect: success
+  - name: docker-arm64
+    runner: docker
+    platform: linux/arm64
+    target: final
+    expect: success
+  - name: docker-multiarch
+    runner: docker
+    platform: linux/arm64,linux/amd64
     target: final
     expect: success
   - name: buildkit
     runner: buildkit
     target: final
     expect: success
-  - name: llb
+  - name: llb-amd64
     runner: llb
+    platform: linux/amd64
+    target: final
+    expect: success
+  - name: llb-arm64
+    runner: llb
+    platform: linux/arm64
     target: final
     expect: success
   - name: validate
