@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-// Run the integration test
+// Run the integration test.
 type Run interface {
 	Run(t *testing.T)
 }
@@ -48,21 +48,24 @@ func getRunner(manifest RunManifest) (Run, error) {
 			CommandRunner: CommandRunner{
 				Expect: manifest.Expect,
 			},
-			Target: manifest.Target,
+			Target:   manifest.Target,
+			Platform: manifest.Platform,
 		}, nil
 	case "buildkit":
 		return BuildkitRunner{
 			CommandRunner: CommandRunner{
 				Expect: manifest.Expect,
 			},
-			Target: manifest.Target,
+			Target:   manifest.Target,
+			Platform: manifest.Platform,
 		}, nil
 	case "llb":
 		return LLBRunner{
 			CommandRunner: CommandRunner{
 				Expect: manifest.Expect,
 			},
-			Target: manifest.Target,
+			Target:   manifest.Target,
+			Platform: manifest.Platform,
 		}, nil
 	case "validate":
 		return ValidateRunner{

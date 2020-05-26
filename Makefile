@@ -4,7 +4,8 @@ TAG ?= $(shell git describe --tag --always --dirty)
 REGISTRY_AND_USERNAME := $(REGISTRY)/$(USERNAME)
 RUN_TESTS ?= TestIntegration
 
-PLATFORM ?= linux/amd64
+BUILD_PLATFORM ?= linux/amd64
+PLATFORM ?= linux/amd64,linux/arm64
 PROGRESS ?= auto
 PUSH ?= false
 
@@ -55,4 +56,4 @@ frontend:
 
 .PHONY: integration
 integration: integration.test bldr
-	cd internal/pkg/integration && PATH="$$PWD/../../../out:$$PATH"  integration.test -test.v -test.run $(RUN_TESTS)
+	cd internal/pkg/integration && PATH="$$PWD/../../../out/$(subst /,_,$(BUILD_PLATFORM)):$$PATH"  integration.test -test.v -test.run $(RUN_TESTS)

@@ -10,17 +10,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// TestManifest describes single integration test in test.ymal.
+// TestManifest describes single integration test in test.yaml.
 type TestManifest struct {
 	Runs []RunManifest `yaml:"run"`
 }
 
 // RunManifest describes single run of integration test.
 type RunManifest struct {
-	Name   string `yaml:"name"`
-	Runner string `yaml:"runner"`
-	Target string `yaml:"target"`
-	Expect string `yaml:"expect"`
+	Name     string `yaml:"name"`
+	Runner   string `yaml:"runner"`
+	Platform string `yaml:"platform"`
+	Target   string `yaml:"target"`
+	Expect   string `yaml:"expect"`
 }
 
 // NewTestManifest loads TestManifest from test.yaml file.

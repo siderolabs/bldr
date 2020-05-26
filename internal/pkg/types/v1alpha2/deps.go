@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 )
 
-// Dependency on another image or stage
+// Dependency on another image or stage.
 type Dependency struct {
 	Image   string `yaml:"image,omitempty"`
 	Stage   string `yaml:"stage,omitempty"`
@@ -18,17 +18,17 @@ type Dependency struct {
 	Runtime bool   `yaml:"runtime,omitempty"`
 }
 
-// IsInternal checks whether dependency is internal to some stage
+// IsInternal checks whether dependency is internal to some stage.
 func (d *Dependency) IsInternal() bool {
 	return d.Stage != ""
 }
 
-// Src returns copy source (from dependency)
+// Src returns copy source (from dependency).
 func (d *Dependency) Src() string {
 	return "/"
 }
 
-// Dest returns copy destination (to base)
+// Dest returns copy destination (to base).
 func (d *Dependency) Dest() string {
 	if d.To != "" {
 		return d.To
@@ -37,7 +37,7 @@ func (d *Dependency) Dest() string {
 	return "/"
 }
 
-// Validate the dependency
+// Validate the dependency.
 func (d *Dependency) Validate() error {
 	if d.Image != "" && d.Stage != "" {
 		return fmt.Errorf("dependency can't have both image & stage set: %q, %q", d.Image, d.Stage)
@@ -50,10 +50,10 @@ func (d *Dependency) Validate() error {
 	return nil
 }
 
-// Dependencies is a list of Depency
+// Dependencies is a list of Depency.
 type Dependencies []Dependency
 
-// Validate dependencies
+// Validate dependencies.
 func (deps Dependencies) Validate() error {
 	var multiErr *multierror.Error
 

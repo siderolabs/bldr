@@ -5,24 +5,34 @@
 package testutil
 
 import (
+	"log"
 	"os/exec"
 	"sync"
 	"testing"
 )
 
-// DockerRunner runs bldr via docker buildx
+// DockerRunner runs bldr via docker buildx.
 type DockerRunner struct {
 	CommandRunner
-	Target string
+	Target   string
+	Platform string
 }
 
-// Run implements Run interface
+// Run implements Run interface.
 func (runner DockerRunner) Run(t *testing.T) {
 	if err := IsDockerAvailable(); err != nil {
 		t.Skipf("docker buildx is not available: %q", err)
 	}
 
-	cmd := exec.Command("docker", "buildx", "build", "-f", "./Pkgfile", "--target", runner.Target, ".")
+	args := []string{"buildx", "build", "-f", "./Pkgfile", "--target", runner.Target}
+
+	if runner.Platform != "" {
+		args = append(args, "--platform", runner.Platform)
+	}
+
+	log.Printf("args = %v", args)
+
+	cmd := exec.Command("docker", append(args, ".")...)
 
 	runner.run(t, cmd, "docker buildx")
 }
@@ -32,7 +42,7 @@ var (
 	dockerCheckError error
 )
 
-// IsDockerAvailable returns nil if docker buildx is ready to use
+// IsDockerAvailable returns nil if docker buildx is ready to use.
 func IsDockerAvailable() error {
 	dockerCheckOnce.Do(func() {
 		dockerCheckError = exec.Command("docker", "buildx", "ls").Run()

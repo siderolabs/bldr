@@ -15,7 +15,7 @@ import (
 	"github.com/talos-systems/bldr/internal/pkg/pkgfile"
 )
 
-// frontendCmd represents the frontend command
+// frontendCmd represents the frontend command.
 var frontendCmd = &cobra.Command{
 	Use:   "frontend",
 	Short: "Buildkit frontend for Pkgfile",

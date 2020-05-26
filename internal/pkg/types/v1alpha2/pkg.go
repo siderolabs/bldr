@@ -18,7 +18,7 @@ import (
 	"github.com/talos-systems/bldr/internal/pkg/types"
 )
 
-// Pkg represents build instructions for a single package
+// Pkg represents build instructions for a single package.
 type Pkg struct {
 	Name         string       `yaml:"name,omitempty"`
 	Variant      Variant      `yaml:"variant,omitempty"`
@@ -31,7 +31,7 @@ type Pkg struct {
 	BaseDir string `yaml:"-"`
 }
 
-// NewPkg loads Pkg structure from file
+// NewPkg loads Pkg structure from file.
 func NewPkg(baseDir string, contents []byte, vars types.Variables) (*Pkg, error) {
 	p := &Pkg{
 		BaseDir: baseDir,
@@ -62,7 +62,7 @@ func NewPkg(baseDir string, contents []byte, vars types.Variables) (*Pkg, error)
 	return p, nil
 }
 
-// Validate the Pkg
+// Validate the Pkg.
 func (p *Pkg) Validate() error {
 	var multiErr *multierror.Error
 

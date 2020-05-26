@@ -6,13 +6,13 @@ package v1alpha2
 
 import "fmt"
 
-// Variant is a kind of base build image
+// Variant is a kind of base build image.
 type Variant int
 
 const (
-	// Alpine variant uses Alpine as base image for the build
+	// Alpine variant uses Alpine as base image for the build.
 	Alpine Variant = iota
-	// Scratch variant uses scratch image as base image for the build
+	// Scratch variant uses scratch image as base image for the build.
 	Scratch
 )
 
@@ -20,7 +20,7 @@ func (v Variant) String() string {
 	return []string{"alpine", "scratch"}[v]
 }
 
-// UnmarshalYAML implements yaml.Unmarshaller interface
+// UnmarshalYAML implements yaml.Unmarshaller interface.
 func (v *Variant) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var aux string
 
@@ -45,7 +45,7 @@ func (v *Variant) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	return nil
 }
 
-// MarshalYAML implements yaml.Marshaller interface
+// MarshalYAML implements yaml.Marshaller interface.
 func (v Variant) MarshalYAML() (interface{}, error) {
 	return v.String(), nil
 }

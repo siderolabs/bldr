@@ -7,22 +7,25 @@ package environment
 import (
 	"fmt"
 
+	"github.com/containerd/containerd/platforms"
 	"github.com/moby/buildkit/client/llb"
+	specs "github.com/opencontainers/image-spec/specs-go/v1"
 
 	"github.com/talos-systems/bldr/internal/pkg/types"
 )
 
-// Platform describes build & target platforms
+// Platform describes build & target platforms.
 type Platform struct {
-	ID          string
-	Arch        string
-	Target      string
-	Build       string
-	Host        string
-	LLBPlatform llb.ConstraintsOpt
+	ID           string
+	Arch         string
+	Target       string
+	Build        string
+	Host         string
+	LLBPlatform  llb.ConstraintsOpt
+	PlatformSpec specs.Platform
 }
 
-// BuildVariables returns build env variables
+// BuildVariables returns build env variables.
 func (p Platform) BuildVariables() types.Variables {
 	return types.Variables{
 		"BUILD": p.Build,
@@ -30,7 +33,7 @@ func (p Platform) BuildVariables() types.Variables {
 	}
 }
 
-// TargetVariables returns target env variables
+// TargetVariables returns target env variables.
 func (p Platform) TargetVariables() types.Variables {
 	return types.Variables{
 		"ARCH":   p.Arch,
@@ -42,7 +45,7 @@ func (p Platform) String() string {
 	return p.ID
 }
 
-// Set implements pflag.Value interface
+// Set implements pflag.Value interface.
 func (p *Platform) Set(id string) error {
 	if _, exists := Platforms[id]; !exists {
 		return fmt.Errorf("platform %q is not defined", id)
@@ -53,42 +56,45 @@ func (p *Platform) Set(id string) error {
 	return nil
 }
 
-// Type implements pflag.Value interface
+// Type implements pflag.Value interface.
 func (p *Platform) Type() string {
 	return "platform"
 }
 
-// Platform definitions
+// Platform definitions.
 var (
 	LinuxAmd64 = Platform{
-		ID:          "linux/amd64",
-		Arch:        "x86_64",
-		Target:      "x86_64-talos-linux-musl",
-		Build:       "x86_64-linux-musl",
-		Host:        "x86_64-linux-musl",
-		LLBPlatform: llb.LinuxAmd64,
+		ID:           "linux/amd64",
+		Arch:         "x86_64",
+		Target:       "x86_64-talos-linux-musl",
+		Build:        "x86_64-linux-musl",
+		Host:         "x86_64-linux-musl",
+		LLBPlatform:  llb.LinuxAmd64,
+		PlatformSpec: platforms.MustParse("linux/amd64"),
 	}
 
 	LinuxArm64 = Platform{
-		ID:          "linux/arm64",
-		Arch:        "aarch64",
-		Target:      "aarch64-talos-linux-musl",
-		Build:       "aarch64-linux-musl",
-		Host:        "aarch64-linux-musl",
-		LLBPlatform: llb.LinuxArm64,
+		ID:           "linux/arm64",
+		Arch:         "aarch64",
+		Target:       "aarch64-talos-linux-musl",
+		Build:        "aarch64-linux-musl",
+		Host:         "aarch64-linux-musl",
+		LLBPlatform:  llb.LinuxArm64,
+		PlatformSpec: platforms.MustParse("linux/arm64"),
 	}
 
 	LinuxArmv7 = Platform{
-		ID:          "linux/armv7",
-		Arch:        "armv7",
-		Target:      "armv7-talos-linux-musl",
-		Build:       "armv7-linux-musl",
-		Host:        "armv7-linux-musl",
-		LLBPlatform: llb.LinuxArmhf,
+		ID:           "linux/armv7",
+		Arch:         "armv7",
+		Target:       "armv7-talos-linux-musl",
+		Build:        "armv7-linux-musl",
+		Host:         "armv7-linux-musl",
+		LLBPlatform:  llb.LinuxArmhf,
+		PlatformSpec: platforms.MustParse("linux/arm7"),
 	}
 )
 
-// Platforms is mapping of platform ID to Platform
+// Platforms is mapping of platform ID to Platform.
 var Platforms = map[string]Platform{}
 
 func init() {

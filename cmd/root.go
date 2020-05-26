@@ -8,10 +8,13 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/spf13/cobra"
 	"github.com/talos-systems/bldr/internal/pkg/environment"
 )
+
+const defaultPlatform = (runtime.GOOS + "/" + runtime.GOARCH)
 
 var (
 	pkgRoot string
@@ -21,7 +24,7 @@ var (
 	}
 )
 
-// rootCmd represents the base command when called without any subcommands
+// rootCmd represents the base command when called without any subcommands.
 var rootCmd = &cobra.Command{
 	Use:   "bldr",
 	Short: "A tool to build and manage software via Pkgfile and pkg.yaml",
@@ -35,6 +38,7 @@ output LLB directly which is useful for development or debugging.`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
+//
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
@@ -46,4 +50,7 @@ func Execute() {
 func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	rootCmd.PersistentFlags().StringVarP(&pkgRoot, "root", "", ".", "The path to a pkg root")
+
+	options.BuildPlatform.Set(defaultPlatform)  //nolint: errcheck
+	options.TargetPlatform.Set(defaultPlatform) //nolint: errcheck
 }

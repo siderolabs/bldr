@@ -11,28 +11,33 @@ import (
 	"testing"
 )
 
-// BuildkitRunner runs bldr via buildctl/buildkit
+// BuildkitRunner runs bldr via buildctl/buildkit.
 type BuildkitRunner struct {
 	CommandRunner
-	Target string
+	Target   string
+	Platform string
 }
 
-// Run implements Run interface
+// Run implements Run interface.
 func (runner BuildkitRunner) Run(t *testing.T) {
 	if err := IsBuildkitAvailable(); err != nil {
 		t.Skipf("buildkit is not available: %q", err)
 	}
 
-	cmd := exec.Command("buildctl",
-		append(getBuildkitGlobalFlags(),
-			"build",
-			"--frontend", "dockerfile.v0",
-			"--local", "context=.",
-			"--local", "dockerfile=.",
-			"--opt", "filename=Pkgfile",
-			"--opt", "target="+runner.Target,
-		)...,
+	args := append(getBuildkitGlobalFlags(),
+		"build",
+		"--frontend", "dockerfile.v0",
+		"--local", "context=.",
+		"--local", "dockerfile=.",
+		"--opt", "filename=Pkgfile",
+		"--opt", "target="+runner.Target,
 	)
+
+	if runner.Platform != "" {
+		args = append(args, "--opt", "platform="+runner.Platform)
+	}
+
+	cmd := exec.Command("buildctl", args...)
 
 	runner.run(t, cmd, "buildkit")
 }
@@ -52,7 +57,7 @@ var (
 	buildkitCheckError error
 )
 
-// IsBuildkitAvailable returns nil if buildkit is ready to use
+// IsBuildkitAvailable returns nil if buildkit is ready to use.
 func IsBuildkitAvailable() error {
 	buildkitCheckOnce.Do(func() {
 		buildkitCheckError = exec.Command("buildctl", append(getBuildkitGlobalFlags(), "debug", "workers")...).Run()

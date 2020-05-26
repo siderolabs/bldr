@@ -118,6 +118,7 @@ linters:
     - funlen
     - godox
     - gocognit
+    - goerr113
   disable-all: false
   fast: false
 

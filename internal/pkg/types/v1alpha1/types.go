@@ -5,9 +5,8 @@
 package v1alpha1
 
 import (
+	"fmt"
 	"io/ioutil"
-
-	"golang.org/x/xerrors"
 
 	"gopkg.in/yaml.v2"
 )
@@ -76,7 +75,7 @@ func (v *Variant) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	case Scratch.String():
 		val = Scratch
 	default:
-		return xerrors.Errorf("unknown variant %q")
+		return fmt.Errorf("unknown variant %q")
 	}
 	*v = val
 

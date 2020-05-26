@@ -18,7 +18,7 @@ import (
 	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
 )
 
-// FilesystemPackageLoader loads packages by walking file system tree
+// FilesystemPackageLoader loads packages by walking file system tree.
 type FilesystemPackageLoader struct {
 	*log.Logger
 	Root    string
@@ -53,6 +53,7 @@ func (fspl *FilesystemPackageLoader) walkFunc() filepath.WalkFunc {
 
 				return nil
 			}
+
 			fspl.Logger.Printf("loaded pkg %q from %q", pkg.Name, path)
 			fspl.pkgs = append(fspl.pkgs, pkg)
 		}
@@ -61,7 +62,7 @@ func (fspl *FilesystemPackageLoader) walkFunc() filepath.WalkFunc {
 	}
 }
 
-// Load implements PackageLoader
+// Load implements PackageLoader.
 func (fspl *FilesystemPackageLoader) Load() ([]*v1alpha2.Pkg, error) {
 	if fspl.Logger == nil {
 		fspl.Logger = log.New(log.Writer(), "[loader] ", log.Flags())

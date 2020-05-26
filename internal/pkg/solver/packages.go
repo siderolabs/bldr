@@ -10,12 +10,12 @@ import (
 	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
 )
 
-// Packages is a collect of Pkg objects with dependencies tracked
+// Packages is a collect of Pkg objects with dependencies tracked.
 type Packages struct {
 	packages map[string]*v1alpha2.Pkg
 }
 
-// NewPackages builds Packages using PackageLoader
+// NewPackages builds Packages using PackageLoader.
 func NewPackages(loader PackageLoader) (*Packages, error) {
 	pkgs, err := loader.Load()
 	if err != nil {
@@ -84,7 +84,7 @@ func (pkgs *Packages) resolve(name string, path []string, cache map[string]*Pack
 	return node, nil
 }
 
-// Resolve trims down the package tree to have only deps of the target
+// Resolve trims down the package tree to have only deps of the target.
 func (pkgs *Packages) Resolve(target string) (*PackageGraph, error) {
 	root, err := pkgs.resolve(target, nil, make(map[string]*PackageNode))
 	if err != nil {
@@ -94,7 +94,7 @@ func (pkgs *Packages) Resolve(target string) (*PackageGraph, error) {
 	return &PackageGraph{root}, nil
 }
 
-// ToSet converts to set of package nodes
+// ToSet converts to set of package nodes.
 func (pkgs *Packages) ToSet() (set PackageSet) {
 	for name, pkg := range pkgs.packages {
 		dependencies := make([]PackageDependency, len(pkg.Dependencies))

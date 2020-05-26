@@ -11,7 +11,7 @@ import (
 	"github.com/talos-systems/bldr/internal/pkg/solver"
 )
 
-// validateCmd represents the graph command
+// validateCmd represents the validate command.
 var validateCmd = &cobra.Command{
 	Use:   "validate",
 	Short: "Validate syntax of pkg.yaml files",

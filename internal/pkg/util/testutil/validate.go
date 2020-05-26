@@ -9,12 +9,12 @@ import (
 	"testing"
 )
 
-// ValidateRunner runs bldr validate
+// ValidateRunner runs bldr validate.
 type ValidateRunner struct {
 	CommandRunner
 }
 
-// Run implements Run interface
+// Run implements Run interface.
 func (runner ValidateRunner) Run(t *testing.T) {
 	cmd := exec.Command("bldr", "validate")
 

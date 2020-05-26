@@ -11,7 +11,7 @@ import (
 	"github.com/talos-systems/bldr/internal/pkg/types"
 )
 
-// Default returns default values for environment variables
+// Default returns default values for environment variables.
 func Default() types.Variables {
 	return types.Variables{
 		"CFLAGS":    "-g0 -Os",

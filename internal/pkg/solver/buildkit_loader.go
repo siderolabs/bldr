@@ -18,7 +18,7 @@ import (
 	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
 )
 
-// BuildkitFrontendLoader loads packages from buildkit client.Reference
+// BuildkitFrontendLoader loads packages from buildkit client.Reference.
 type BuildkitFrontendLoader struct {
 	*log.Logger
 	Context types.Variables
@@ -62,7 +62,7 @@ func (bkfl *BuildkitFrontendLoader) walk(path string, process packageProcess) er
 	return nil
 }
 
-// Load implements PackageLoader
+// Load implements PackageLoader.
 func (bkfl *BuildkitFrontendLoader) Load() ([]*v1alpha2.Pkg, error) {
 	if bkfl.Logger == nil {
 		bkfl.Logger = log.New(log.Writer(), "[loader] ", log.Flags())

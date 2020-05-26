@@ -27,11 +27,17 @@ steps:
     image: autonomy/build-container:latest
     pull: always
     environment:
-      REGISTRY: registry.ci.svc:5000
-      PLATFORM: linux/amd64
-      BUILDKIT_HOST: ${BUILDKIT_HOST=tcp://buildkitd.ci.svc:1234}
+      PLATFORM: linux/amd64,linux/arm64
+      SSH_KEY:
+        from_secret: ssh_key
+      DOCKER_USERNAME:
+        from_secret: docker_username
+      DOCKER_PASSWORD:
+        from_secret: docker_password
     commands:
-      - docker buildx create --driver docker-container --platform linux/amd64 --name local --config hack/buildkit.conf --use
+      - install-ci-key
+      - setup-buildx-amd64-arm64
+      - docker login --username "$${DOCKER_USERNAME}" --password "$${DOCKER_PASSWORD}"
       - make # build everything
       - make frontend PUSH=true  # push only frontend for integration tests
       - make integration
@@ -47,14 +53,15 @@ steps:
     image: autonomy/build-container:latest
     pull: always
     environment:
-      PLATFORM: linux/amd64
+      PLATFORM: linux/amd64,linux/arm64
       BUILDKIT_HOST: ${BUILDKIT_HOST=tcp://buildkitd.ci.svc:1234}
       DOCKER_USERNAME:
         from_secret: docker_username
       DOCKER_PASSWORD:
         from_secret: docker_password
     commands:
-      - docker buildx create --driver docker-container --platform linux/amd64 --name local --use
+      - install-ci-key
+      - setup-buildx-amd64-arm64
       - docker login --username "$${DOCKER_USERNAME}" --password "$${DOCKER_PASSWORD}"
       - make PUSH=true
       - make integration

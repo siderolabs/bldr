@@ -15,7 +15,7 @@ import (
 	"github.com/talos-systems/bldr/internal/pkg/solver"
 )
 
-// llbCmd represents the llb command
+// llbCmd represents the llb command.
 var llbCmd = &cobra.Command{
 	Use:   "llb",
 	Short: "Dump buildkit LLB for the build",
@@ -38,12 +38,7 @@ and outputs buildkit LLB to stdout. This can be used as 'bldr pack ... | buildct
 			log.Fatal(err)
 		}
 
-		out, err := convert.BuildLLB(graph, options)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		dt, err := out.Marshal(options.BuildPlatform.LLBPlatform)
+		dt, err := convert.MarshalLLB(graph, options)
 		if err != nil {
 			log.Fatal(err)
 		}
