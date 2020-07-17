@@ -138,7 +138,7 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 			} else {
 				k := ctrplatforms.Format(platform.PlatformSpec)
 				res.AddMeta(fmt.Sprintf("%s/%s", exptypes.ExporterImageConfigKey, k), config)
-				res.AddRef(platform.ID, ref)
+				res.AddRef(k, ref)
 				expPlatforms.Platforms[i] = exptypes.Platform{
 					ID:       k,
 					Platform: platform.PlatformSpec,
