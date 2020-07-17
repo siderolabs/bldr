@@ -55,6 +55,8 @@ steps:
     environment:
       PLATFORM: linux/amd64,linux/arm64
       BUILDKIT_HOST: ${BUILDKIT_HOST=tcp://buildkitd.ci.svc:1234}
+      SSH_KEY:
+        from_secret: ssh_key
       DOCKER_USERNAME:
         from_secret: docker_username
       DOCKER_PASSWORD:
