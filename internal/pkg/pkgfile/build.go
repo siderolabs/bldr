@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	ctrplatforms "github.com/containerd/containerd/platforms"
@@ -27,6 +28,7 @@ import (
 const (
 	keyTarget         = "target"
 	keyTargetPlatform = "platform"
+	keyMultiPlatform  = "multi-platform"
 
 	localNameDockerfile = "dockerfile"
 	sharedKeyHint       = constants.PkgYaml
@@ -57,6 +59,19 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 
 	exportMap := len(platforms) > 1
 
+	if v := opts[keyMultiPlatform]; v != "" {
+		b, err := strconv.ParseBool(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid boolean value %s", v)
+		}
+
+		if !b && exportMap {
+			return nil, fmt.Errorf("returning multiple target plaforms is not allowed")
+		}
+
+		exportMap = b
+	}
+
 	expPlatforms := &exptypes.Platforms{
 		Platforms: make([]exptypes.Platform, len(platforms)),
 	}
@@ -74,7 +89,7 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 			options.BuildPlatform = platform
 			options.TargetPlatform = platform
 
-			if len(platforms) > 1 {
+			if exportMap {
 				options.CommonPrefix = fmt.Sprintf("%s ", platform.ID)
 			}
 
