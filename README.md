@@ -129,12 +129,15 @@ names are ignored.
 ### `Pkgfile`
 
 ```yaml
-# syntax = docker.io/autonomy/bldr:v0.1.0-alpha.0-frontend
+# syntax = ghcr.io/talos-systems/bldr:v0.2.0-alpha.3-frontend
 
 format: v1alpha2
 
 vars:
-  TOOLCHAIN_IMAGE: docker.io/autonomy/toolchain:0714f82
+  TOOLCHAIN_IMAGE: ghcr.io/talos-systems/tools:v0.3.0-8-ge86a8f3
+
+labels:
+  org.opencontainers.image.source: https://github.com/talos-systems/bldr
 ```
 
 First line of the file should always be magic comment which is picked up by
@@ -145,6 +148,7 @@ Rest of the `Pkgfile` is regular YAML file with the following fields:
 
 - `format` (*string*, *required*): format of the `pkg.yaml` files, the only allowed value today is `v1alpha2`.
 - `vars` (*map[str]str*, *optional*): set of variables which are used to process `pkg.yaml` as a template.
+- `labels` (*map[str]str*, *optional*): labels to apply to the output images (only in frontend mode).
 
 `bldr` parses `Pkgfile` as the first thing during the build, it should always
 reside at the root of the build tree.
@@ -233,7 +237,7 @@ Internal dependency:
 External dependency:
 
 ```yaml
-- image: docker.io/autonomy/toolchain:0714f82
+- image: ghcr.io/talos-systems/tools:v0.3.0-8-ge86a8f3
   runtime: false
   to: /
 ```

@@ -66,7 +66,7 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 		}
 
 		if !b && exportMap {
-			return nil, fmt.Errorf("returning multiple target plaforms is not allowed")
+			return nil, fmt.Errorf("returning multiple target platforms is not allowed")
 		}
 
 		exportMap = b
@@ -137,6 +137,11 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 					OS:           platform.PlatformSpec.OS,
 					RootFS: specs.RootFS{
 						Type: "layers",
+					},
+				},
+				Config: dockerfile2llb.ImageConfig{
+					ImageConfig: specs.ImageConfig{
+						Labels: packages.ImageLabels(),
 					},
 				},
 				Variant: platform.PlatformSpec.Variant,

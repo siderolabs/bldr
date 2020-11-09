@@ -13,20 +13,22 @@ import (
 // Packages is a collect of Pkg objects with dependencies tracked.
 type Packages struct {
 	packages map[string]*v1alpha2.Pkg
+	pkgfile  *v1alpha2.Pkgfile
 }
 
 // NewPackages builds Packages using PackageLoader.
 func NewPackages(loader PackageLoader) (*Packages, error) {
-	pkgs, err := loader.Load()
+	loadResult, err := loader.Load()
 	if err != nil {
 		return nil, err
 	}
 
 	result := &Packages{
-		packages: make(map[string]*v1alpha2.Pkg),
+		packages: make(map[string]*v1alpha2.Pkg, len(loadResult.Pkgs)),
+		pkgfile:  loadResult.Pkgfile,
 	}
 
-	for _, pkg := range pkgs {
+	for _, pkg := range loadResult.Pkgs {
 		name := pkg.Name
 
 		if dup, exists := result.packages[name]; exists {
@@ -110,4 +112,9 @@ func (pkgs *Packages) ToSet() (set PackageSet) {
 	}
 
 	return
+}
+
+// ImageLabels returns set of image labels to apply to the output image.
+func (pkgs *Packages) ImageLabels() map[string]string {
+	return pkgs.pkgfile.Labels
 }

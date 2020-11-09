@@ -8,7 +8,13 @@ import (
 	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
 )
 
+// LoadResult is a result of PackageLoader.Load function.
+type LoadResult struct {
+	Pkgfile *v1alpha2.Pkgfile
+	Pkgs    []*v1alpha2.Pkg
+}
+
 // PackageLoader implements some way to fetch collection of Pkgs.
 type PackageLoader interface {
-	Load() ([]*v1alpha2.Pkg, error)
+	Load() (*LoadResult, error)
 }

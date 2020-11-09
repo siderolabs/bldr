@@ -14,8 +14,9 @@ import (
 
 // Pkgfile describes structure of 'Pkgfile'.
 type Pkgfile struct {
-	Format string          `yaml:"format"`
-	Vars   types.Variables `yaml:"vars,omitempty"`
+	Format string            `yaml:"format"`
+	Vars   types.Variables   `yaml:"vars,omitempty"`
+	Labels map[string]string `yaml:"labels,omitempty"`
 }
 
 // NewPkgfile loads Pkgfile from `[]byte` contents.

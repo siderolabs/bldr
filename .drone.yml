@@ -1,49 +1,35 @@
 ---
 kind: pipeline
 name: default
+type: kubernetes
 
-services:
-  - name: docker
-    image: docker:19.03.3-rc1-dind
-    privileged: true
-    entrypoint:
-    - dockerd
-    command:
-      - --mtu=1440
-      - --insecure-registry=registry.ci.svc:5000
+steps:
+  - name: setup-ci
+    image: autonomy/build-container:latest
+    commands:
+      - git fetch --tags
+      - install-ci-key
+      - setup-buildx-amd64-arm64
     volumes:
       - name: docker-socket
         path: /var/run
-
-steps:
-  - name: fetch
-    image: docker:git
-    commands:
-      - git fetch --tags
-    when:
-      event: tag
+      - name: docker
+        path: /root/.docker/buildx
 
   - name: build-and-test
     image: autonomy/build-container:latest
     pull: always
     environment:
       PLATFORM: linux/amd64,linux/arm64
-      SSH_KEY:
-        from_secret: ssh_key
-      DOCKER_USERNAME:
-        from_secret: docker_username
-      DOCKER_PASSWORD:
-        from_secret: docker_password
+      REGISTRY: registry.dev.talos-systems.io
     commands:
-      - install-ci-key
-      - setup-buildx-amd64-arm64
-      - docker login --username "$${DOCKER_USERNAME}" --password "$${DOCKER_PASSWORD}"
-      - make # build everything
-      - make frontend PUSH=true  # push only frontend for integration tests
+      - make PUSH=true
       - make integration
     volumes:
       - name: docker-socket
         path: /var/run
+      - name: docker
+        path: /root/.docker/buildx
     when:
       event:
         include:
@@ -54,22 +40,19 @@ steps:
     pull: always
     environment:
       PLATFORM: linux/amd64,linux/arm64
-      BUILDKIT_HOST: ${BUILDKIT_HOST=tcp://buildkitd.ci.svc:1234}
-      SSH_KEY:
-        from_secret: ssh_key
-      DOCKER_USERNAME:
-        from_secret: docker_username
-      DOCKER_PASSWORD:
-        from_secret: docker_password
+      GHCR_USERNAME:
+        from_secret: ghcr_username
+      GHCR_PASSWORD:
+        from_secret: ghcr_token
     commands:
-      - install-ci-key
-      - setup-buildx-amd64-arm64
-      - docker login --username "$${DOCKER_USERNAME}" --password "$${DOCKER_PASSWORD}"
+      - docker login ghcr.io --username "$${GHCR_USERNAME}" --password "$${GHCR_PASSWORD}"
       - make PUSH=true
       - make integration
     volumes:
       - name: docker-socket
         path: /var/run
+      - name: docker
+        path: /root/.docker/buildx
     when:
       event:
         exclude:
@@ -77,10 +60,15 @@ steps:
 
 volumes:
   - name: docker-socket
+    host:
+      path: /var/ci-docker
+  - name: docker
     temp: {}
+
 ---
 kind: pipeline
 name: notify
+type: kubernetes
 
 clone:
   disable: true
