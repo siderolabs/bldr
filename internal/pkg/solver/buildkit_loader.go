@@ -63,7 +63,7 @@ func (bkfl *BuildkitFrontendLoader) walk(path string, process packageProcess) er
 }
 
 // Load implements PackageLoader.
-func (bkfl *BuildkitFrontendLoader) Load() ([]*v1alpha2.Pkg, error) {
+func (bkfl *BuildkitFrontendLoader) Load() (*LoadResult, error) {
 	if bkfl.Logger == nil {
 		bkfl.Logger = log.New(log.Writer(), "[loader] ", log.Flags())
 	}
@@ -106,5 +106,8 @@ func (bkfl *BuildkitFrontendLoader) Load() ([]*v1alpha2.Pkg, error) {
 
 	err = bkfl.walk("/", process)
 
-	return pkgs, multierror.Append(multiErr, err).ErrorOrNil()
+	return &LoadResult{
+		Pkgfile: bkfl.pkgFile,
+		Pkgs:    pkgs,
+	}, multierror.Append(multiErr, err).ErrorOrNil()
 }

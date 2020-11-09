@@ -23,7 +23,7 @@ var frontendCmd = &cobra.Command{
 
 To activate, put following line as the first line of Pkgfile:
 
-# syntax = docker.io/autonomy/bldr:<version>-frontend
+# syntax = ghcr.io/talos-systems/bldr:<version>-frontend
 
 Run with:
 

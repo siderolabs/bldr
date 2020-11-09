@@ -1,5 +1,5 @@
-REGISTRY ?= docker.io
-USERNAME ?= autonomy
+REGISTRY ?= ghcr.io
+USERNAME ?= talos-systems
 TAG ?= $(shell git describe --tag --always --dirty)
 REGISTRY_AND_USERNAME := $(REGISTRY)/$(USERNAME)
 RUN_TESTS ?= TestIntegration

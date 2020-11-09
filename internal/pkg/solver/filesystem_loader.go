@@ -63,7 +63,7 @@ func (fspl *FilesystemPackageLoader) walkFunc() filepath.WalkFunc {
 }
 
 // Load implements PackageLoader.
-func (fspl *FilesystemPackageLoader) Load() ([]*v1alpha2.Pkg, error) {
+func (fspl *FilesystemPackageLoader) Load() (*LoadResult, error) {
 	if fspl.Logger == nil {
 		fspl.Logger = log.New(log.Writer(), "[loader] ", log.Flags())
 	}
@@ -87,7 +87,10 @@ func (fspl *FilesystemPackageLoader) Load() ([]*v1alpha2.Pkg, error) {
 
 	err = filepath.Walk(fspl.Root, fspl.walkFunc())
 
-	return fspl.pkgs, multierror.Append(fspl.multiErr, err).ErrorOrNil()
+	return &LoadResult{
+		Pkgfile: fspl.pkgFile,
+		Pkgs:    fspl.pkgs,
+	}, multierror.Append(fspl.multiErr, err).ErrorOrNil()
 }
 
 func (fspl *FilesystemPackageLoader) loadPkg(path string) (*v1alpha2.Pkg, error) {
