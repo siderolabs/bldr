@@ -5,15 +5,22 @@
 package cmd
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/moby/buildkit/client/llb"
+	solverpb "github.com/moby/buildkit/solver/pb"
 	"github.com/spf13/cobra"
 
 	"github.com/talos-systems/bldr/internal/pkg/convert"
 	"github.com/talos-systems/bldr/internal/pkg/solver"
 )
+
+var llbCmdFlags struct {
+	json bool
+}
 
 // llbCmd represents the llb command.
 var llbCmd = &cobra.Command{
@@ -43,6 +50,37 @@ and outputs buildkit LLB to stdout. This can be used as 'bldr pack ... | buildct
 			log.Fatal(err)
 		}
 
+		if llbCmdFlags.json {
+			pb := dt.ToPB()
+			var b []byte
+			if b, err = json.MarshalIndent(pb, "", "  "); err != nil {
+				log.Fatal(err)
+			}
+			fmt.Printf("%s\n", b)
+
+			for _, def := range pb.Def {
+				b, err = json.MarshalIndent(def, "", "  ")
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				fmt.Printf("Def %s: ", b)
+
+				op := new(solverpb.Op)
+				if err = op.Unmarshal(def); err != nil {
+					log.Fatal(err)
+				}
+
+				b, err = json.MarshalIndent(op, "", "  ")
+				if err != nil {
+					log.Fatal(err)
+				}
+				fmt.Printf("%s\n", b)
+			}
+
+			return
+		}
+
 		err = llb.WriteTo(dt, os.Stdout)
 		if err != nil {
 			log.Fatal(err)
@@ -55,5 +93,6 @@ func init() {
 	llbCmd.MarkFlagRequired("target") //nolint:errcheck
 	llbCmd.Flags().Var(&options.BuildPlatform, "build-platform", "Build platform")
 	llbCmd.Flags().Var(&options.TargetPlatform, "target-platform", "Target platform")
+	llbCmd.Flags().BoolVar(&llbCmdFlags.json, "json", false, "Dump as JSON for debug")
 	rootCmd.AddCommand(llbCmd)
 }
