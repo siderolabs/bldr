@@ -11,6 +11,10 @@ import (
 )
 
 func TestIntegration(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping in -short mode")
+	}
+
 	collection, err := testutil.CollectTests()
 	if err != nil {
 		t.Fatalf("error collecting tests: %v", err)

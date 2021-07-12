@@ -5,6 +5,7 @@
 package convert
 
 import (
+	"context"
 	"sort"
 
 	"github.com/moby/buildkit/client/llb"
@@ -122,5 +123,5 @@ func (graph *GraphLLB) Marshal() (*llb.Definition, error) {
 
 	out = out.SetMarshalDefaults(graph.Options.BuildPlatform.LLBPlatform)
 
-	return out.Marshal()
+	return out.Marshal(context.TODO())
 }

@@ -9,10 +9,9 @@ import (
 	"errors"
 	"text/template"
 
-	"gopkg.in/yaml.v2"
-
-	"github.com/Masterminds/sprig"
+	"github.com/Masterminds/sprig/v3"
 	"github.com/hashicorp/go-multierror"
+	"gopkg.in/yaml.v2"
 
 	"github.com/talos-systems/bldr/internal/pkg/constants"
 	"github.com/talos-systems/bldr/internal/pkg/types"
@@ -28,15 +27,17 @@ type Pkg struct {
 	Steps        Steps        `yaml:"steps,omitempty"`
 	Finalize     []Finalize   `yaml:"finalize,omitempty"`
 
-	BaseDir string `yaml:"-"`
+	BaseDir  string `yaml:"-"`
+	FileName string `yaml:"-"`
 }
 
 // NewPkg loads Pkg structure from file.
-func NewPkg(baseDir string, contents []byte, vars types.Variables) (*Pkg, error) {
+func NewPkg(baseDir, fileName string, contents []byte, vars types.Variables) (*Pkg, error) {
 	p := &Pkg{
-		BaseDir: baseDir,
-		Shell:   "/bin/sh",
-		Variant: Alpine,
+		BaseDir:  baseDir,
+		FileName: fileName,
+		Shell:    "/bin/sh",
+		Variant:  Alpine,
 	}
 
 	tmpl, err := template.New(constants.PkgYaml).

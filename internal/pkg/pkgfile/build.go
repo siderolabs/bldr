@@ -36,7 +36,7 @@ const (
 
 // Build is an entrypoint for buildkit frontend.
 //
-//nolint: gocyclo
+//nolint:gocyclo
 func Build(ctx context.Context, c client.Client, options *environment.Options) (*client.Result, error) {
 	opts := c.BuildOpts().Opts
 	options.Target = opts[keyTarget]
@@ -199,7 +199,7 @@ func fetchPkgs(ctx context.Context, c client.Client) (client.Reference, error) {
 		llb.WithCustomName(name),
 	)
 
-	def, err := src.Marshal()
+	def, err := src.Marshal(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal local source: %q", err)
 	}

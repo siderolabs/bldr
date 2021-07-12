@@ -33,7 +33,7 @@ func NewTestManifest(path string) (manifest TestManifest, err error) {
 		return
 	}
 
-	defer f.Close() //nolint: errcheck
+	defer f.Close() //nolint:errcheck
 
 	err = yaml.NewDecoder(f).Decode(&manifest)
 

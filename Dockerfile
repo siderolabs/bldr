@@ -1,6 +1,6 @@
-# syntax = docker/dockerfile-upstream:1.1.2-experimental
+# syntax = docker/dockerfile-upstream:1.2.0
 
-FROM golang:1.14-alpine AS base
+FROM golang:1.16-alpine AS base
 ENV GO111MODULE on
 ENV GOPROXY https://proxy.golang.org
 ENV CGO_ENABLED 0

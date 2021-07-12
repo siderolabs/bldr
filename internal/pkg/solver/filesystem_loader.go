@@ -109,14 +109,14 @@ func (fspl *FilesystemPackageLoader) loadPkg(path string) (*v1alpha2.Pkg, error)
 		return nil, err
 	}
 
-	defer f.Close() //nolint: errcheck
+	defer f.Close() //nolint:errcheck
 
 	contents, err := ioutil.ReadAll(f)
 	if err != nil {
 		return nil, err
 	}
 
-	return v1alpha2.NewPkg(filepath.Dir(basePath), contents, fspl.Context)
+	return v1alpha2.NewPkg(filepath.Dir(basePath), path, contents, fspl.Context)
 }
 
 func (fspl *FilesystemPackageLoader) loadPkgfile() error {
@@ -130,7 +130,7 @@ func (fspl *FilesystemPackageLoader) loadPkgfile() error {
 		return err
 	}
 
-	defer f.Close() //nolint: errcheck
+	defer f.Close() //nolint:errcheck
 
 	contents, err := ioutil.ReadAll(f)
 	if err != nil {

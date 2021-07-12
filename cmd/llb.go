@@ -52,7 +52,7 @@ and outputs buildkit LLB to stdout. This can be used as 'bldr pack ... | buildct
 
 func init() {
 	llbCmd.Flags().StringVarP(&options.Target, "target", "t", "", "Target image to build")
-	llbCmd.MarkFlagRequired("target") //nolint: errcheck
+	llbCmd.MarkFlagRequired("target") //nolint:errcheck
 	llbCmd.Flags().Var(&options.BuildPlatform, "build-platform", "Build platform")
 	llbCmd.Flags().Var(&options.TargetPlatform, "target-platform", "Target platform")
 	rootCmd.AddCommand(llbCmd)
