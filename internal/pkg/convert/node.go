@@ -5,6 +5,9 @@
 package convert
 
 import (
+	// register hash implementations for go-digest and llb
+	_ "crypto/sha256"
+	_ "crypto/sha512"
 	"fmt"
 	"path/filepath"
 	"sort"
@@ -140,22 +143,12 @@ func (node *NodeLLB) stepDownload(root llb.State, step v1alpha2.Step) llb.State 
 			source.URL,
 			llb.Filename(filepath.Join("/", source.Destination)),
 			llb.Checksum(digest.NewDigestFromEncoded(digest.SHA256, source.SHA256)),
+			llb.Checksum(digest.NewDigestFromEncoded(digest.SHA512, source.SHA512)),
 			llb.WithCustomNamef(node.Prefix+"download %s -> %s", source.URL, source.Destination),
 		)
 
-		checksummer := node.Graph.Checksummer.File(
-			llb.Mkfile("/checksums", 0644, source.ToSHA512Sum()).
-				Copy(download, "/", "/", defaultCopyOptions).
-				Mkdir("/empty", constants.DefaultDirMode),
-			llb.WithCustomName(node.Prefix+"cksum-prepare"),
-		).Run(
-			llb.Shlex("sha512sum -c --strict /checksums"),
-			llb.WithCustomName(node.Prefix+"cksum-verify"),
-		).Root()
-
 		root = root.File(
-			llb.Copy(download, "/", step.TmpDir, defaultCopyOptions).
-				Copy(checksummer, "/empty", "/", defaultCopyOptions), // TODO: this is "fake" dependency on checksummer
+			llb.Copy(download, "/", step.TmpDir, defaultCopyOptions),
 			llb.WithCustomName(node.Prefix+"download finalize"),
 		)
 	}

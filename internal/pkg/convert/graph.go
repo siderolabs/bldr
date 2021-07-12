@@ -23,7 +23,6 @@ type GraphLLB struct {
 	Options *environment.Options
 
 	BaseImages   map[v1alpha2.Variant]llb.State
-	Checksummer  llb.State
 	LocalContext llb.State
 
 	cache map[*solver.PackageNode]llb.State
@@ -38,7 +37,6 @@ func NewGraphLLB(graph *solver.PackageGraph, options *environment.Options) *Grap
 	}
 
 	result.buildBaseImages()
-	result.buildChecksummer()
 	result.buildLocalContext()
 
 	return result
@@ -83,16 +81,6 @@ func (graph *GraphLLB) buildBaseImages() {
 	).Root()))
 
 	graph.BaseImages[v1alpha2.Scratch] = addEnv(addPkg(llb.Scratch()))
-}
-
-func (graph *GraphLLB) buildChecksummer() {
-	graph.Checksummer = llb.Image(
-		constants.DefaultBaseImage,
-		llb.WithCustomName(graph.Options.CommonPrefix+"cksum"),
-	).Run(
-		llb.Shlex("apk --no-cache --update add coreutils"),
-		llb.WithCustomName(graph.Options.CommonPrefix+"cksum-apkinstall"),
-	).Root()
 }
 
 func (graph *GraphLLB) buildLocalContext() {

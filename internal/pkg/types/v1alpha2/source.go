@@ -34,11 +34,6 @@ type Source struct {
 	SHA512      string `yaml:"sha512,omitempty"`
 }
 
-// ToSHA512Sum returns in format of line expected by 'sha512sum'.
-func (source *Source) ToSHA512Sum() []byte {
-	return []byte(source.SHA512 + " *" + source.Destination + "\n")
-}
-
 // Validate source.
 func (source *Source) Validate() error {
 	var multiErr *multierror.Error
