@@ -75,7 +75,7 @@ func (v *Variant) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	case Scratch.String():
 		val = Scratch
 	default:
-		return fmt.Errorf("unknown variant %q")
+		return fmt.Errorf("unknown variant %q", aux)
 	}
 	*v = val
 

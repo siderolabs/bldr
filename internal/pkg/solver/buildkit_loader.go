@@ -90,7 +90,7 @@ func (bkfl *BuildkitFrontendLoader) Load() (*LoadResult, error) {
 	)
 
 	process := func(baseDir string, contents []byte) error {
-		pkg, err2 := v1alpha2.NewPkg(baseDir, contents, bkfl.Context)
+		pkg, err2 := v1alpha2.NewPkg(baseDir, "", contents, bkfl.Context)
 		if err2 != nil {
 			log.Printf("error loading %q: %s", baseDir, err2)
 			multiErr = multierror.Append(multiErr, fmt.Errorf("error loading %q: %w", baseDir, err2))

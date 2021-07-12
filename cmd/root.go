@@ -18,6 +18,7 @@ const defaultPlatform = (runtime.GOOS + "/" + runtime.GOARCH)
 
 var (
 	pkgRoot string
+	debug   bool
 	options = &environment.Options{
 		BuildPlatform:  environment.LinuxAmd64,
 		TargetPlatform: environment.LinuxAmd64,
@@ -48,9 +49,9 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "", false, "Enable debug logging")
 	rootCmd.PersistentFlags().StringVarP(&pkgRoot, "root", "", ".", "The path to a pkg root")
 
-	options.BuildPlatform.Set(defaultPlatform)  //nolint: errcheck
-	options.TargetPlatform.Set(defaultPlatform) //nolint: errcheck
+	options.BuildPlatform.Set(defaultPlatform)  //nolint:errcheck
+	options.TargetPlatform.Set(defaultPlatform) //nolint:errcheck
 }
