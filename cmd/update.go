@@ -30,6 +30,87 @@ type updateInfo struct {
 	*update.LatestInfo
 }
 
+//nolint:gocyclo
+func checkUpdates(ctx context.Context, set solver.PackageSet, l *log.Logger) error {
+	var (
+		wg          sync.WaitGroup
+		concurrency = runtime.GOMAXPROCS(-1)
+		sources     = make(chan *pkgInfo)
+		updates     = make(chan *updateInfo)
+	)
+
+	// start updaters
+	for i := 0; i < concurrency; i++ {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+
+			for src := range sources {
+				res, e := update.Latest(ctx, src.source)
+				if e != nil {
+					l.Print(e)
+					continue
+				}
+
+				updates <- &updateInfo{
+					file:       src.file,
+					LatestInfo: res,
+				}
+			}
+		}()
+	}
+
+	var (
+		res  []updateInfo
+		done = make(chan struct{})
+	)
+
+	// start results reader
+	go func() {
+		for update := range updates {
+			res = append(res, *update)
+		}
+
+		close(done)
+	}()
+
+	// send work to updaters
+	for _, node := range set {
+		for _, step := range node.Pkg.Steps {
+			for _, src := range step.Sources {
+				sources <- &pkgInfo{
+					file:   node.Pkg.FileName,
+					source: src.URL,
+				}
+			}
+		}
+	}
+
+	close(sources)
+	wg.Wait()
+	close(updates)
+	<-done
+
+	sort.Slice(res, func(i, j int) bool { return res[i].file < res[j].file })
+
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
+	fmt.Fprintf(w, "%s\t%s\t%s\n", "File", "Update", "URL")
+
+	for _, info := range res {
+		if updateCmdFlag.all || info.HasUpdate {
+			url := info.LatestURL
+			if url == "" {
+				url = info.BaseURL
+			}
+
+			fmt.Fprintf(w, "%s\t%t\t%s\n", info.file, info.HasUpdate, url)
+		}
+	}
+
+	return w.Flush()
+}
+
 var updateCmdFlag struct {
 	all bool
 	dry bool
@@ -59,71 +140,7 @@ var updateCmd = &cobra.Command{
 			l.SetOutput(ioutil.Discard)
 		}
 
-		concurrency := runtime.GOMAXPROCS(-1)
-		var wg sync.WaitGroup
-		sources := make(chan *pkgInfo)
-		updates := make(chan *updateInfo)
-		for i := 0; i < concurrency; i++ {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-
-				for src := range sources {
-					res, e := update.Latest(context.TODO(), src.source)
-					if e != nil {
-						l.Print(e)
-						continue
-					}
-
-					updates <- &updateInfo{
-						file:       src.file,
-						LatestInfo: res,
-					}
-				}
-			}()
-		}
-
-		var res []updateInfo
-		done := make(chan struct{})
-		go func() {
-			for update := range updates {
-				res = append(res, *update)
-			}
-			close(done)
-		}()
-
-		for _, node := range packages.ToSet() {
-			for _, step := range node.Pkg.Steps {
-				for _, src := range step.Sources {
-					sources <- &pkgInfo{
-						file:   node.Pkg.FileName,
-						source: src.URL,
-					}
-				}
-			}
-		}
-		close(sources)
-		wg.Wait()
-		close(updates)
-		<-done
-
-		sort.Slice(res, func(i, j int) bool { return res[i].file < res[j].file })
-
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-		fmt.Fprintf(w, "%s\t%s\t%s\n", "File", "Update", "URL")
-
-		for _, info := range res {
-			if updateCmdFlag.all || info.HasUpdate {
-				url := info.LatestURL
-				if url == "" {
-					url = info.BaseURL
-				}
-
-				fmt.Fprintf(w, "%s\t%t\t%s\n", info.file, info.HasUpdate, url)
-			}
-		}
-
-		if err = w.Flush(); err != nil {
+		if err = checkUpdates(context.TODO(), packages.ToSet(), l); err != nil {
 			log.Fatal(err)
 		}
 	},
