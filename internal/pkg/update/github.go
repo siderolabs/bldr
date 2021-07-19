@@ -89,6 +89,8 @@ func (g *gitHub) Latest(ctx context.Context, source string) (*LatestInfo, error)
 }
 
 // findLatestRelease returns information about latest released version.
+//
+//nolint:gocyclo
 func (g *gitHub) findLatestRelease(releases []*github.RepositoryRelease, sourceURL *url.URL, considerPrereleases bool) (*LatestInfo, error) {
 	parts := strings.Split(sourceURL.Path, "/")
 	owner, repo := parts[1], parts[2]
@@ -116,26 +118,28 @@ func (g *gitHub) findLatestRelease(releases []*github.RepositoryRelease, sourceU
 
 	source := sourceURL.String()
 
-	// treat releases without extra assets as tags
-	if len(newest.Assets) == 0 {
-		// update is available if the release doesn't have the same tarball URL
-		res.LatestURL = g.getTagGZ(owner, repo, newest.GetTagName())
-		res.HasUpdate = res.LatestURL != source
-
-		return res, nil
-	}
-
 	// update is available if the newest release doesn't have source in their assets download URLs
 	for _, asset := range newest.Assets {
 		if asset.GetBrowserDownloadURL() == source {
-			res.HasUpdate = false
 			res.LatestURL = source
 
 			return res, nil
 		}
 	}
 
-	// we don't know correct asset URL
+	// check default .tag.gz URL
+	latestTarGz := g.getTagTarGZ(owner, repo, newest.GetTagName())
+	if latestTarGz == source {
+		res.LatestURL = source
+
+		return res, nil
+	}
+
+	// we don't know correct asset if there are any
+	if len(newest.Assets) == 0 {
+		res.LatestURL = latestTarGz
+	}
+
 	res.HasUpdate = true
 
 	return res, nil
@@ -179,7 +183,7 @@ func (g *gitHub) findLatestTag(ctx context.Context, tags []*github.RepositoryTag
 
 	res := &LatestInfo{
 		BaseURL:   fmt.Sprintf("https://github.com/%s/%s/releases/", owner, repo),
-		LatestURL: g.getTagGZ(owner, repo, newest.GetName()),
+		LatestURL: g.getTagTarGZ(owner, repo, newest.GetName()),
 	}
 
 	// update is available if the newest tag doesn't have the same tarball URL
@@ -251,9 +255,9 @@ func (g *gitHub) getCommitTime(ctx context.Context, owner, repo, sha string) (ti
 	return t, nil
 }
 
-// getTagTarball returns .tar.gz URL.
+// getTagTarGZ returns .tar.gz URL.
 // API's GetTarballURL is not good enough.
-func (g *gitHub) getTagGZ(owner, repo, name string) string {
+func (g *gitHub) getTagTarGZ(owner, repo, name string) string {
 	return fmt.Sprintf("https://github.com/%s/%s/archive/refs/tags/%s.tar.gz", owner, repo, name)
 }
 
