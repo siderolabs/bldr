@@ -6,14 +6,16 @@ package update
 
 import (
 	"fmt"
-	"net/url"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/Masterminds/semver"
 )
 
 var (
+	versionRE = regexp.MustCompile(semver.SemVerRegex) // the same as semver.versionRegex except "^" and "$"
+
 	commonExtensions = map[string]struct{}{
 		".bz2":  {},
 		".diff": {},
@@ -28,15 +30,7 @@ var (
 
 // extractVersion extracts SemVer version from file name or URL.
 func extractVersion(s string) (*semver.Version, error) {
-	// extract file name
-	u, err := url.Parse(s)
-	if err != nil {
-		return nil, err
-	}
-
-	s = filepath.Base(u.Path)
-
-	// remove common extensions
+	// remove common extensions like .bz2 that would confuse SemVer parser
 	found := true
 	for found {
 		ext := filepath.Ext(s)
@@ -45,15 +39,13 @@ func extractVersion(s string) (*semver.Version, error) {
 		}
 	}
 
-	// remove package name, keep only version
-	i := strings.IndexAny(s, "0123456789")
-	if i < 0 {
-		return nil, fmt.Errorf("failed to remove package name from %q", s)
+	matches := versionRE.FindAllString(s, -1)
+	if len(matches) == 0 {
+		return nil, fmt.Errorf("failed to find version in %q", s)
 	}
 
-	s = s[i:]
-
-	res, err := semver.NewVersion(s)
+	// use the last match to skip hostnames, folders, etc
+	res, err := semver.NewVersion(matches[len(matches)-1])
 	if err != nil {
 		return nil, fmt.Errorf("%q: %w", s, err)
 	}
