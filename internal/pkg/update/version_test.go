@@ -23,6 +23,7 @@ func TestExtractVersion(t *testing.T) {
 
 		"https://github.com/pullmoll/void-linux/archive/refs/tags/v1.2.7.tar.gz":                           "1.2.7",
 		"https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protobuf-cpp-3.17.3.tar.gz": "3.17.3",
+		"https://github.com/opencontainers/runc/releases/download/v1.0.1/runc.tar.xz":                      "1.0.1",
 	} {
 		s, expected := s, expected
 		t.Run(s, func(t *testing.T) {

@@ -58,6 +58,18 @@ func TestLatestGithub(t *testing.T) {
 			BaseURL:   "https://github.com/protocolbuffers/protobuf/releases/",
 			LatestURL: "https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protobuf-cpp-3.17.3.tar.gz",
 		},
+
+		// https://github.com/opencontainers/runc/releases has releases with extra assets (and no version in the file name).
+		"https://github.com/opencontainers/runc/releases/download/v1.0.0/runc.tar.xz": {
+			HasUpdate: true,
+			BaseURL:   "https://github.com/opencontainers/runc/releases/",
+			LatestURL: "",
+		},
+		"https://github.com/opencontainers/runc/releases/download/v1.0.1/runc.tar.xz": {
+			HasUpdate: false,
+			BaseURL:   "https://github.com/opencontainers/runc/releases/",
+			LatestURL: "https://github.com/opencontainers/runc/releases/download/v1.0.1/runc.tar.xz",
+		},
 	} {
 		source, expected := source, expected
 
