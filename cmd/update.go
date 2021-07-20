@@ -17,7 +17,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/talos-systems/bldr/internal/pkg/solver"
-	"github.com/talos-systems/bldr/internal/pkg/update"
+	"github.com/talos-systems/bldr/pkg/update"
 )
 
 type pkgInfo struct {

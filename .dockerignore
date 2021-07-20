@@ -5,3 +5,4 @@
 !go.sum
 !main.go
 !hack
+!pkg

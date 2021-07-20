@@ -13,6 +13,7 @@ RUN go mod download
 RUN go mod verify
 COPY ./cmd ./cmd
 COPY ./internal ./internal
+COPY ./pkg ./pkg
 COPY ./main.go ./main.go
 RUN go list -mod=readonly all >/dev/null
 
