@@ -108,11 +108,13 @@ func (source *Source) ValidateChecksums(ctx context.Context) (string, string, er
 	)
 
 	if actualSHA256 = hex.EncodeToString(s256.Sum(nil)); source.SHA256 != actualSHA256 {
-		multiErr = multierror.Append(multiErr, fmt.Errorf("source.sha256 does not match: expected %s, got %s", source.SHA256, actualSHA256))
+		err = fmt.Errorf("%s sha256 does not match: expected %s, got %s", source.Destination, source.SHA256, actualSHA256)
+		multiErr = multierror.Append(multiErr, err)
 	}
 
 	if actualSHA512 = hex.EncodeToString(s512.Sum(nil)); source.SHA512 != actualSHA512 {
-		multiErr = multierror.Append(multiErr, fmt.Errorf("source.sha512 does not match: expected %s, got %s", source.SHA512, actualSHA512))
+		err = fmt.Errorf("%s sha512 does not match: expected %s, got %s", source.Destination, source.SHA512, actualSHA512)
+		multiErr = multierror.Append(multiErr, err)
 	}
 
 	return actualSHA256, actualSHA512, multiErr.ErrorOrNil()
