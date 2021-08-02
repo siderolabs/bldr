@@ -7,7 +7,7 @@ package constants
 import "os"
 
 // DefaultBaseImage for non-scratch builds.
-const DefaultBaseImage = "docker.io/alpine:3.11"
+const DefaultBaseImage = "docker.io/alpine:3.14"
 
 // DefaultDirMode is UNIX file mode for mkdir.
 const DefaultDirMode os.FileMode = 0755
