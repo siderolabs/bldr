@@ -213,7 +213,7 @@ On the root level, following properties are available:
 - `name` (*str*, *required*): name of the package, also used to reference this package from other packages as dependency.
 
 - `variant` (*str*, *optional*): variant of the base image of the build. Two variants are available:
-  - `alpine`: Alpine Linux 3.10 image with `bash` package pre-installed
+  - `alpine`: Alpine Linux 3.14 image with `bash` package pre-installed
   - `scratch`: scratch (empty) image
   Default variant is `alpine`.
 - `install`: (*list*, *optional*): list of Alpine packages to be installed as part of the build. These packages are usually build dependencies.
