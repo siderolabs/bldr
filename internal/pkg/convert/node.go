@@ -33,6 +33,8 @@ type NodeLLB struct {
 
 	Graph  *GraphLLB
 	Prefix string
+
+	promotedDependency string
 }
 
 // NewNodeLLB wraps PackageNode for LLB conversion.
@@ -45,8 +47,18 @@ func NewNodeLLB(node *solver.PackageNode, graph *GraphLLB) *NodeLLB {
 	}
 }
 
-func (node *NodeLLB) base() llb.State {
-	return node.Graph.BaseImages[node.Pkg.Variant]
+func (node *NodeLLB) base() (llb.State, error) {
+	if node.Pkg.Variant == v1alpha2.Scratch && len(node.Dependencies) > 0 {
+		// pull the first dependency as base image if the package build is from scratch
+		promotedDep := node.Dependencies[0]
+		node.promotedDependency = promotedDep.ID()
+
+		depState, _, err := node.convertDependency(promotedDep)
+
+		return node.Graph.baseImageProcessor(depState), err
+	}
+
+	return node.Graph.BaseImages[node.Pkg.Variant], nil
 }
 
 func (node *NodeLLB) install(root llb.State) llb.State {
@@ -68,6 +80,22 @@ func (node *NodeLLB) context(root llb.State) llb.State {
 		llb.Copy(node.Graph.LocalContext, filepath.Join("/", relPath), pkgDir, defaultCopyOptions),
 		llb.WithCustomNamef(node.Prefix+"context %s -> %s", relPath, pkgDir),
 	)
+}
+
+func (node *NodeLLB) convertDependency(dep solver.PackageDependency) (depState llb.State, srcName string, err error) {
+	if dep.IsInternal() {
+		depState, err = NewNodeLLB(dep.Node, node.Graph).Build()
+		if err != nil {
+			return llb.Scratch(), "", err
+		}
+
+		srcName = dep.Node.Name
+	} else {
+		depState = llb.Image(dep.Image)
+		srcName = dep.Image
+	}
+
+	return
 }
 
 func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
@@ -96,28 +124,19 @@ func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
 
 		seen[dep.ID()] = struct{}{}
 
-		var (
-			depState llb.State
-			srcName  string
-		)
+		if node.promotedDependency == dep.ID() {
+			// dependency promoted as base image, skip it
+			continue
+		}
 
-		if dep.IsInternal() {
-			var err error
-
-			depState, err = NewNodeLLB(dep.Node, node.Graph).Build()
-			if err != nil {
-				return llb.Scratch(), err
-			}
-
-			srcName = dep.Node.Name
-		} else {
-			depState = llb.Image(dep.Image)
-			srcName = dep.Image
+		depState, srcName, err := node.convertDependency(dep)
+		if err != nil {
+			return llb.Scratch(), err
 		}
 
 		root = root.File(
 			llb.Copy(depState, dep.Src(), dep.Dest(), defaultCopyOptions),
-			llb.WithCustomNamef(node.Prefix+"copy --from %s %s -> %s", srcName, dep.Src(), dep.Dest()))
+			llb.WithCustomNamef("copy --from %s %s -> %s", srcName, dep.Src(), dep.Dest()))
 	}
 
 	return root, nil
@@ -229,20 +248,22 @@ func (node *NodeLLB) finalize(root llb.State) llb.State {
 
 // Build converts PackageNode to buildkit LLB.
 func (node *NodeLLB) Build() (llb.State, error) {
-	var err error
-
 	if state, ok := node.Graph.cache[node.PackageNode]; ok {
 		return state, nil
 	}
 
-	root := node.base()
-	root = node.install(root)
-	root = node.context(root)
+	root, err := node.base()
+	if err != nil {
+		return llb.Scratch(), err
+	}
 
 	root, err = node.dependencies(root)
 	if err != nil {
 		return llb.Scratch(), err
 	}
+
+	root = node.install(root)
+	root = node.context(root)
 
 	for i, step := range node.Pkg.Steps {
 		root = node.step(root, i, step)

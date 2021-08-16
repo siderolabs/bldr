@@ -27,8 +27,11 @@ type GraphLLB struct {
 	Checksummer  llb.State
 	LocalContext llb.State
 
-	cache map[*solver.PackageNode]llb.State
+	baseImageProcessor llbProcessor
+	cache              map[*solver.PackageNode]llb.State
 }
+
+type llbProcessor func(llb.State) llb.State
 
 // NewGraphLLB creates new GraphLLB and initializes shared images.
 func NewGraphLLB(graph *solver.PackageGraph, options *environment.Options) *GraphLLB {
@@ -72,7 +75,11 @@ func (graph *GraphLLB) buildBaseImages() {
 		return root
 	}
 
-	graph.BaseImages[v1alpha2.Alpine] = addEnv(addPkg(llb.Image(
+	graph.baseImageProcessor = func(root llb.State) llb.State {
+		return addEnv(addPkg(root))
+	}
+
+	graph.BaseImages[v1alpha2.Alpine] = graph.baseImageProcessor(llb.Image(
 		constants.DefaultBaseImage,
 		llb.WithCustomName(graph.Options.CommonPrefix+"base"),
 	).Run(
@@ -81,9 +88,9 @@ func (graph *GraphLLB) buildBaseImages() {
 	).Run(
 		llb.Args([]string{"ln", "-svf", "/bin/bash", "/bin/sh"}),
 		llb.WithCustomName(graph.Options.CommonPrefix+"base-symlink"),
-	).Root()))
+	).Root())
 
-	graph.BaseImages[v1alpha2.Scratch] = addEnv(addPkg(llb.Scratch()))
+	graph.BaseImages[v1alpha2.Scratch] = graph.baseImageProcessor(llb.Scratch())
 }
 
 func (graph *GraphLLB) buildChecksummer() {
