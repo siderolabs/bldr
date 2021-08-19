@@ -64,9 +64,11 @@ func (node *NodeLLB) base() (llb.State, error) {
 func (node *NodeLLB) install(root llb.State) llb.State {
 	if len(node.Pkg.Install) > 0 {
 		root = root.Run(
-			llb.Args(
-				append([]string{"/sbin/apk", "add", "--no-cache"}, node.Pkg.Install...)),
-			llb.WithCustomName(node.Prefix+"apk-install"),
+			append(node.Graph.commonRunOptions,
+				llb.Args(
+					append([]string{"/sbin/apk", "add", "--no-cache"}, node.Pkg.Install...)),
+				llb.WithCustomName(node.Prefix+"apk-install"),
+			)...,
 		).Root()
 	}
 
@@ -168,8 +170,10 @@ func (node *NodeLLB) stepDownload(root llb.State, step v1alpha2.Step) llb.State 
 				Mkdir("/empty", constants.DefaultDirMode),
 			llb.WithCustomName(node.Prefix+"cksum-prepare"),
 		).Run(
-			llb.Shlex("sha512sum -c --strict /checksums"),
-			llb.WithCustomName(node.Prefix+"cksum-verify"),
+			append(node.Graph.commonRunOptions,
+				llb.Shlex("sha512sum -c --strict /checksums"),
+				llb.WithCustomName(node.Prefix+"cksum-verify"),
+			)...,
 		).Root()
 
 		root = root.File(
@@ -211,12 +215,14 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 	} {
 		for _, instruction := range script.Instructions {
 			root = root.Run(
-				llb.Args([]string{
-					node.Pkg.Shell.Get(),
-					"-c",
-					instruction.Script(),
-				}),
-				llb.WithCustomName(fmt.Sprintf("%s%s-%d", node.Prefix, script.Desc, i)),
+				append(node.Graph.commonRunOptions,
+					llb.Args([]string{
+						node.Pkg.Shell.Get(),
+						"-c",
+						instruction.Script(),
+					}),
+					llb.WithCustomName(fmt.Sprintf("%s%s-%d", node.Prefix, script.Desc, i)),
+				)...,
 			).Root()
 		}
 	}

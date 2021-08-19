@@ -30,6 +30,8 @@ const (
 	keyTargetPlatform = "platform"
 	keyMultiPlatform  = "multi-platform"
 
+	buildArgPrefix = "build-arg:"
+
 	localNameDockerfile = "dockerfile"
 	sharedKeyHint       = constants.PkgYaml
 )
@@ -39,7 +41,9 @@ const (
 //nolint:gocyclo
 func Build(ctx context.Context, c client.Client, options *environment.Options) (*client.Result, error) {
 	opts := c.BuildOpts().Opts
+
 	options.Target = opts[keyTarget]
+	options.ProxyEnv = proxyEnvFromBuildArgs(filter(opts, buildArgPrefix))
 
 	platforms := []environment.Platform{options.TargetPlatform}
 
@@ -212,4 +216,49 @@ func fetchPkgs(ctx context.Context, c client.Client) (client.Reference, error) {
 	}
 
 	return res.SingleRef()
+}
+
+func proxyEnvFromBuildArgs(args map[string]string) *llb.ProxyEnv {
+	pe := &llb.ProxyEnv{}
+	isNil := true
+
+	for k, v := range args {
+		if strings.EqualFold(k, "http_proxy") {
+			pe.HTTPProxy = v
+			isNil = false
+		}
+
+		if strings.EqualFold(k, "https_proxy") {
+			pe.HTTPSProxy = v
+			isNil = false
+		}
+
+		if strings.EqualFold(k, "ftp_proxy") {
+			pe.FTPProxy = v
+			isNil = false
+		}
+
+		if strings.EqualFold(k, "no_proxy") {
+			pe.NoProxy = v
+			isNil = false
+		}
+	}
+
+	if isNil {
+		return nil
+	}
+
+	return pe
+}
+
+func filter(opt map[string]string, key string) map[string]string {
+	m := map[string]string{}
+
+	for k, v := range opt {
+		if strings.HasPrefix(k, key) {
+			m[strings.TrimPrefix(k, key)] = v
+		}
+	}
+
+	return m
 }

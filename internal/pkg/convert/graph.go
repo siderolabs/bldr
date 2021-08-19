@@ -29,6 +29,8 @@ type GraphLLB struct {
 
 	baseImageProcessor llbProcessor
 	cache              map[*solver.PackageNode]llb.State
+
+	commonRunOptions []llb.RunOption
 }
 
 type llbProcessor func(llb.State) llb.State
@@ -39,6 +41,10 @@ func NewGraphLLB(graph *solver.PackageGraph, options *environment.Options) *Grap
 		PackageGraph: graph,
 		Options:      options,
 		cache:        make(map[*solver.PackageNode]llb.State),
+	}
+
+	if options.ProxyEnv != nil {
+		result.commonRunOptions = append(result.commonRunOptions, llb.WithProxy(*options.ProxyEnv))
 	}
 
 	result.buildBaseImages()
@@ -83,11 +89,15 @@ func (graph *GraphLLB) buildBaseImages() {
 		constants.DefaultBaseImage,
 		llb.WithCustomName(graph.Options.CommonPrefix+"base"),
 	).Run(
-		llb.Shlex("apk --no-cache --update add bash"),
-		llb.WithCustomName(graph.Options.CommonPrefix+"base-apkinstall"),
+		append(graph.commonRunOptions,
+			llb.Shlex("apk --no-cache --update add bash"),
+			llb.WithCustomName(graph.Options.CommonPrefix+"base-apkinstall"),
+		)...,
 	).Run(
-		llb.Args([]string{"ln", "-svf", "/bin/bash", "/bin/sh"}),
-		llb.WithCustomName(graph.Options.CommonPrefix+"base-symlink"),
+		append(graph.commonRunOptions,
+			llb.Args([]string{"ln", "-svf", "/bin/bash", "/bin/sh"}),
+			llb.WithCustomName(graph.Options.CommonPrefix+"base-symlink"),
+		)...,
 	).Root())
 
 	graph.BaseImages[v1alpha2.Scratch] = graph.baseImageProcessor(llb.Scratch())
@@ -98,8 +108,10 @@ func (graph *GraphLLB) buildChecksummer() {
 		constants.DefaultBaseImage,
 		llb.WithCustomName(graph.Options.CommonPrefix+"cksum"),
 	).Run(
-		llb.Shlex("apk --no-cache --update add coreutils"),
-		llb.WithCustomName(graph.Options.CommonPrefix+"cksum-apkinstall"),
+		append(graph.commonRunOptions,
+			llb.Shlex("apk --no-cache --update add coreutils"),
+			llb.WithCustomName(graph.Options.CommonPrefix+"cksum-apkinstall"),
+		)...,
 	).Root()
 }
 

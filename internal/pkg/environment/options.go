@@ -4,7 +4,11 @@
 
 package environment
 
-import "github.com/talos-systems/bldr/internal/pkg/types"
+import (
+	"github.com/moby/buildkit/client/llb"
+
+	"github.com/talos-systems/bldr/internal/pkg/types"
+)
 
 // Options for bldr.
 type Options struct {
@@ -12,6 +16,7 @@ type Options struct {
 	TargetPlatform Platform
 	Target         string
 	CommonPrefix   string
+	ProxyEnv       *llb.ProxyEnv
 }
 
 // GetVariables returns set of variables set for options.
