@@ -28,12 +28,13 @@ func (steps Steps) Validate() error {
 // Steps are executed sequentially, each step runs in its own
 // empty temporary directory.
 type Step struct {
-	Sources Sources      `yaml:"sources,omitempty"`
-	Env     Environment  `yaml:"env,omitempty"`
-	Prepare Instructions `yaml:"prepare,omitempty"`
-	Build   Instructions `yaml:"build,omitempty"`
-	Install Instructions `yaml:"install,omitempty"`
-	Test    Instructions `yaml:"test,omitempty"`
+	Sources   Sources      `yaml:"sources,omitempty"`
+	Env       Environment  `yaml:"env,omitempty"`
+	CachePath string       `yaml:"cache,omitempty"`
+	Prepare   Instructions `yaml:"prepare,omitempty"`
+	Build     Instructions `yaml:"build,omitempty"`
+	Install   Instructions `yaml:"install,omitempty"`
+	Test      Instructions `yaml:"test,omitempty"`
 
 	TmpDir string `yaml:"-"`
 }

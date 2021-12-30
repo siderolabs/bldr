@@ -6,6 +6,7 @@ package convert
 
 import (
 	"fmt"
+	"path"
 	"path/filepath"
 	"sort"
 
@@ -214,16 +215,24 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 		{"test", step.Test},
 	} {
 		for _, instruction := range script.Instructions {
-			root = root.Run(
-				append(node.Graph.commonRunOptions,
-					llb.Args([]string{
-						node.Pkg.Shell.Get(),
-						"-c",
-						instruction.Script(),
-					}),
-					llb.WithCustomName(fmt.Sprintf("%s%s-%d", node.Prefix, script.Desc, i)),
-				)...,
-			).Root()
+			runOptions := append([]llb.RunOption(nil), node.Graph.commonRunOptions...)
+
+			if step.CachePath != "" {
+				sharing := llb.CacheMountShared
+
+				runOptions = append(runOptions, llb.AddMount(step.CachePath, root, llb.AsPersistentCacheDir(path.Clean(step.CachePath), sharing)))
+			}
+
+			runOptions = append(runOptions,
+				llb.Args([]string{
+					node.Pkg.Shell.Get(),
+					"-c",
+					instruction.Script(),
+				}),
+				llb.WithCustomName(fmt.Sprintf("%s%s-%d", node.Prefix, script.Desc, i)),
+			)
+
+			root = root.Run(runOptions...).Root()
 		}
 	}
 
