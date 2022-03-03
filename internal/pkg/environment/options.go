@@ -5,6 +5,8 @@
 package environment
 
 import (
+	"time"
+
 	"github.com/moby/buildkit/client/llb"
 
 	"github.com/talos-systems/bldr/internal/pkg/types"
@@ -12,11 +14,12 @@ import (
 
 // Options for bldr.
 type Options struct {
-	BuildPlatform  Platform
-	TargetPlatform Platform
-	Target         string
-	CommonPrefix   string
-	ProxyEnv       *llb.ProxyEnv
+	BuildPlatform   Platform
+	TargetPlatform  Platform
+	Target          string
+	CommonPrefix    string
+	ProxyEnv        *llb.ProxyEnv
+	SourceDateEpoch time.Time
 }
 
 // GetVariables returns set of variables set for options.

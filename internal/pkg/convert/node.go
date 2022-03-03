@@ -13,6 +13,7 @@ import (
 	"github.com/moby/buildkit/client/llb"
 	"github.com/opencontainers/go-digest"
 	"github.com/talos-systems/bldr/internal/pkg/constants"
+	"github.com/talos-systems/bldr/internal/pkg/environment"
 	"github.com/talos-systems/bldr/internal/pkg/solver"
 	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
 )
@@ -22,10 +23,29 @@ const (
 	pkgDir         = "/pkg"
 )
 
-var defaultCopyOptions = &llb.CopyInfo{
-	CopyDirContentsOnly: true,
-	CreateDestPath:      true,
-	FollowSymlinks:      true,
+func defaultCopyOptions(options *environment.Options, reproducible bool) *llb.CopyInfo {
+	copyOptions := &llb.CopyInfo{
+		CopyDirContentsOnly: true,
+		CreateDestPath:      true,
+		FollowSymlinks:      true,
+	}
+
+	if reproducible {
+		copyOptions.ChownOpt = &llb.ChownOpt{
+			User: &llb.UserOpt{
+				UID: 0,
+			},
+			Group: &llb.UserOpt{
+				UID: 0,
+			},
+		}
+
+		if !options.SourceDateEpoch.IsZero() {
+			copyOptions.CreatedTime = &options.SourceDateEpoch
+		}
+	}
+
+	return copyOptions
 }
 
 // NodeLLB wraps PackageNode to provide LLB conversion.
@@ -80,7 +100,7 @@ func (node *NodeLLB) context(root llb.State) llb.State {
 	relPath := node.Pkg.BaseDir
 
 	return root.File(
-		llb.Copy(node.Graph.LocalContext, filepath.Join("/", relPath), pkgDir, defaultCopyOptions),
+		llb.Copy(node.Graph.LocalContext, filepath.Join("/", relPath), pkgDir, defaultCopyOptions(node.Graph.Options, false)),
 		llb.WithCustomNamef(node.Prefix+"context %s -> %s", relPath, pkgDir),
 	)
 }
@@ -138,7 +158,7 @@ func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
 		}
 
 		root = root.File(
-			llb.Copy(depState, dep.Src(), dep.Dest(), defaultCopyOptions),
+			llb.Copy(depState, dep.Src(), dep.Dest(), defaultCopyOptions(node.Graph.Options, false)),
 			llb.WithCustomNamef("copy --from %s %s -> %s", srcName, dep.Src(), dep.Dest()))
 	}
 
@@ -167,7 +187,7 @@ func (node *NodeLLB) stepDownload(root llb.State, step v1alpha2.Step) llb.State 
 
 		checksummer := node.Graph.Checksummer.File(
 			llb.Mkfile("/checksums", 0644, source.ToSHA512Sum()).
-				Copy(download, "/", "/", defaultCopyOptions).
+				Copy(download, "/", "/", defaultCopyOptions(node.Graph.Options, false)).
 				Mkdir("/empty", constants.DefaultDirMode),
 			llb.WithCustomName(node.Prefix+"cksum-prepare"),
 		).Run(
@@ -178,8 +198,8 @@ func (node *NodeLLB) stepDownload(root llb.State, step v1alpha2.Step) llb.State 
 		).Root()
 
 		root = root.File(
-			llb.Copy(download, "/", step.TmpDir, defaultCopyOptions).
-				Copy(checksummer, "/empty", "/", defaultCopyOptions), // TODO: this is "fake" dependency on checksummer
+			llb.Copy(download, "/", step.TmpDir, defaultCopyOptions(node.Graph.Options, false)).
+				Copy(checksummer, "/empty", "/", defaultCopyOptions(node.Graph.Options, false)), // TODO: this is "fake" dependency on checksummer
 			llb.WithCustomName(node.Prefix+"download finalize"),
 		)
 	}
@@ -253,7 +273,7 @@ func (node *NodeLLB) finalize(root llb.State) llb.State {
 
 	for _, fin := range node.Pkg.Finalize {
 		newroot = newroot.File(
-			llb.Copy(root, fin.From, fin.To, defaultCopyOptions),
+			llb.Copy(root, fin.From, fin.To, defaultCopyOptions(node.Graph.Options, true)),
 			llb.WithCustomNamef(node.Prefix+"finalize %s -> %s", fin.From, fin.To),
 		)
 	}

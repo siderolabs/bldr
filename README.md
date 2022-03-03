@@ -325,6 +325,8 @@ Step `finalize` performs final copying of the build artifacts into scratch image
 
 Finalize instruction `{"from": "/", "to": "/"}` copies full build contents as output image, but usually it doesn't make sense to include build temporary files and build dependencies into the package output. Usual trick to install build result under designated initially empty prefix (e.g. `/rootfs`) and set only contents of that prefix as build output.
 
+If `SOURCE_DATE_EPOCH` build argument is set, `bldr` will update timestamps of all files copied in the `finalize` step to the value of `SOURCE_DATE_EPOCH`.
+
 ### Built-in variables
 
 Variables are made available to the templating engine when processing `pkg.yaml` contents and also pushed into the build as environment variables.

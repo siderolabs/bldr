@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	ctrplatforms "github.com/containerd/containerd/platforms"
 	"github.com/moby/buildkit/client/llb"
@@ -30,7 +31,8 @@ const (
 	keyTargetPlatform = "platform"
 	keyMultiPlatform  = "multi-platform"
 
-	buildArgPrefix = "build-arg:"
+	buildArgPrefix          = "build-arg:"
+	buildArgSourceDateEpoch = buildArgPrefix + "SOURCE_DATE_EPOCH"
 
 	localNameDockerfile = "dockerfile"
 	sharedKeyHint       = constants.PkgYaml
@@ -44,6 +46,15 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 
 	options.Target = opts[keyTarget]
 	options.ProxyEnv = proxyEnvFromBuildArgs(filter(opts, buildArgPrefix))
+
+	if sourceDateEpoch, ok := opts[buildArgSourceDateEpoch]; ok {
+		timestamp, err := strconv.ParseInt(sourceDateEpoch, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing %q: %w", buildArgSourceDateEpoch, err)
+		}
+
+		options.SourceDateEpoch = time.Unix(timestamp, 0)
+	}
 
 	platforms := []environment.Platform{options.TargetPlatform}
 
