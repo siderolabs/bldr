@@ -21,7 +21,7 @@ can be exported as container image.
 ## Usage
 
 Given directory structure with `Pkgfile` and `pkg.yaml`
-(see [tools repository](https://github.com/talos-systems/tools) as an example),build can be triggered using following commands:
+(see [tools repository](https://github.com/siderolabs/tools) as an example),build can be triggered using following commands:
 
 - via `docker buildx`:
 
@@ -129,15 +129,15 @@ names are ignored.
 ### `Pkgfile`
 
 ```yaml
-# syntax = ghcr.io/talos-systems/bldr:v0.2.0-alpha.3-frontend
+# syntax = ghcr.io/siderolabs/bldr:v0.2.0-alpha.3-frontend
 
 format: v1alpha2
 
 vars:
-  TOOLCHAIN_IMAGE: ghcr.io/talos-systems/tools:v0.3.0-8-ge86a8f3
+  TOOLCHAIN_IMAGE: ghcr.io/siderolabs/tools:v0.3.0-8-ge86a8f3
 
 labels:
-  org.opencontainers.image.source: https://github.com/talos-systems/bldr
+  org.opencontainers.image.source: https://github.com/siderolabs/bldr
 ```
 
 First line of the file should always be magic comment which is picked up by
@@ -238,7 +238,7 @@ Internal dependency:
 External dependency:
 
 ```yaml
-- image: ghcr.io/talos-systems/tools:v0.3.0-8-ge86a8f3
+- image: ghcr.io/siderolabs/tools:v0.3.0-8-ge86a8f3
   runtime: false
   to: /
 ```

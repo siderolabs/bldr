@@ -34,12 +34,12 @@ COPY hack/golang/golangci-lint.yaml .
 RUN --mount=type=cache,target=/root/.cache/go-build golangci-lint run --config golangci-lint.yaml
 
 FROM scratch AS bldr
-LABEL org.opencontainers.image.source https://github.com/talos-systems/bldr
+LABEL org.opencontainers.image.source https://github.com/siderolabs/bldr
 COPY --from=build /bldr /bldr
 
 FROM scratch AS integration.test
 COPY --from=build /src/integration.test /integration.test
 
 FROM bldr AS frontend
-LABEL org.opencontainers.image.source https://github.com/talos-systems/bldr
+LABEL org.opencontainers.image.source https://github.com/siderolabs/bldr
 ENTRYPOINT ["/bldr", "frontend"]

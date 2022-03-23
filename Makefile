@@ -1,5 +1,5 @@
 REGISTRY ?= ghcr.io
-USERNAME ?= talos-systems
+USERNAME ?= siderolabs
 TAG ?= $(shell git describe --tag --always --dirty)
 REGISTRY_AND_USERNAME := $(REGISTRY)/$(USERNAME)
 RUN_TESTS ?= TestIntegration
