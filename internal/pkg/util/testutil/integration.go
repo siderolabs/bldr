@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/otiai10/copy"
 	"github.com/talos-systems/bldr/internal/pkg/constants"
@@ -100,11 +101,25 @@ func (test IntegrationTest) run(t *testing.T) {
 	test.patch(t)
 
 	for _, runManifest := range test.Manifest.Runs {
-		runner, err := getRunner(runManifest)
-		if err != nil {
-			t.Fatal(err)
-		}
+		func() {
+			if runManifest.CreateFile != "" {
+				if err := ioutil.WriteFile(runManifest.CreateFile, []byte(time.Now().String()), 0o644); err != nil {
+					t.Fatalf("error creating file %q: %v", runManifest.CreateFile, err)
+				}
 
-		t.Run(runManifest.Name, runner.Run)
+				defer func() {
+					if err := os.Remove(runManifest.CreateFile); err != nil {
+						t.Fatalf("error removing file %q: %v", runManifest.CreateFile, err)
+					}
+				}()
+			}
+
+			runner, err := getRunner(runManifest)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			t.Run(runManifest.Name, runner.Run)
+		}()
 	}
 }

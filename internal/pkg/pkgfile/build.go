@@ -33,6 +33,7 @@ const (
 
 	buildArgPrefix          = "build-arg:"
 	buildArgSourceDateEpoch = buildArgPrefix + "SOURCE_DATE_EPOCH"
+	buildArgCacheNS         = buildArgPrefix + "BUILDKIT_CACHE_MOUNT_NS"
 
 	localNameDockerfile = "dockerfile"
 	sharedKeyHint       = constants.PkgYaml
@@ -54,6 +55,10 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 		}
 
 		options.SourceDateEpoch = time.Unix(timestamp, 0)
+	}
+
+	if cacheNS, ok := opts[buildArgCacheNS]; ok {
+		options.CacheIDNamespace = cacheNS
 	}
 
 	platforms := []environment.Platform{options.TargetPlatform}

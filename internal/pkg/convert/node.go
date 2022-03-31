@@ -260,9 +260,16 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 			runOptions := append([]llb.RunOption(nil), node.Graph.commonRunOptions...)
 
 			if step.CachePath != "" {
-				sharing := llb.CacheMountShared
-
-				runOptions = append(runOptions, llb.AddMount(step.CachePath, root, llb.AsPersistentCacheDir(path.Clean(step.CachePath), sharing)))
+				runOptions = append(runOptions,
+					llb.AddMount(
+						step.CachePath,
+						llb.Scratch(),
+						llb.AsPersistentCacheDir(
+							path.Clean(node.Graph.Options.CacheIDNamespace+"/"+step.CachePath),
+							llb.CacheMountShared,
+						),
+					),
+				)
 			}
 
 			runOptions = append(runOptions,

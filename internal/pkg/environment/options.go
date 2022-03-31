@@ -14,12 +14,13 @@ import (
 
 // Options for bldr.
 type Options struct {
-	BuildPlatform   Platform
-	TargetPlatform  Platform
-	Target          string
-	CommonPrefix    string
-	ProxyEnv        *llb.ProxyEnv
-	SourceDateEpoch time.Time
+	BuildPlatform    Platform
+	TargetPlatform   Platform
+	Target           string
+	CommonPrefix     string
+	ProxyEnv         *llb.ProxyEnv
+	SourceDateEpoch  time.Time
+	CacheIDNamespace string
 }
 
 // GetVariables returns set of variables set for options.

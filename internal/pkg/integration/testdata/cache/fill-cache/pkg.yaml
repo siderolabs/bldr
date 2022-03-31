@@ -1,0 +1,9 @@
+name: fill-cache
+steps:
+- cache: /.cache
+  prepare:
+    -  echo "foo" > /.cache/foo
+
+finalize:
+  - from: /pkg
+    to: /

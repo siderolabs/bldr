@@ -1,0 +1,14 @@
+---
+run:
+  - name: docker
+    runner: docker
+    target: check-cache
+    expect: success
+  - name: docker-context-change
+    runner: docker
+    target: check-cache
+    expect: success
+    createFile: check-cache/bar
+  - name: validate
+    runner: validate
+    expect: success
