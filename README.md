@@ -232,6 +232,7 @@ Internal dependency:
 ```yaml
 - stage: gcc
   runtime: false
+  from: /
   to: /
 ```
 
@@ -248,6 +249,7 @@ Properties:
 - `stage` (*str*, *internal dependency*): name of other package this package depends on. Circular dependencies are not allowed. Contents of the stage are poured into the build at the location specified with `to:` parameter.
 - `image` (*str*, *external dependency*): reference to the registry container image this package depends on. Contents of the image are poured into the build at the location specified with `to:` parameter.
 - `runtime` (*bool*, *optional*): if set, marks dependency as runtime. This means that when this package is pulled in into the build, all the runtime dependencies are pulled in automatically as well. This also applies to transitive runtime dependencies.
+- `from` (*str*, *optional*, default `/`): base path to copy from the dependency.
 - `to` (*str*, *optional*, default `/`): location to copy dependency contents to.
 
 ### `steps`

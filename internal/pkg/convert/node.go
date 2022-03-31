@@ -122,6 +122,10 @@ func (node *NodeLLB) convertDependency(dep solver.PackageDependency) (depState l
 }
 
 func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
+	if len(node.Dependencies) == 0 {
+		return root, nil
+	}
+
 	deps := make([]solver.PackageDependency, 0, len(node.Dependencies))
 
 	// collect all the dependencies including transitive runtime dependencies
@@ -140,6 +144,8 @@ func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
 
 	seen := map[string]struct{}{}
 
+	stages := []llb.State{root}
+
 	for _, dep := range deps {
 		if _, alreadyProcessed := seen[dep.ID()]; alreadyProcessed {
 			continue
@@ -157,12 +163,20 @@ func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
 			return llb.Scratch(), err
 		}
 
-		root = root.File(
-			llb.Copy(depState, dep.Src(), dep.Dest(), defaultCopyOptions(node.Graph.Options, false)),
-			llb.WithCustomNamef("copy --from %s %s -> %s", srcName, dep.Src(), dep.Dest()))
+		if dep.Src() == "/" && dep.Dest() == "/" {
+			// skip copying if the source and destination are "/"
+			stages = append(stages, depState)
+		} else {
+			stages = append(stages,
+				llb.Scratch().File(
+					llb.Copy(depState, dep.Src(), dep.Dest(), defaultCopyOptions(node.Graph.Options, false)),
+					llb.WithCustomNamef(node.Prefix+"copy --from %s %s -> %s", srcName, dep.Src(), dep.Dest()),
+				),
+			)
+		}
 	}
 
-	return root, nil
+	return root.WithOutput(llb.Merge(stages, llb.WithCustomName(node.Prefix+"copy")).Output()), nil
 }
 
 func (node *NodeLLB) stepTmpDir(root llb.State, i int, step *v1alpha2.Step) llb.State {
@@ -177,6 +191,12 @@ func (node *NodeLLB) stepTmpDir(root llb.State, i int, step *v1alpha2.Step) llb.
 }
 
 func (node *NodeLLB) stepDownload(root llb.State, step v1alpha2.Step) llb.State {
+	if len(step.Sources) == 0 {
+		return root
+	}
+
+	stages := []llb.State{root}
+
 	for _, source := range step.Sources {
 		download := llb.HTTP(
 			source.URL,
@@ -197,14 +217,16 @@ func (node *NodeLLB) stepDownload(root llb.State, step v1alpha2.Step) llb.State 
 			)...,
 		).Root()
 
-		root = root.File(
-			llb.Copy(download, "/", step.TmpDir, defaultCopyOptions(node.Graph.Options, false)).
-				Copy(checksummer, "/empty", "/", defaultCopyOptions(node.Graph.Options, false)), // TODO: this is "fake" dependency on checksummer
-			llb.WithCustomName(node.Prefix+"download finalize"),
+		stages = append(stages,
+			llb.Scratch().File(
+				llb.Copy(download, "/", step.TmpDir, defaultCopyOptions(node.Graph.Options, false)).
+					Copy(checksummer, "/empty", "/", defaultCopyOptions(node.Graph.Options, false)), // TODO: this is "fake" dependency on checksummer
+				llb.WithCustomName(node.Prefix+"download finalize"),
+			),
 		)
 	}
 
-	return root
+	return root.WithOutput(llb.Merge(stages, llb.WithCustomName(node.Prefix+"download")).Output())
 }
 
 func (node *NodeLLB) stepEnvironment(root llb.State, step v1alpha2.Step) llb.State {
@@ -269,16 +291,18 @@ func (node *NodeLLB) step(root llb.State, i int, step v1alpha2.Step) llb.State {
 }
 
 func (node *NodeLLB) finalize(root llb.State) llb.State {
-	newroot := llb.Scratch()
+	stages := make([]llb.State, 0, len(node.Pkg.Finalize))
 
 	for _, fin := range node.Pkg.Finalize {
-		newroot = newroot.File(
-			llb.Copy(root, fin.From, fin.To, defaultCopyOptions(node.Graph.Options, true)),
-			llb.WithCustomNamef(node.Prefix+"finalize %s -> %s", fin.From, fin.To),
+		stages = append(stages,
+			llb.Scratch().File(
+				llb.Copy(root, fin.From, fin.To, defaultCopyOptions(node.Graph.Options, true)),
+				llb.WithCustomNamef(node.Prefix+"finalize %s -> %s", fin.From, fin.To),
+			),
 		)
 	}
 
-	return newroot
+	return llb.Merge(stages, llb.WithCustomNamef(node.Prefix+"finalize"))
 }
 
 // Build converts PackageNode to buildkit LLB.

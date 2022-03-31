@@ -14,6 +14,7 @@ import (
 type Dependency struct {
 	Image   string `yaml:"image,omitempty"`
 	Stage   string `yaml:"stage,omitempty"`
+	From    string `yaml:"from,omitempty"`
 	To      string `yaml:"to,omitempty"`
 	Runtime bool   `yaml:"runtime,omitempty"`
 }
@@ -25,6 +26,10 @@ func (d *Dependency) IsInternal() bool {
 
 // Src returns copy source (from dependency).
 func (d *Dependency) Src() string {
+	if d.From != "" {
+		return d.From
+	}
+
 	return "/"
 }
 
