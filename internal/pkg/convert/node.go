@@ -122,10 +122,6 @@ func (node *NodeLLB) convertDependency(dep solver.PackageDependency) (depState l
 }
 
 func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
-	if len(node.Dependencies) == 0 {
-		return root, nil
-	}
-
 	deps := make([]solver.PackageDependency, 0, len(node.Dependencies))
 
 	// collect all the dependencies including transitive runtime dependencies
@@ -174,6 +170,10 @@ func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
 				),
 			)
 		}
+	}
+
+	if len(stages) == 1 {
+		return root, nil
 	}
 
 	return root.WithOutput(llb.Merge(stages, llb.WithCustomName(node.Prefix+"copy")).Output()), nil
