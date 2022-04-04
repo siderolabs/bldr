@@ -15,6 +15,8 @@ COMMON_ARGS += --platform=$(PLATFORM)
 COMMON_ARGS += --build-arg=VERSION=$(TAG)
 COMMON_ARGS += --build-arg=USERNAME=$(USERNAME)
 COMMON_ARGS += --build-arg=REGISTRY=$(REGISTRY)
+COMMON_ARGS += --build-arg=http_proxy=$(http_proxy)
+COMMON_ARGS += --build-arg=https_proxy=$(https_proxy)
 
 PKGS := frontend bldr
 
