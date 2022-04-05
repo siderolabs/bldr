@@ -14,7 +14,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/moby/buildkit v0.10.0
 	github.com/opencontainers/go-digest v1.0.0
-	github.com/opencontainers/image-spec v1.0.2-0.20211117181255-693428a734f5
+	github.com/opencontainers/image-spec v1.0.2
 	github.com/otiai10/copy v1.7.0
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.1

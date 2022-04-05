@@ -54,8 +54,6 @@ type NodeLLB struct {
 
 	Graph  *GraphLLB
 	Prefix string
-
-	promotedDependency string
 }
 
 // NewNodeLLB wraps PackageNode for LLB conversion.
@@ -68,18 +66,8 @@ func NewNodeLLB(node *solver.PackageNode, graph *GraphLLB) *NodeLLB {
 	}
 }
 
-func (node *NodeLLB) base() (llb.State, error) {
-	if node.Pkg.Variant == v1alpha2.Scratch && len(node.Dependencies) > 0 {
-		// pull the first dependency as base image if the package build is from scratch
-		promotedDep := node.Dependencies[0]
-		node.promotedDependency = promotedDep.ID()
-
-		depState, _, err := node.convertDependency(promotedDep)
-
-		return node.Graph.baseImageProcessor(depState), err
-	}
-
-	return node.Graph.BaseImages[node.Pkg.Variant], nil
+func (node *NodeLLB) base() llb.State {
+	return node.Graph.BaseImages[node.Pkg.Variant]
 }
 
 func (node *NodeLLB) install(root llb.State) llb.State {
@@ -148,11 +136,6 @@ func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
 		}
 
 		seen[dep.ID()] = struct{}{}
-
-		if node.promotedDependency == dep.ID() {
-			// dependency promoted as base image, skip it
-			continue
-		}
 
 		depState, srcName, err := node.convertDependency(dep)
 		if err != nil {
@@ -318,12 +301,9 @@ func (node *NodeLLB) Build() (llb.State, error) {
 		return state, nil
 	}
 
-	root, err := node.base()
-	if err != nil {
-		return llb.Scratch(), err
-	}
+	root := node.base()
 
-	root, err = node.dependencies(root)
+	root, err := node.dependencies(root)
 	if err != nil {
 		return llb.Scratch(), err
 	}
