@@ -189,7 +189,7 @@ func (node *NodeLLB) stepDownload(root llb.State, step v1alpha2.Step) llb.State 
 		)
 
 		checksummer := node.Graph.Checksummer.File(
-			llb.Mkfile("/checksums", 0644, source.ToSHA512Sum()).
+			llb.Mkfile("/checksums", 0o644, source.ToSHA512Sum()).
 				Copy(download, "/", "/", defaultCopyOptions(node.Graph.Options, false)).
 				Mkdir("/empty", constants.DefaultDirMode),
 			llb.WithCustomName(node.Prefix+"cksum-prepare"),

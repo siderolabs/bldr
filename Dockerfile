@@ -1,13 +1,13 @@
 # syntax = docker/dockerfile-upstream:1.2.0
 
-FROM golang:1.17-alpine AS base
+FROM golang:1.18-alpine AS base
 ENV GO111MODULE on
 ENV GOPROXY https://proxy.golang.org
 ENV CGO_ENABLED 0
 ENV GOCACHE /.cache/go-build
 ENV GOMODCACHE /.cache/mod
 RUN apk --update --no-cache add bash curl
-RUN curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b /bin v1.27.0
+RUN curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b /bin v1.45.2
 WORKDIR /src
 COPY ./go.mod ./
 COPY ./go.sum ./

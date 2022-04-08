@@ -10,13 +10,16 @@ import "os"
 const DefaultBaseImage = "docker.io/alpine:3.14"
 
 // DefaultDirMode is UNIX file mode for mkdir.
-const DefaultDirMode os.FileMode = 0755
+const DefaultDirMode os.FileMode = 0o755
 
 // DefaultPath is default value for PATH environment variable.
 const DefaultPath = "/bin:/usr/bin:/sbin:/usr/sbin"
 
 // PkgYaml is the filename of 'pkg.yaml'.
 const PkgYaml = "pkg.yaml"
+
+// VarsYaml is the filename of 'vars.yaml'.
+const VarsYaml = "vars.yaml"
 
 // Pkgfile is the filename of 'Pkgfile'.
 const Pkgfile = "Pkgfile"

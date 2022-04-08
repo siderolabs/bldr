@@ -41,7 +41,7 @@ const (
 
 // Build is an entrypoint for buildkit frontend.
 //
-//nolint:gocyclo
+//nolint:gocyclo,cyclop
 func Build(ctx context.Context, c client.Client, options *environment.Options) (*client.Result, error) {
 	opts := c.BuildOpts().Opts
 
@@ -118,8 +118,12 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 				return err
 			}
 
+			buildContext := options.GetVariables().Copy()
+			// push build arguments as `BUILD_ARGS_` prefixed variables
+			buildContext.Merge(prefix(filter(opts, buildArgPrefix), "BUILD_ARG_"))
+
 			loader := solver.BuildkitFrontendLoader{
-				Context: options.GetVariables(),
+				Context: buildContext,
 				Ref:     pkgRef,
 				Ctx:     ctx,
 			}
@@ -143,7 +147,7 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 				Definition: def.ToPB(),
 			})
 			if err != nil {
-				return fmt.Errorf("failed to resolve dockerfile: %q", err)
+				return fmt.Errorf("failed to solve LLB: %w", err)
 			}
 
 			ref, err := r.SingleRef()
@@ -206,12 +210,13 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 }
 
 func fetchPkgs(ctx context.Context, c client.Client) (client.Reference, error) {
-	name := fmt.Sprintf("load %s and %ss", constants.Pkgfile, constants.PkgYaml)
+	name := fmt.Sprintf("load %s, %ss and %ss", constants.Pkgfile, constants.PkgYaml, constants.VarsYaml)
 
 	src := llb.Local(localNameDockerfile,
 		llb.IncludePatterns([]string{
 			constants.Pkgfile,
 			"**/" + constants.PkgYaml,
+			"**/" + constants.VarsYaml,
 			"*/",
 		}),
 		llb.SessionID(c.BuildOpts().SessionID),
@@ -221,14 +226,14 @@ func fetchPkgs(ctx context.Context, c client.Client) (client.Reference, error) {
 
 	def, err := src.Marshal(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal local source: %q", err)
+		return nil, fmt.Errorf("failed to marshal local source: %w", err)
 	}
 
 	res, err := c.Solve(ctx, client.SolveRequest{
 		Definition: def.ToPB(),
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to resolve pkgfile: %q", err)
+		return nil, fmt.Errorf("failed to resolve pkgfile: %w", err)
 	}
 
 	return res.SingleRef()
@@ -274,6 +279,16 @@ func filter(opt map[string]string, key string) map[string]string {
 		if strings.HasPrefix(k, key) {
 			m[strings.TrimPrefix(k, key)] = v
 		}
+	}
+
+	return m
+}
+
+func prefix(opt map[string]string, prefix string) map[string]string {
+	m := map[string]string{}
+
+	for k, v := range opt {
+		m[prefix+k] = v
 	}
 
 	return m

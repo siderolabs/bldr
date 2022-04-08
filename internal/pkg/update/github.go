@@ -6,6 +6,7 @@ package update
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -90,7 +91,7 @@ func (g *gitHub) Latest(ctx context.Context, source string) (*LatestInfo, error)
 
 // findLatestRelease returns information about latest released version.
 //
-//nolint:gocyclo
+//nolint:gocyclo,cyclop
 func (g *gitHub) findLatestRelease(releases []*github.RepositoryRelease, sourceURL *url.URL, considerPrereleases bool) (*LatestInfo, error) {
 	parts := strings.Split(sourceURL.Path, "/")
 	owner, repo := parts[1], parts[2]
@@ -266,7 +267,9 @@ func (g *gitHub) wrapGitHubError(err error) error {
 		return nil
 	}
 
-	if _, ok := err.(*github.RateLimitError); ok {
+	var ghe *github.RateLimitError
+
+	if errors.As(err, &ghe) {
 		err = fmt.Errorf("%w\nSet `BLDR_GITHUB_TOKEN` or `GITHUB_TOKEN` environment variable", err)
 	}
 

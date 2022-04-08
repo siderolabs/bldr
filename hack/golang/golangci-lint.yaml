@@ -119,6 +119,16 @@ linters:
     - godox
     - gocognit
     - goerr113
+    - exhaustivestruct
+    - paralleltest
+    - thelper
+    - varnamelen
+    - wrapcheck
+    - forbidigo
+    - gomoddirectives
+    - gomnd
+    - ireturn
+    - gci
   disable-all: false
   fast: false
 

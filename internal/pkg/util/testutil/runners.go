@@ -5,6 +5,7 @@
 package testutil
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -18,12 +19,19 @@ type Run interface {
 
 // CommandRunner is an abstract runner mix-in which processes command result.
 type CommandRunner struct {
-	Expect string
+	Expect       string
+	ExpectStdout *string
 }
 
 func (runner CommandRunner) run(t *testing.T, cmd *exec.Cmd, title string) {
+	var stdout bytes.Buffer
+
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
+
+	if runner.ExpectStdout != nil {
+		cmd.Stdout = &stdout
+	}
 
 	err := cmd.Run()
 
@@ -38,6 +46,12 @@ func (runner CommandRunner) run(t *testing.T, cmd *exec.Cmd, title string) {
 		}
 	default:
 		t.Fatalf("unsupported expect %q", runner.Expect)
+	}
+
+	if runner.ExpectStdout != nil {
+		if *runner.ExpectStdout != stdout.String() {
+			t.Fatalf("%s stdout mismatch: %q != %q", title, *runner.ExpectStdout, stdout.String())
+		}
 	}
 }
 
@@ -58,6 +72,15 @@ func getRunner(manifest RunManifest) (Run, error) {
 			},
 			Target:   manifest.Target,
 			Platform: manifest.Platform,
+		}, nil
+	case "eval":
+		return EvalRunner{
+			CommandRunner: CommandRunner{
+				Expect:       manifest.Expect,
+				ExpectStdout: manifest.ExpectStdout,
+			},
+			Target:   manifest.Target,
+			Template: manifest.Template,
 		}, nil
 	case "llb":
 		return LLBRunner{

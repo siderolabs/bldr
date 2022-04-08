@@ -1,0 +1,16 @@
+name: vars-yaml-inner
+steps:
+-
+  prepare:
+    - mkdir -p /root
+
+  build:
+    - touch /root/{{ .INNERLEVEL }} # variables from vars.yaml same level are available for templates
+
+  test:
+    - test "{{ .TOPLEVEL }}" = "toplevel" # test for the variable
+    - test "{{ .PACKAGELEVEL }}" = "toplevel packagelevel" # test for the variable
+
+finalize:
+  - from: /root
+    to: /result

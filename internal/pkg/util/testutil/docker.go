@@ -5,7 +5,6 @@
 package testutil
 
 import (
-	"log"
 	"os/exec"
 	"sync"
 	"testing"
@@ -24,13 +23,17 @@ func (runner DockerRunner) Run(t *testing.T) {
 		t.Skipf("docker buildx is not available: %q", err)
 	}
 
-	args := []string{"buildx", "build", "-f", "./Pkgfile", "--target", runner.Target}
+	args := []string{
+		"buildx",
+		"build",
+		"-f", "./Pkgfile",
+		"--target", runner.Target,
+		"--build-arg", "TAG=testtag",
+	}
 
 	if runner.Platform != "" {
 		args = append(args, "--platform", runner.Platform)
 	}
-
-	log.Printf("args = %v", args)
 
 	cmd := exec.Command("docker", append(args, ".")...)
 
@@ -38,7 +41,8 @@ func (runner DockerRunner) Run(t *testing.T) {
 }
 
 var (
-	dockerCheckOnce  sync.Once
+	dockerCheckOnce sync.Once
+	//nolint:errname
 	dockerCheckError error
 )
 

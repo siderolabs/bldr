@@ -1,0 +1,21 @@
+name: vars-yaml-0
+dependencies:
+  - stage: vars-yaml-inner
+    from: /result
+    to: /root
+steps:
+-
+  prepare:
+    - mkdir -p /root
+
+  build:
+    - touch /root/{{ .TOPLEVEL }} # variables from top-level vars.yaml are available for templates
+    - touch /root/{{ .BUILD_ARG_TAG}} # variables from build args are imported as BUILD_ARG_xxx
+
+  test:
+    - test "{{ .TOPLEVEL }}" = "toplevel" # test for the variable
+    - test "{{ .PACKAGELEVEL }}" = "toplevel packagelevel" # test for the variable
+
+finalize:
+  - from: /root
+    to: /result

@@ -30,7 +30,7 @@ type updateInfo struct {
 	*update.LatestInfo
 }
 
-//nolint:gocyclo
+//nolint:gocyclo,cyclop
 func checkUpdates(ctx context.Context, set solver.PackageSet, l *log.Logger) error {
 	var (
 		wg          sync.WaitGroup
@@ -50,6 +50,7 @@ func checkUpdates(ctx context.Context, set solver.PackageSet, l *log.Logger) err
 				res, e := update.Latest(ctx, src.source)
 				if e != nil {
 					l.Print(e)
+
 					continue
 				}
 
@@ -120,6 +121,7 @@ var updateCmdFlag struct {
 var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update pkgs",
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if !updateCmdFlag.dry {
 			log.Fatal("Real update is not implemented yet; pass `--dry` flag.")

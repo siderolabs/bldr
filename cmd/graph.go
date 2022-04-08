@@ -23,6 +23,7 @@ Typical usage:
 
   bldr graph | dot -Tpng > graph.png
 `,
+	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		loader := solver.FilesystemPackageLoader{
 			Root:    pkgRoot,

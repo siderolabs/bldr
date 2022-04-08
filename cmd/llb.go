@@ -29,6 +29,7 @@ var llbCmd = &cobra.Command{
 	Long: `This command parses build instructions from pkg.yaml files,
 and outputs buildkit LLB to stdout. This can be used as 'bldr pack ... | buildctl ...'.
 `,
+	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		loader := solver.FilesystemPackageLoader{
 			Root:    pkgRoot,

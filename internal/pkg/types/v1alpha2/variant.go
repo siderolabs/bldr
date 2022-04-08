@@ -24,8 +24,7 @@ func (v Variant) String() string {
 func (v *Variant) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var aux string
 
-	err := unmarshal(&aux)
-	if err != nil {
+	if err := unmarshal(&aux); err != nil {
 		return err
 	}
 

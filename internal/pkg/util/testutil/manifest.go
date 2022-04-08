@@ -17,12 +17,14 @@ type TestManifest struct {
 
 // RunManifest describes single run of integration test.
 type RunManifest struct {
-	Name       string `yaml:"name"`
-	Runner     string `yaml:"runner"`
-	Platform   string `yaml:"platform"`
-	Target     string `yaml:"target"`
-	Expect     string `yaml:"expect"`
-	CreateFile string `yaml:"createFile"`
+	Name         string  `yaml:"name"`
+	Runner       string  `yaml:"runner"`
+	Platform     string  `yaml:"platform"`
+	Target       string  `yaml:"target"`
+	Expect       string  `yaml:"expect"`
+	ExpectStdout *string `yaml:"expectStdout"`
+	CreateFile   string  `yaml:"createFile"`
+	Template     string  `yaml:"template"`
 }
 
 // NewTestManifest loads TestManifest from test.yaml file.

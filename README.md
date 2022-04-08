@@ -107,11 +107,13 @@ bldr validate
 
 ```text
 ├── Pkgfile
+├── vars.yaml
 ├── protobuf
 │   ├── patches
 │   │   └── musl-fix.patch
 │   └── pkg.yaml
 ├── protoc-gen-go
+│   ├── vars.yaml
 │   └── pkg.yaml
 ├── python2
 │   └── pkg.yaml
@@ -125,6 +127,8 @@ the build processes (patches, additional files, sources, etc.)
 Subdirectory structure could is flexible, `bldr` just looks for
 any subdirectory which has `pkg.yaml` file in it. Subdirectory
 names are ignored.
+
+Additional variables
 
 ### `Pkgfile`
 
@@ -153,6 +157,13 @@ Rest of the `Pkgfile` is regular YAML file with the following fields:
 `bldr` parses `Pkgfile` as the first thing during the build, it should always
 reside at the root of the build tree.
 
+### Build Arguments
+
+Any build arguments are added to the list of variables available with the prefix `BUILD_ARG_`.
+
+For example, if the `--build-arg=TAG=v1.0.0` is set, the variable `BUILD_ARG_TAG: v1.0.0` will be set at the
+global level.
+
 ### Package
 
 Package is a subdirectory with `pkg.yaml` file in it.
@@ -161,11 +172,21 @@ Package is a subdirectory with `pkg.yaml` file in it.
 ├── protobuf
 │   ├── patches
 │   │   └── musl-fix.patch
-│   └── pkg.yaml
+│   ├── pkg.yaml
+│   └── vars.yaml
 ```
 
 Any additional files in the directory are copied into the build and
 are available under `/pkg` subdirectory. For example, during the build the patch file above will be copied as `/pkg/patches/musl-fix.patch`.
+
+### `vars.yaml`
+
+`vars.yaml` contains set of variables which can be used as in the `pkg.yaml` template.
+
+The file `vars.yaml` is templated using variables from the `Pkgfile`, build arguments and any `vars.yaml` on the upper
+levels of the tree. So variables can be deeply nested and use values from any level above.
+
+When `pkg.yaml` is templated, all variables available in the directory level matching `pkg.yaml` are available.
 
 ### `pkg.yaml`
 

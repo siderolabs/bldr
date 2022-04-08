@@ -13,7 +13,7 @@ import (
 )
 
 func convertDeps(stageNames []string, old []*v1alpha1.Dependency) v1alpha2.Dependencies {
-	new := v1alpha2.Dependencies{}
+	newDep := v1alpha2.Dependencies{}
 
 	for _, dep := range old {
 		src := strings.SplitN(dep.Image, ":", 2)[0]
@@ -25,27 +25,29 @@ func convertDeps(stageNames []string, old []*v1alpha1.Dependency) v1alpha2.Depen
 		for _, stageName := range stageNames {
 			if src == stageName {
 				isStage = true
+
 				break
 			}
 		}
 
 		if isStage {
-			new = append(new, v1alpha2.Dependency{
+			newDep = append(newDep, v1alpha2.Dependency{
 				Stage: src,
 				To:    dep.To,
 			})
 		} else {
-			new = append(new, v1alpha2.Dependency{
+			newDep = append(newDep, v1alpha2.Dependency{
 				Image: dep.Image,
 				To:    dep.To,
 			})
 		}
 	}
 
-	return new
+	return newDep
 }
+
 func convertSteps(old []*v1alpha1.Step) []v1alpha2.Step {
-	new := []v1alpha2.Step{}
+	newSteps := []v1alpha2.Step{}
 
 	for _, step := range old {
 		newStep := v1alpha2.Step{}
@@ -70,18 +72,19 @@ func convertSteps(old []*v1alpha1.Step) []v1alpha2.Step {
 			newStep.Sources = append(newStep.Sources, v1alpha2.Source(*src))
 		}
 
-		new = append(new, newStep)
+		newSteps = append(newSteps, newStep)
 	}
 
-	return new
+	return newSteps
 }
+
 func convertFinalize(old []*v1alpha1.Finalize) []v1alpha2.Finalize {
-	new := []v1alpha2.Finalize{}
+	newFinalize := []v1alpha2.Finalize{}
 	for _, f := range old {
-		new = append(new, v1alpha2.Finalize(*f))
+		newFinalize = append(newFinalize, v1alpha2.Finalize(*f))
 	}
 
-	return new
+	return newFinalize
 }
 
 // FromV1Alpha1 upgrades v1alpha1 format -> v1alpha2.

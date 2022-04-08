@@ -27,3 +27,15 @@ run:
   - name: validate
     runner: validate
     expect: success
+  - name: eval-local
+    runner: eval
+    target: final
+    template: "<<{{ .TOPLEVEL }}>>"
+    expect: success
+    expectStdout: "<<toplevel>>"
+  - name: eval-pkg
+    runner: eval
+    target: vars-yaml-0
+    template: "<<{{ .PACKAGELEVEL }}>>"
+    expect: success
+    expectStdout: "<<toplevel packagelevel>>"

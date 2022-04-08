@@ -122,6 +122,7 @@ func (graph *GraphLLB) buildLocalContext() {
 			[]string{
 				"**/.*",
 				"**/" + constants.PkgYaml,
+				"**/" + constants.VarsYaml,
 			},
 		),
 		llb.WithCustomName(graph.Options.CommonPrefix+"context"),

@@ -31,6 +31,7 @@ func (runner BuildkitRunner) Run(t *testing.T) {
 		"--local", "dockerfile=.",
 		"--opt", "filename=Pkgfile",
 		"--opt", "target="+runner.Target,
+		"--build-arg", "TAG=testtag",
 	)
 
 	if runner.Platform != "" {
@@ -53,7 +54,8 @@ func getBuildkitGlobalFlags() []string {
 }
 
 var (
-	buildkitCheckOnce  sync.Once
+	buildkitCheckOnce sync.Once
+	//nolint:errname
 	buildkitCheckError error
 )
 

@@ -86,6 +86,7 @@ var validateCmd = &cobra.Command{
 	Short: "Validate syntax of pkg.yaml files",
 	Long: `This command scans directory tree for pkg.yaml files,
 loads them and validates for errors. `,
+	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		loader := solver.FilesystemPackageLoader{
 			Root:    pkgRoot,

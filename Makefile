@@ -59,3 +59,7 @@ frontend:
 .PHONY: integration
 integration: integration.test bldr
 	cd internal/pkg/integration && PATH="$$PWD/../../../out/$(subst /,_,$(BUILD_PLATFORM)):$$PATH"  integration.test -test.v -test.run $(RUN_TESTS)
+
+.PHONY: conformance
+conformance: ## Performs policy checks against the commit and source code.
+	docker run --rm -it -v $(PWD):/src -w /src ghcr.io/siderolabs/conform:v0.1.0-alpha.22 enforce
