@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 // Package cmd contains definitions of CLI commands.
 package cmd
@@ -11,7 +11,8 @@ import (
 	"runtime"
 
 	"github.com/spf13/cobra"
-	"github.com/talos-systems/bldr/internal/pkg/environment"
+
+	"github.com/siderolabs/bldr/internal/pkg/environment"
 )
 
 const defaultPlatform = (runtime.GOOS + "/" + runtime.GOARCH)
@@ -49,6 +50,7 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.AddCommand(versionCmd)
 	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "", false, "Enable debug logging")
 	rootCmd.PersistentFlags().StringVarP(&pkgRoot, "root", "", ".", "The path to a pkg root")
 

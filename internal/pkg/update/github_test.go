@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package update_test
 
@@ -12,15 +12,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/talos-systems/bldr/internal/pkg/update"
+	"github.com/siderolabs/bldr/internal/pkg/update"
 )
 
 func TestLatestGithub(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping in -short mode")
-	}
-
 	t.Parallel()
+
+	if !testing.Short() {
+		t.Skip("skipping in normal mode")
+	}
 
 	for source, expected := range map[string]*update.LatestInfo{
 		// https://github.com/pullmoll/musl-fts/releases has only tags.
@@ -53,10 +53,10 @@ func TestLatestGithub(t *testing.T) {
 			BaseURL:   "https://github.com/protocolbuffers/protobuf/releases/",
 			LatestURL: "",
 		},
-		"https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protobuf-cpp-3.17.3.tar.gz": {
+		"https://github.com/protocolbuffers/protobuf/releases/download/v21.5/protobuf-cpp-3.21.5.tar.gz": {
 			HasUpdate: false,
 			BaseURL:   "https://github.com/protocolbuffers/protobuf/releases/",
-			LatestURL: "https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protobuf-cpp-3.17.3.tar.gz",
+			LatestURL: "https://github.com/protocolbuffers/protobuf/releases/download/v21.5/protobuf-cpp-3.21.5.tar.gz",
 		},
 
 		// https://github.com/opencontainers/runc/releases has releases with extra assets and no version in the file name.
@@ -65,10 +65,10 @@ func TestLatestGithub(t *testing.T) {
 			BaseURL:   "https://github.com/opencontainers/runc/releases/",
 			LatestURL: "",
 		},
-		"https://github.com/opencontainers/runc/releases/download/v1.0.1/runc.tar.xz": {
+		"https://github.com/opencontainers/runc/releases/download/v1.1.4/runc.tar.xz": {
 			HasUpdate: false,
 			BaseURL:   "https://github.com/opencontainers/runc/releases/",
-			LatestURL: "https://github.com/opencontainers/runc/releases/download/v1.0.1/runc.tar.xz",
+			LatestURL: "https://github.com/opencontainers/runc/releases/download/v1.1.4/runc.tar.xz",
 		},
 
 		// https://github.com/containerd/containerd/releases has releases with extra assets that we don't use.
@@ -77,10 +77,10 @@ func TestLatestGithub(t *testing.T) {
 			BaseURL:   "https://github.com/containerd/containerd/releases/",
 			LatestURL: "",
 		},
-		"https://github.com/containerd/containerd/archive/refs/tags/v1.5.3.tar.gz": {
+		"https://github.com/containerd/containerd/archive/refs/tags/v1.6.8.tar.gz": {
 			HasUpdate: false,
 			BaseURL:   "https://github.com/containerd/containerd/releases/",
-			LatestURL: "https://github.com/containerd/containerd/archive/refs/tags/v1.5.3.tar.gz",
+			LatestURL: "https://github.com/containerd/containerd/archive/refs/tags/v1.6.8.tar.gz",
 		},
 	} {
 		source, expected := source, expected
@@ -89,7 +89,7 @@ func TestLatestGithub(t *testing.T) {
 			t.Parallel()
 
 			// check that source is actually working (with optional redirects)
-			resp, err := http.Head(source)
+			resp, err := http.Head(source) //nolint:noctx
 			require.NoError(t, err)
 			require.Equal(t, 200, resp.StatusCode)
 			require.NoError(t, resp.Body.Close())

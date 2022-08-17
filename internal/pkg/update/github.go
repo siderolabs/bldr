@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package update
 
@@ -90,8 +90,6 @@ func (g *gitHub) Latest(ctx context.Context, source string) (*LatestInfo, error)
 }
 
 // findLatestRelease returns information about latest released version.
-//
-//nolint:gocyclo,cyclop
 func (g *gitHub) findLatestRelease(releases []*github.RepositoryRelease, sourceURL *url.URL, considerPrereleases bool) (*LatestInfo, error) {
 	parts := strings.Split(sourceURL.Path, "/")
 	owner, repo := parts[1], parts[2]

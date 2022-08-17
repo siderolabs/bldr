@@ -1,13 +1,13 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package cmd
 
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"runtime"
@@ -16,8 +16,9 @@ import (
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
-	"github.com/talos-systems/bldr/internal/pkg/solver"
-	"github.com/talos-systems/bldr/internal/pkg/update"
+
+	"github.com/siderolabs/bldr/internal/pkg/solver"
+	"github.com/siderolabs/bldr/internal/pkg/update"
 )
 
 type pkgInfo struct {
@@ -26,11 +27,10 @@ type pkgInfo struct {
 }
 
 type updateInfo struct {
-	file string
 	*update.LatestInfo
+	file string
 }
 
-//nolint:gocyclo,cyclop
 func checkUpdates(ctx context.Context, set solver.PackageSet, l *log.Logger) error {
 	var (
 		wg          sync.WaitGroup
@@ -139,7 +139,7 @@ var updateCmd = &cobra.Command{
 
 		l := log.New(log.Writer(), "[update] ", log.Flags())
 		if !debug {
-			l.SetOutput(ioutil.Discard)
+			l.SetOutput(io.Discard)
 		}
 
 		if err = checkUpdates(context.TODO(), packages.ToSet(), l); err != nil {

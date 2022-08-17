@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package solver
 
@@ -14,9 +14,10 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/moby/buildkit/frontend/gateway/client"
-	"github.com/talos-systems/bldr/internal/pkg/constants"
-	"github.com/talos-systems/bldr/internal/pkg/types"
-	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
+
+	"github.com/siderolabs/bldr/internal/pkg/constants"
+	"github.com/siderolabs/bldr/internal/pkg/types"
+	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha2"
 )
 
 // BuildkitFrontendLoader loads packages from buildkit client.Reference.
@@ -33,7 +34,6 @@ type BuildkitFrontendLoader struct {
 
 type processor func(baseDir string, contents []byte) error
 
-//nolint:gocyclo,cyclop
 func (bkfl *BuildkitFrontendLoader) walk(path string, processVars, processPkgs processor) error {
 	entries, err := bkfl.Ref.ReadDir(bkfl.Ctx, client.ReadDirRequest{
 		Path: path,

@@ -1,3 +1,8 @@
+# THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
+#
+# Generated on 2022-08-29T16:54:01Z by kres bb965bb.
+
+---
 policies:
 - type: commit
   spec:
@@ -18,16 +23,15 @@ policies:
       required: true
     conventional:
       types: ["chore","docs","perf","refactor","style","test","release"]
-      scopes: ["*"]
+      scopes: [".*"]
 - type: license
   spec:
     skipPaths:
       - .git/
+      - testdata/
     includeSuffixes:
       - .go
     excludeSuffixes:
       - .pb.go
-    header: |
-      /* This Source Code Form is subject to the terms of the Mozilla Public
-       * License, v. 2.0. If a copy of the MPL was not distributed with this
-       * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+      - .pb.gw.go
+    header: "// This Source Code Form is subject to the terms of the Mozilla Public\u000A// License, v. 2.0. If a copy of the MPL was not distributed with this\u000A// file, You can obtain one at http://mozilla.org/MPL/2.0/.\u000A"

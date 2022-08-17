@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package v1alpha2
 
@@ -83,7 +83,7 @@ func (source *Source) Validate() error {
 // ValidateChecksums downloads the source, validates checksums,
 // and returns actual checksums and validation error, if any.
 func (source *Source) ValidateChecksums(ctx context.Context) (string, string, error) {
-	req, err := http.NewRequestWithContext(ctx, "GET", source.URL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, source.URL, nil)
 	if err != nil {
 		return "", "", err
 	}

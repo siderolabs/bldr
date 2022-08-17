@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package testutil
 
@@ -8,13 +8,13 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/otiai10/copy"
-	"github.com/talos-systems/bldr/internal/pkg/constants"
+
+	"github.com/siderolabs/bldr/internal/pkg/constants"
 )
 
 // IntegrationTest describes single integration set (common testdata).
@@ -27,7 +27,7 @@ type IntegrationTest struct {
 // Run executes integration test.
 func (test IntegrationTest) Run(t *testing.T) {
 	// copy test data to temp directory
-	tempDir, err := ioutil.TempDir("", "bldrtest")
+	tempDir, err := os.MkdirTemp("", "bldrtest")
 	if err != nil {
 		t.Fatalf("error creating temp directory: %v", err)
 	}
@@ -70,12 +70,12 @@ func (test IntegrationTest) patch(t *testing.T) {
 		t.Fatalf("error opening %q: %v", constants.Pkgfile, err)
 	}
 
-	contents, err := ioutil.ReadAll(pkgfile)
+	contents, err := io.ReadAll(pkgfile)
 	if err != nil {
 		t.Fatalf("error reading %q: %v", constants.Pkgfile, err)
 	}
 
-	contents = bytes.ReplaceAll(contents, []byte("SHEBANG"), []byte(fmt.Sprintf("%s/%s/bldr:%s-frontend", constants.DefaultRegistry, constants.DefaultOrganization, constants.Version)))
+	contents = bytes.ReplaceAll(contents, []byte("SHEBANG"), []byte(fmt.Sprintf("%s/%s/bldr:%s", constants.DefaultRegistry, constants.DefaultOrganization, constants.Version)))
 
 	_, err = pkgfile.Seek(0, io.SeekStart)
 	if err != nil {
@@ -103,7 +103,7 @@ func (test IntegrationTest) run(t *testing.T) {
 	for _, runManifest := range test.Manifest.Runs {
 		func() {
 			if runManifest.CreateFile != "" {
-				if err := ioutil.WriteFile(runManifest.CreateFile, []byte(time.Now().String()), 0o644); err != nil {
+				if err := os.WriteFile(runManifest.CreateFile, []byte(time.Now().String()), 0o644); err != nil {
 					t.Fatalf("error creating file %q: %v", runManifest.CreateFile, err)
 				}
 

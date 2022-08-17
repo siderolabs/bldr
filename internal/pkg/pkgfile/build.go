@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package pkgfile
 
@@ -20,10 +20,10 @@ import (
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/talos-systems/bldr/internal/pkg/constants"
-	"github.com/talos-systems/bldr/internal/pkg/convert"
-	"github.com/talos-systems/bldr/internal/pkg/environment"
-	"github.com/talos-systems/bldr/internal/pkg/solver"
+	"github.com/siderolabs/bldr/internal/pkg/constants"
+	"github.com/siderolabs/bldr/internal/pkg/convert"
+	"github.com/siderolabs/bldr/internal/pkg/environment"
+	"github.com/siderolabs/bldr/internal/pkg/solver"
 )
 
 const (
@@ -41,7 +41,7 @@ const (
 
 // Build is an entrypoint for buildkit frontend.
 //
-//nolint:gocyclo,cyclop
+//nolint:gocyclo,cyclop,gocognit
 func Build(ctx context.Context, c client.Client, options *environment.Options) (*client.Result, error) {
 	opts := c.BuildOpts().Opts
 
@@ -138,7 +138,7 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 				return err
 			}
 
-			def, err := convert.MarshalLLB(graph, &options)
+			def, err := convert.MarshalLLB(graph, &options) //nolint:contextcheck
 			if err != nil {
 				return err
 			}

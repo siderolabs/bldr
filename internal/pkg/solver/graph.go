@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package solver
 
@@ -9,15 +9,14 @@ import (
 
 	"github.com/emicklei/dot"
 
-	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
+	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha2"
 )
 
 // PackageDependency wraps v1alpha2.Depency with resolved internal dependencies.
 type PackageDependency struct {
-	v1alpha2.Dependency
-
 	// Pkg is set only for Internal dependencies.
 	Node *PackageNode
+	v1alpha2.Dependency
 }
 
 // ID returns unique string for dependency.

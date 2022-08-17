@@ -1,65 +1,193 @@
+# THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
+#
+# Generated on 2022-08-31T21:36:40Z by kres ec2cd64.
+
+# common variables
+
+SHA := $(shell git describe --match=none --always --abbrev=8 --dirty)
+TAG := $(shell git describe --tag --always --dirty)
+BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+ARTIFACTS := _out
 REGISTRY ?= ghcr.io
 USERNAME ?= siderolabs
-TAG ?= $(shell git describe --tag --always --dirty)
-REGISTRY_AND_USERNAME := $(REGISTRY)/$(USERNAME)
-RUN_TESTS ?= TestIntegration
+REGISTRY_AND_USERNAME ?= $(REGISTRY)/$(USERNAME)
+GOLANGCILINT_VERSION ?= v1.49.0
+GOFUMPT_VERSION ?= v0.3.1
+GO_VERSION ?= 1.19
+GOIMPORTS_VERSION ?= v0.1.12
+PROTOBUF_GO_VERSION ?= 1.28.1
+GRPC_GO_VERSION ?= 1.2.0
+GRPC_GATEWAY_VERSION ?= 2.11.1
+VTPROTOBUF_VERSION ?= 0.3.0
+DEEPCOPY_VERSION ?= v0.5.5
+TESTPKGS ?= ./...
+KRES_IMAGE ?= ghcr.io/siderolabs/kres:latest
+CONFORMANCE_IMAGE ?= ghcr.io/siderolabs/conform:latest
 
-BUILD_PLATFORM ?= linux/amd64
-PLATFORM ?= linux/amd64,linux/arm64
-PROGRESS ?= auto
-PUSH ?= false
+# docker build settings
 
 BUILD := docker buildx build
-COMMON_ARGS := --progress=$(PROGRESS)
+PLATFORM ?= linux/amd64
+PROGRESS ?= auto
+PUSH ?= false
+CI_ARGS ?=
+COMMON_ARGS = --file=Dockerfile
+COMMON_ARGS += --progress=$(PROGRESS)
 COMMON_ARGS += --platform=$(PLATFORM)
-COMMON_ARGS += --build-arg=VERSION=$(TAG)
+COMMON_ARGS += --push=$(PUSH)
+COMMON_ARGS += --build-arg=ARTIFACTS=$(ARTIFACTS)
+COMMON_ARGS += --build-arg=SHA=$(SHA)
+COMMON_ARGS += --build-arg=TAG=$(TAG)
 COMMON_ARGS += --build-arg=USERNAME=$(USERNAME)
 COMMON_ARGS += --build-arg=REGISTRY=$(REGISTRY)
-COMMON_ARGS += --build-arg=http_proxy=$(http_proxy)
-COMMON_ARGS += --build-arg=https_proxy=$(https_proxy)
+COMMON_ARGS += --build-arg=TOOLCHAIN=$(TOOLCHAIN)
+COMMON_ARGS += --build-arg=GOLANGCILINT_VERSION=$(GOLANGCILINT_VERSION)
+COMMON_ARGS += --build-arg=GOFUMPT_VERSION=$(GOFUMPT_VERSION)
+COMMON_ARGS += --build-arg=GOIMPORTS_VERSION=$(GOIMPORTS_VERSION)
+COMMON_ARGS += --build-arg=PROTOBUF_GO_VERSION=$(PROTOBUF_GO_VERSION)
+COMMON_ARGS += --build-arg=GRPC_GO_VERSION=$(GRPC_GO_VERSION)
+COMMON_ARGS += --build-arg=GRPC_GATEWAY_VERSION=$(GRPC_GATEWAY_VERSION)
+COMMON_ARGS += --build-arg=VTPROTOBUF_VERSION=$(VTPROTOBUF_VERSION)
+COMMON_ARGS += --build-arg=DEEPCOPY_VERSION=$(DEEPCOPY_VERSION)
+COMMON_ARGS += --build-arg=TESTPKGS=$(TESTPKGS)
+TOOLCHAIN ?= docker.io/golang:1.19-alpine
 
-PKGS := frontend bldr
+# extra variables
 
-all: $(PKGS) lint
+RUN_TESTS ?= TestIntegration
+
+# help menu
+
+export define HELP_MENU_HEADER
+# Getting Started
+
+To build this project, you must have the following installed:
+
+- git
+- make
+- docker (19.03 or higher)
+
+## Creating a Builder Instance
+
+The build process makes use of experimental Docker features (buildx).
+To enable experimental features, add 'experimental: "true"' to '/etc/docker/daemon.json' on
+Linux or enable experimental features in Docker GUI for Windows or Mac.
+
+To create a builder instance, run:
+
+	docker buildx create --name local --use
+
+
+If you already have a compatible builder instance, you may use that instead.
+
+## Artifacts
+
+All artifacts will be output to ./$(ARTIFACTS). Images will be tagged with the
+registry "$(REGISTRY)", username "$(USERNAME)", and a dynamic tag (e.g. $(IMAGE):$(TAG)).
+The registry and username can be overridden by exporting REGISTRY, and USERNAME
+respectively.
+
+endef
+
+all: unit-tests bldr image-bldr integration.test integration lint
+
+.PHONY: clean
+clean:  ## Cleans up all artifacts.
+	@rm -rf $(ARTIFACTS)
+
+target-%:  ## Builds the specified target defined in the Dockerfile. The build result will only remain in the build cache.
+	@$(BUILD) --target=$* $(COMMON_ARGS) $(TARGET_ARGS) $(CI_ARGS) .
+
+local-%:  ## Builds the specified target defined in the Dockerfile using the local output type. The build result will be output to the specified local destination.
+	@$(MAKE) target-$* TARGET_ARGS="--output=type=local,dest=$(DEST) $(TARGET_ARGS)"
+
+lint-golangci-lint:  ## Runs golangci-lint linter.
+	@$(MAKE) target-$@
+
+lint-gofumpt:  ## Runs gofumpt linter.
+	@$(MAKE) target-$@
+
+.PHONY: fmt
+fmt:  ## Formats the source code
+	@docker run --rm -it -v $(PWD):/src -w /src golang:$(GO_VERSION) \
+		bash -c "export GO111MODULE=on; export GOPROXY=https://proxy.golang.org; \
+		go install mvdan.cc/gofumpt@$(GOFUMPT_VERSION) && \
+		gofumpt -w ."
+
+lint-goimports:  ## Runs goimports linter.
+	@$(MAKE) target-$@
+
+.PHONY: base
+base:  ## Prepare base toolchain
+	@$(MAKE) target-$@
+
+.PHONY: unit-tests
+unit-tests:  ## Performs unit tests
+	@$(MAKE) local-$@ DEST=$(ARTIFACTS)
+
+.PHONY: unit-tests-race
+unit-tests-race:  ## Performs unit tests with race detection enabled.
+	@$(MAKE) target-$@
+
+.PHONY: coverage
+coverage:  ## Upload coverage data to codecov.io.
+	bash -c "bash <(curl -s https://codecov.io/bash) -f $(ARTIFACTS)/coverage.txt -X fix"
+
+.PHONY: $(ARTIFACTS)/bldr-linux-amd64
+$(ARTIFACTS)/bldr-linux-amd64:
+	@$(MAKE) local-bldr-linux-amd64 DEST=$(ARTIFACTS)
+
+.PHONY: bldr-linux-amd64
+bldr-linux-amd64: $(ARTIFACTS)/bldr-linux-amd64  ## Builds executable for bldr-linux-amd64.
+
+.PHONY: $(ARTIFACTS)/bldr-linux-arm64
+$(ARTIFACTS)/bldr-linux-arm64:
+	@$(MAKE) local-bldr-linux-arm64 DEST=$(ARTIFACTS)
+
+.PHONY: bldr-linux-arm64
+bldr-linux-arm64: $(ARTIFACTS)/bldr-linux-arm64  ## Builds executable for bldr-linux-arm64.
 
 .PHONY: bldr
-bldr:
-	mkdir -p out
-	$(BUILD) $(COMMON_ARGS) \
-	--target=$@ \
-	--output=type=local,dest=./out \
-	-f ./Dockerfile \
-	.
+bldr: bldr-linux-amd64 bldr-linux-arm64  ## Builds executables for bldr.
+
+.PHONY: lint-markdown
+lint-markdown:  ## Runs markdownlint.
+	@$(MAKE) target-$@
+
+.PHONY: lint
+lint: lint-golangci-lint lint-gofumpt lint-goimports lint-markdown  ## Run all linters for the project.
+
+.PHONY: image-bldr
+image-bldr:  ## Builds image for bldr.
+	@$(MAKE) target-$@ TARGET_ARGS="--tag=$(REGISTRY)/$(USERNAME)/bldr:$(TAG)"
 
 .PHONY: integration.test
 integration.test:
-	mkdir -p out
-	$(BUILD) $(COMMON_ARGS) \
-	--target=$@ \
-	--output=type=local,dest=./out \
-	-f ./Dockerfile \
-	.
-
-.PHONY: lint
-lint:
-	$(BUILD) $(COMMON_ARGS) \
-	--target=$@ \
-	-f ./Dockerfile \
-	.
-
-.PHONY: frontend
-frontend:
-	$(BUILD) $(COMMON_ARGS) \
-	--push=$(PUSH) \
-	--target=$@ \
-	--tag $(REGISTRY_AND_USERNAME)/bldr:$(TAG)-$@ \
-	-f ./Dockerfile \
-	.
+	@$(MAKE) local-$@ DEST=$(ARTIFACTS)
 
 .PHONY: integration
 integration: integration.test bldr
-	cd internal/pkg/integration && PATH="$$PWD/../../../out/$(subst /,_,$(BUILD_PLATFORM)):$$PATH"  integration.test -test.v -test.run $(RUN_TESTS)
+	@$(MAKE) image-bldr PUSH=true
+	cp $(ARTIFACTS)/bldr-$(subst /,-,$(PLATFORM)) $(ARTIFACTS)/bldr
+	cd internal/pkg/integration && PATH="$$PWD/../../../$(ARTIFACTS):$$PATH" integration.test -test.v -test.run $(RUN_TESTS)
+
+.PHONY: rekres
+rekres:
+	@docker pull $(KRES_IMAGE)
+	@docker run --rm -v $(PWD):/src -w /src -e GITHUB_TOKEN $(KRES_IMAGE)
+
+.PHONY: help
+help:  ## This help menu.
+	@echo "$$HELP_MENU_HEADER"
+	@grep -E '^[a-zA-Z%_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+.PHONY: release-notes
+release-notes:
+	mkdir -p $(ARTIFACTS)
+	@ARTIFACTS=$(ARTIFACTS) ./hack/release.sh $@ $(ARTIFACTS)/RELEASE_NOTES.md $(TAG)
 
 .PHONY: conformance
-conformance: ## Performs policy checks against the commit and source code.
-	docker run --rm -it -v $(PWD):/src -w /src ghcr.io/siderolabs/conform:v0.1.0-alpha.22 enforce
+conformance:
+	@docker pull $(CONFORMANCE_IMAGE)
+	@docker run --rm -it -v $(PWD):/src -w /src $(CONFORMANCE_IMAGE) enforce
+

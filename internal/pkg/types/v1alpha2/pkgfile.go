@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package v1alpha2
 
@@ -9,14 +9,14 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/talos-systems/bldr/internal/pkg/types"
+	"github.com/siderolabs/bldr/internal/pkg/types"
 )
 
 // Pkgfile describes structure of 'Pkgfile'.
 type Pkgfile struct {
-	Format string            `yaml:"format"`
 	Vars   types.Variables   `yaml:"vars,omitempty"`
 	Labels map[string]string `yaml:"labels,omitempty"`
+	Format string            `yaml:"format"`
 }
 
 // NewPkgfile loads Pkgfile from `[]byte` contents.

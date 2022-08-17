@@ -1,13 +1,13 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package solver
 
 import (
 	"fmt"
 
-	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
+	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha2"
 )
 
 // Packages is a collect of Pkg objects with dependencies tracked.

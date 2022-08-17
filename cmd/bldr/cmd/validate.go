@@ -1,13 +1,13 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package cmd
 
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"runtime"
 	"sync"
@@ -15,8 +15,8 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/spf13/cobra"
 
-	"github.com/talos-systems/bldr/internal/pkg/solver"
-	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
+	"github.com/siderolabs/bldr/internal/pkg/solver"
+	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha2"
 )
 
 func validateChecksums(ctx context.Context, set solver.PackageSet, l *log.Logger) error {
@@ -101,7 +101,7 @@ loads them and validates for errors. `,
 		if validateCmdFlags.checksums {
 			l := log.New(log.Writer(), "[validate] ", log.Flags())
 			if !debug {
-				l.SetOutput(ioutil.Discard)
+				l.SetOutput(io.Discard)
 			}
 
 			if err = validateChecksums(context.TODO(), packages.ToSet(), l); err != nil {

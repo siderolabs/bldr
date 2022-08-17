@@ -1,0 +1,43 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        ":semanticCommitScopeDisabled"
+    ],
+    "regexManagers": [
+        {
+            "fileMatch": [
+                "internal/pkg/constants/build.go"
+            ],
+            "matchStrings": [
+                "\\/\\/\\s+renovate: datasource=(?<datasource>.*?)(?:\\s+extractVersion=(?<extractVersion>.+?))?(?:\\s+versioning=(?<versioning>.+?))?\\s+depName=(?<depName>.+?)?\\s.*Image\\s+=\\s+\\\"docker.io\\/alpine:(?<currentValue>.+?)\\\""
+            ],
+            "versioningTemplate": "{{#if versioning}}{{versioning}}{{else}}semver{{/if}}"
+        }
+    ],
+    "packageRules": [
+        {
+            "matchPackagePatterns": [
+                "*"
+            ],
+            "matchDatasources": [
+                "docker"
+            ],
+            "groupName": "container images"
+        },
+        {
+            "matchPackagePatterns": [
+                "*"
+            ],
+            "matchDatasources": [
+                "go",
+                "golang-version"
+            ],
+            "groupName": "go packages"
+        }
+    ],
+    "schedule": [
+        "on monday at 1am"
+    ],
+    "timezone": "Etc/UTC",
+    "dependencyDashboard": true
+}

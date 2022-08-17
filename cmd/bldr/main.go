@@ -2,5 +2,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// Package v1alpha2 contains type definitions for `pkg.yaml`.
-package v1alpha2
+// main is the entrypoint for bldr.
+package main
+
+import "github.com/siderolabs/bldr/cmd/bldr/cmd"
+
+func main() {
+	cmd.Execute()
+}

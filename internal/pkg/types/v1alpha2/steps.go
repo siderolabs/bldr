@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package v1alpha2
 
@@ -28,15 +28,14 @@ func (steps Steps) Validate() error {
 // Steps are executed sequentially, each step runs in its own
 // empty temporary directory.
 type Step struct {
-	Sources   Sources      `yaml:"sources,omitempty"`
 	Env       Environment  `yaml:"env,omitempty"`
 	CachePath string       `yaml:"cache,omitempty"`
+	TmpDir    string       `yaml:"-"`
+	Sources   Sources      `yaml:"sources,omitempty"`
 	Prepare   Instructions `yaml:"prepare,omitempty"`
 	Build     Instructions `yaml:"build,omitempty"`
 	Install   Instructions `yaml:"install,omitempty"`
 	Test      Instructions `yaml:"test,omitempty"`
-
-	TmpDir string `yaml:"-"`
 }
 
 // Validate the step.

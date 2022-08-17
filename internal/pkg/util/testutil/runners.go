@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package testutil
 
@@ -19,8 +19,8 @@ type Run interface {
 
 // CommandRunner is an abstract runner mix-in which processes command result.
 type CommandRunner struct {
-	Expect       string
 	ExpectStdout *string
+	Expect       string
 }
 
 func (runner CommandRunner) run(t *testing.T, cmd *exec.Cmd, title string) {

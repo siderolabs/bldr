@@ -1,13 +1,14 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package constants
 
 import "os"
 
 // DefaultBaseImage for non-scratch builds.
-const DefaultBaseImage = "docker.io/alpine:3.14"
+// renovate: datasource=docker versioning=docker depName=alpine
+const DefaultBaseImage = "docker.io/alpine:3.16"
 
 // DefaultDirMode is UNIX file mode for mkdir.
 const DefaultDirMode os.FileMode = 0o755

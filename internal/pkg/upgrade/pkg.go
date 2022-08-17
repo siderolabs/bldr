@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 // Package upgrade contains function to upgrade between pkg formats
 package upgrade
@@ -8,8 +8,8 @@ package upgrade
 import (
 	"strings"
 
-	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha1"
-	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
+	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha1"
+	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha2"
 )
 
 func convertDeps(stageNames []string, old []*v1alpha1.Dependency) v1alpha2.Dependencies {

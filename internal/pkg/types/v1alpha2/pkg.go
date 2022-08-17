@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package v1alpha2
 
@@ -13,24 +13,22 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"gopkg.in/yaml.v2"
 
-	"github.com/talos-systems/bldr/internal/pkg/constants"
-	"github.com/talos-systems/bldr/internal/pkg/types"
+	"github.com/siderolabs/bldr/internal/pkg/constants"
+	"github.com/siderolabs/bldr/internal/pkg/types"
 )
 
 // Pkg represents build instructions for a single package.
 type Pkg struct {
-	Name         string       `yaml:"name,omitempty"`
-	Variant      Variant      `yaml:"variant,omitempty"`
-	Shell        Shell        `yaml:"shell,omitempty"`
-	Install      Install      `yaml:"install,omitempty"`
-	Dependencies Dependencies `yaml:"dependencies,omitempty"`
-	Steps        Steps        `yaml:"steps,omitempty"`
-	Finalize     []Finalize   `yaml:"finalize,omitempty"`
-
-	// filled on loading stage
-	BaseDir  string          `yaml:"-"`
-	FileName string          `yaml:"-"`
-	Context  types.Variables `yaml:"-"`
+	Context      types.Variables `yaml:"-"`
+	Name         string          `yaml:"name,omitempty"`
+	Shell        Shell           `yaml:"shell,omitempty"`
+	BaseDir      string          `yaml:"-"`
+	FileName     string          `yaml:"-"`
+	Install      Install         `yaml:"install,omitempty"`
+	Dependencies Dependencies    `yaml:"dependencies,omitempty"`
+	Steps        Steps           `yaml:"steps,omitempty"`
+	Finalize     []Finalize      `yaml:"finalize,omitempty"`
+	Variant      Variant         `yaml:"variant,omitempty"`
 }
 
 // NewPkg loads Pkg structure from file.

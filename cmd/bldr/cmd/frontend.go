@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package cmd
 
@@ -12,7 +12,8 @@ import (
 	"github.com/moby/buildkit/frontend/gateway/grpcclient"
 	"github.com/moby/buildkit/util/appcontext"
 	"github.com/spf13/cobra"
-	"github.com/talos-systems/bldr/internal/pkg/pkgfile"
+
+	"github.com/siderolabs/bldr/internal/pkg/pkgfile"
 )
 
 // frontendCmd represents the frontend command.
@@ -23,7 +24,7 @@ var frontendCmd = &cobra.Command{
 
 To activate, put following line as the first line of Pkgfile:
 
-# syntax = ghcr.io/talos-systems/bldr:<version>-frontend
+# syntax = ghcr.io/siderolabs/bldr:<version>
 
 Run with:
 

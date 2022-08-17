@@ -1,12 +1,12 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package solver
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -14,26 +14,24 @@ import (
 	"strings"
 
 	"github.com/hashicorp/go-multierror"
-	"github.com/talos-systems/bldr/internal/pkg/constants"
-	"github.com/talos-systems/bldr/internal/pkg/types"
-	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
+
+	"github.com/siderolabs/bldr/internal/pkg/constants"
+	"github.com/siderolabs/bldr/internal/pkg/types"
+	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha2"
 )
 
 // FilesystemPackageLoader loads packages by walking file system tree.
 type FilesystemPackageLoader struct {
 	*log.Logger
-	Root string
-
-	Context types.Variables
-
+	Context      types.Variables
 	pathContexts map[string]types.Variables
+	multiErr     *multierror.Error
+	pkgFile      *v1alpha2.Pkgfile
+	Root         string
+	absRootPath  string
 	pkgFilePaths []string
 	varFilePaths []string
-
-	absRootPath string
-	pkgs        []*v1alpha2.Pkg
-	multiErr    *multierror.Error
-	pkgFile     *v1alpha2.Pkgfile
+	pkgs         []*v1alpha2.Pkg
 }
 
 func (fspl *FilesystemPackageLoader) walkFunc() filepath.WalkFunc {
@@ -191,7 +189,7 @@ func (fspl *FilesystemPackageLoader) loadPkg(path string) (*v1alpha2.Pkg, error)
 
 	defer f.Close() //nolint:errcheck
 
-	contents, err := ioutil.ReadAll(f)
+	contents, err := io.ReadAll(f)
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +211,7 @@ func (fspl *FilesystemPackageLoader) loadPkgfile() error {
 
 	defer f.Close() //nolint:errcheck
 
-	contents, err := ioutil.ReadAll(f)
+	contents, err := io.ReadAll(f)
 	if err != nil {
 		return err
 	}

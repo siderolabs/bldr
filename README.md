@@ -1,8 +1,7 @@
 # bldr
 
-`bldr` is a tool to build and package software distributions. Build process
-runs in [buildkit](https://github.com/moby/buildkit)
-(or [docker buildx](https://github.com/docker/buildx)), build result
+`bldr` is a tool to build and package software distributions.
+Build processruns in [buildkit](https://github.com/moby/buildkit)(or [docker buildx](https://github.com/docker/buildx)), build result
 can be exported as container image.
 
 ## Roadmap
@@ -37,21 +36,14 @@ Given directory structure with `Pkgfile` and `pkg.yaml`
 
 ### Target
 
-Each `bldr` invocation specifies a target package to build, it is set
-as `--target` flag for `docker buildx` and `--opt target=` option for
-`buildctl`. `bldr` frontend is launched, it loads `Pkgfile` and scans
-subdirectories for `pkg.yaml` files, resolves dependencies and produces
-[LLB](https://github.com/moby/buildkit#exploring-llb) input
-which is executed in `buildkit` backend. Result of execution
-is the target argument of the invocation.
+Each `bldr` invocation specifies a target package to build, it is set as `--target` flag for `docker buildx` and `--opt target=` option for `buildctl`. `bldr` frontend is launched, it loads `Pkgfile` and scans subdirectories for `pkg.yaml` files, resolves dependencies and produces [LLB](https://github.com/moby/buildkit#exploring-llb) input which is executed in `buildkit` backend.
+Result of execution is the target argument of the invocation.
 
 ### Saving output
 
-Build output can be exported from buildkit using any of the methods
-supported by [buildkit](https://github.com/moby/buildkit#output) or
-[docker buildx](https://github.com/docker/buildx#-o---outputpath-typetypekeyvalue). By default, if output is
-not specified output is saved in buildkit cache only. This is still
-useful to test the build before pushing.
+Build output can be exported from buildkit using any of the methods supported by [buildkit](https://github.com/moby/buildkit#output) or [docker buildx](https://github.com/docker/buildx#-o---outputpath-typetypekeyvalue).
+By default, if output is not specified output is saved in buildkit cache only.
+This is still useful to test the build before pushing.
 
 Most common output type is pushing to the registry:
 
@@ -89,8 +81,8 @@ This renders graph like:
 ![sample graph](/hack/examples/graph.png)
 
 Boxes with yellow background are external images as dependencies, white
-nodes are internal stages. Arrows present dependencies: regular arrows
-for build dependencies and green bold arrows for runtime dependencies.
+nodes are internal stages.
+Arrows present dependencies: regular arrows for build dependencies and green bold arrows for runtime dependencies.
 
 ### Validating pkg.yaml files
 
@@ -119,14 +111,11 @@ bldr validate
 │   └── pkg.yaml
 ```
 
-At the directory root there should be `Pkgfile` which triggers dockerfile
-frontend build and contains global options. Each package resides in
-subdirectory with `pkg.yaml` file and any additional files used for
-the build processes (patches, additional files, sources, etc.)
+At the directory root there should be `Pkgfile` which triggers dockerfile frontend build and contains global options.
+Each package resides in subdirectory with `pkg.yaml` file and any additional files used for the build processes (patches, additional files, sources, etc.)
 
-Subdirectory structure could is flexible, `bldr` just looks for
-any subdirectory which has `pkg.yaml` file in it. Subdirectory
-names are ignored.
+Subdirectory structure could is flexible, `bldr` just looks for any subdirectory which has `pkg.yaml` file in it.
+Subdirectory names are ignored.
 
 Additional variables
 
@@ -144,8 +133,7 @@ labels:
   org.opencontainers.image.source: https://github.com/siderolabs/bldr
 ```
 
-First line of the file should always be magic comment which is picked up by
-dockerfile frontend of buildkit and redirects build to the `bldr` frontend.
+First line of the file should always be magic comment which is picked up by dockerfile frontend of buildkit and redirects build to the `bldr` frontend.
 Version tag should match version of the `bldr` you want to use.
 
 Rest of the `Pkgfile` is regular YAML file with the following fields:
@@ -176,15 +164,16 @@ Package is a subdirectory with `pkg.yaml` file in it.
 │   └── vars.yaml
 ```
 
-Any additional files in the directory are copied into the build and
-are available under `/pkg` subdirectory. For example, during the build the patch file above will be copied as `/pkg/patches/musl-fix.patch`.
+Any additional files in the directory are copied into the build and are available under `/pkg` subdirectory.
+For example, during the build the patch file above will be copied as `/pkg/patches/musl-fix.patch`.
 
 ### `vars.yaml`
 
 `vars.yaml` contains set of variables which can be used as in the `pkg.yaml` template.
 
 The file `vars.yaml` is templated using variables from the `Pkgfile`, build arguments and any `vars.yaml` on the upper
-levels of the tree. So variables can be deeply nested and use values from any level above.
+levels of the tree.
+So variables can be deeply nested and use values from any level above.
 
 When `pkg.yaml` is templated, all variables available in the directory level matching `pkg.yaml` are available.
 
@@ -228,25 +217,32 @@ finalize:
     to: /
 ```
 
-Before loading `pkg.yaml`, `bldr` runs file contents through [Go template engine](https://godoc.org/text/template) providing merged list of built-in variables (see below) and variables provided in `Pkgfile`. Most common syntax is to render variable value with `{{ .<variable_name> }}`. Due to the YAML syntax limitations, such constructs should be quoted if they start YAML value: `"{{ .VARIABLE }}"`. Additionally, hermetic text functions from [Sprig](http://masterminds.github.io/sprig/) collection are available.
+Before loading `pkg.yaml`, `bldr` runs file contents through [Go template engine](https://godoc.org/text/template) providing merged list of built-in variables (see below) and variables provided in `Pkgfile`.
+Most common syntax is to render variable value with `{{ .<variable_name> }}`.
+Due to the YAML syntax limitations, such constructs should be quoted if they start YAML value: `"{{ .VARIABLE }}"`.
+Additionally, hermetic text functions from [Sprig](http://masterminds.github.io/sprig/) collection are available.
 
 On the root level, following properties are available:
 
 - `name` (*str*, *required*): name of the package, also used to reference this package from other packages as dependency.
-
-- `variant` (*str*, *optional*): variant of the base image of the build. Two variants are available:
-  - `alpine`: Alpine Linux 3.14 image with `bash` package pre-installed
+- `variant` (*str*, *optional*): variant of the base image of the build.
+  Two variants are available:
+  - `alpine`: Alpine Linux 3.16 image with `bash` package pre-installed
   - `scratch`: scratch (empty) image
   Default variant is `alpine`.
-- `install`: (*list*, *optional*): list of Alpine packages to be installed as part of the build. These packages are usually build dependencies.
+- `install`: (*list*, *optional*): list of Alpine packages to be installed as part of the build.
+  These packages are usually build dependencies.
 - `shell`: (*str*, *optional*): path to the shell to execute build step instructions, defaults to `/bin/sh`.
 
 ### `dependencies`
 
 Section `dependencies` lists build artifacts this package depends on.
 
-There are two kinds of dependencies: *external* and *internal*. External
-dependencies are container images which are copied into the build. Internal dependencies are references to other packages (by their `name:`) of the same build tree. Internal dependencies are resolved by `bldr` and `buildkit` and cached if there're no changes. Internal dependencies might be intermediate (never exported from the build) or they might be self-contained and exported from the build.
+There are two kinds of dependencies: *external* and *internal*.
+External dependencies are container images which are copied into the build.
+Internal dependencies are references to other packages (by their `name:`) of the same build tree.
+Internal dependencies are resolved by `bldr` and `buildkit` and cached if there're no changes.
+Internal dependencies might be intermediate (never exported from the build) or they might be self-contained and exported from the build.
 
 Internal dependency:
 
@@ -267,15 +263,23 @@ External dependency:
 
 Properties:
 
-- `stage` (*str*, *internal dependency*): name of other package this package depends on. Circular dependencies are not allowed. Contents of the stage are poured into the build at the location specified with `to:` parameter.
-- `image` (*str*, *external dependency*): reference to the registry container image this package depends on. Contents of the image are poured into the build at the location specified with `to:` parameter.
-- `runtime` (*bool*, *optional*): if set, marks dependency as runtime. This means that when this package is pulled in into the build, all the runtime dependencies are pulled in automatically as well. This also applies to transitive runtime dependencies.
+- `stage` (*str*, *internal dependency*): name of other package this package depends on.
+  Circular dependencies are not allowed.
+  Contents of the stage are poured into the build at the location specified with `to:` parameter.
+- `image` (*str*, *external dependency*): reference to the registry container image this package depends on.
+  Contents of the image are poured into the build at the location specified with `to:` parameter.
+- `runtime` (*bool*, *optional*): if set, marks dependency as runtime.
+  This means that when this package is pulled in into the build, all the runtime dependencies are pulled in automatically as well.
+  This also applies to transitive runtime dependencies.
 - `from` (*str*, *optional*, default `/`): base path to copy from the dependency.
 - `to` (*str*, *optional*, default `/`): location to copy dependency contents to.
 
 ### `steps`
 
-Build process consists of the sequence of steps. Each step is composed out of phases: download sources, set environment variables, prepare, build, install and test. Each step runs in its own temporary directory. This temporary directory is set as working directory for the duration of the step.
+Build process consists of the sequence of steps.
+Each step is composed out of phases: download sources, set environment variables, prepare, build, install and test.
+Each step runs in its own temporary directory.
+This temporary directory is set as working directory for the duration of the step.
 
 ```yaml
 - sources:
@@ -328,15 +332,20 @@ Download phase is described in `sources` section:
 - `destination` (*str*, *required*): destination file name under the build step temporary directory.
 - `sha256`, `sha512` (*str*, *required*): checksums for the downloaded object.
 
-Section `env` adds additional environment variables to the build. These environment variables persist to the steps following this one.
+Section `env` adds additional environment variables to the build.
+These environment variables persist to the steps following this one.
 
-Sections `prepare`, `build`, `install` and `test` list set of shell instructions to perform the build. They consist of a list of shell instruction. Each instruction is executed as LLB stage, so in terms of caching it's better to split into multiple instructions, but instructions don't share shell state (so `cd` in one instruction won't affect another).
+Sections `prepare`, `build`, `install` and `test` list set of shell instructions to perform the build.
+They consist of a list of shell instruction.
+Each instruction is executed as LLB stage, so in terms of caching it's better to split into multiple instructions, but instructions don't share shell state (so `cd` in one instruction won't affect another).
 
-Each instruction is executed as a shell script, so any complex shell constructs can be used. Scripts are executed with options `set -eou pipefail`.
+Each instruction is executed as a shell script, so any complex shell constructs can be used.
+Scripts are executed with options `set -eou pipefail`.
 
 ### `finalize`
 
-Step `finalize` performs final copying of the build artifacts into scratch image which will be output of the build. There might be multiple `finalize` instructions in the package, they are executed sequentially.
+Step `finalize` performs final copying of the build artifacts into scratch image which will be output of the build.
+There might be multiple `finalize` instructions in the package, they are executed sequentially.
 
 ```yaml
 - from: /rootfs
@@ -346,7 +355,8 @@ Step `finalize` performs final copying of the build artifacts into scratch image
 - `from` (*str*, *optional*): copy source, defaults to `/`
 - `to` (*str*, *optional*): copy destination, defaults to `/`
 
-Finalize instruction `{"from": "/", "to": "/"}` copies full build contents as output image, but usually it doesn't make sense to include build temporary files and build dependencies into the package output. Usual trick to install build result under designated initially empty prefix (e.g. `/rootfs`) and set only contents of that prefix as build output.
+Finalize instruction `{"from": "/", "to": "/"}` copies full build contents as output image, but usually it doesn't make sense to include build temporary files and build dependencies into the package output.
+Usual trick to install build result under designated initially empty prefix (e.g. `/rootfs`) and set only contents of that prefix as build output.
 
 If `SOURCE_DATE_EPOCH` build argument is set, `bldr` will update timestamps of all files copied in the `finalize` step to the value of `SOURCE_DATE_EPOCH`.
 
@@ -393,11 +403,14 @@ When translated to LLB, build flow is the following:
 
 When internal stage as referenced as dependency, LLB for that step is also emitted and linked into the flow.
 
-Due to the way LLB is executed, some steps might be executed out of order if they don't have all the dependent steps already completed. For example, downloads happen first concurrently. Dependencies of a stage might be also executed concurrently.
+Due to the way LLB is executed, some steps might be executed out of order if they don't have all the dependent steps already completed.
+For example, downloads happen first concurrently.
+Dependencies of a stage might be also executed concurrently.
 
 ## Development
 
-When developing `bldr`, going via `dockerfile` frontend mode is not always the best way as it requires pushing frontend image each time any change is done. To help with development flow, `bldr` CLI supports `llb` command which emits LLB directly which can be piped into `buildctl`:
+When developing `bldr`, going via `dockerfile` frontend mode is not always the best way as it requires pushing frontend image each time any change is done.
+To help with development flow, `bldr` CLI supports `llb` command which emits LLB directly which can be piped into `buildctl`:
 
 ```shell
 bldr llb --root . --target tools | buildctl build --local context=.

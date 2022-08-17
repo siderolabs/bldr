@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 package convert
 
@@ -9,10 +9,11 @@ import (
 	"sort"
 
 	"github.com/moby/buildkit/client/llb"
-	"github.com/talos-systems/bldr/internal/pkg/constants"
-	"github.com/talos-systems/bldr/internal/pkg/environment"
-	"github.com/talos-systems/bldr/internal/pkg/solver"
-	"github.com/talos-systems/bldr/internal/pkg/types/v1alpha2"
+
+	"github.com/siderolabs/bldr/internal/pkg/constants"
+	"github.com/siderolabs/bldr/internal/pkg/environment"
+	"github.com/siderolabs/bldr/internal/pkg/solver"
+	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha2"
 )
 
 // GraphLLB wraps PackageGraph to provide LLB conversion.
