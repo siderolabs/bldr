@@ -7,7 +7,8 @@ ENV CGO_ENABLED 0
 ENV GOCACHE /.cache/go-build
 ENV GOMODCACHE /.cache/mod
 RUN apk --update --no-cache add bash curl
-RUN curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b /bin v1.45.2
+RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.48.0 \
+	&& mv /go/bin/golangci-lint /bin/golangci-lint
 WORKDIR /src
 COPY ./go.mod ./
 COPY ./go.sum ./
