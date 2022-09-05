@@ -3,6 +3,8 @@ kind: common.Image
 name: image-bldr
 spec:
   pushLatest: false
+  droneExtraEnvironment:
+    PLATFORM: linux/amd64,linux/arm64
   entrypointArgs:
    - frontend
 ---
@@ -14,6 +16,12 @@ spec:
       GOARCH: amd64
     linux-arm64:
       GOOS: linux
+      GOARCH: arm64
+    darwin-amd64:
+      GOOS: darwin
+      GOARCH: amd64
+    darwin-arm64:
+      GOOS: darwin
       GOARCH: arm64
 ---
 kind: auto.CustomSteps

@@ -1,7 +1,7 @@
 ---
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2022-08-31T21:37:24Z by kres ec2cd64.
+# Generated on 2022-09-05T17:11:08Z by kres 871f67c.
 
 kind: pipeline
 type: kubernetes
@@ -169,6 +169,7 @@ steps:
       from_secret: ghcr_token
     GHCR_USERNAME:
       from_secret: ghcr_username
+    PLATFORM: linux/amd64,linux/arm64
     PUSH: true
   volumes:
   - name: outer-docker-socket

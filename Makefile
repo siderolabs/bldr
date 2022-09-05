@@ -1,6 +1,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2022-08-31T21:36:40Z by kres ec2cd64.
+# Generated on 2022-09-05T17:08:38Z by kres 871f67c.
 
 # common variables
 
@@ -17,7 +17,7 @@ GO_VERSION ?= 1.19
 GOIMPORTS_VERSION ?= v0.1.12
 PROTOBUF_GO_VERSION ?= 1.28.1
 GRPC_GO_VERSION ?= 1.2.0
-GRPC_GATEWAY_VERSION ?= 2.11.1
+GRPC_GATEWAY_VERSION ?= 2.11.3
 VTPROTOBUF_VERSION ?= 0.3.0
 DEEPCOPY_VERSION ?= v0.5.5
 TESTPKGS ?= ./...
@@ -133,6 +133,20 @@ unit-tests-race:  ## Performs unit tests with race detection enabled.
 coverage:  ## Upload coverage data to codecov.io.
 	bash -c "bash <(curl -s https://codecov.io/bash) -f $(ARTIFACTS)/coverage.txt -X fix"
 
+.PHONY: $(ARTIFACTS)/bldr-darwin-amd64
+$(ARTIFACTS)/bldr-darwin-amd64:
+	@$(MAKE) local-bldr-darwin-amd64 DEST=$(ARTIFACTS)
+
+.PHONY: bldr-darwin-amd64
+bldr-darwin-amd64: $(ARTIFACTS)/bldr-darwin-amd64  ## Builds executable for bldr-darwin-amd64.
+
+.PHONY: $(ARTIFACTS)/bldr-darwin-arm64
+$(ARTIFACTS)/bldr-darwin-arm64:
+	@$(MAKE) local-bldr-darwin-arm64 DEST=$(ARTIFACTS)
+
+.PHONY: bldr-darwin-arm64
+bldr-darwin-arm64: $(ARTIFACTS)/bldr-darwin-arm64  ## Builds executable for bldr-darwin-arm64.
+
 .PHONY: $(ARTIFACTS)/bldr-linux-amd64
 $(ARTIFACTS)/bldr-linux-amd64:
 	@$(MAKE) local-bldr-linux-amd64 DEST=$(ARTIFACTS)
@@ -148,7 +162,7 @@ $(ARTIFACTS)/bldr-linux-arm64:
 bldr-linux-arm64: $(ARTIFACTS)/bldr-linux-arm64  ## Builds executable for bldr-linux-arm64.
 
 .PHONY: bldr
-bldr: bldr-linux-amd64 bldr-linux-arm64  ## Builds executables for bldr.
+bldr: bldr-darwin-amd64 bldr-darwin-arm64 bldr-linux-amd64 bldr-linux-arm64  ## Builds executables for bldr.
 
 .PHONY: lint-markdown
 lint-markdown:  ## Runs markdownlint.
