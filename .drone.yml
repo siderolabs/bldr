@@ -1,7 +1,7 @@
 ---
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2022-09-05T17:11:08Z by kres 871f67c.
+# Generated on 2022-09-15T15:20:15Z by kres 430a0da.
 
 kind: pipeline
 type: kubernetes
@@ -293,6 +293,12 @@ volumes:
 - name: ssh
   temp:
     medium: memory
+
+trigger:
+  branch:
+    exclude:
+    - renovate/*
+    - dependabot/*
 
 ---
 kind: pipeline
