@@ -1,7 +1,7 @@
 ---
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2022-09-15T15:20:15Z by kres 430a0da.
+# Generated on 2022-09-19T13:43:37Z by kres 9ea8a33.
 
 kind: pipeline
 type: kubernetes
@@ -327,9 +327,10 @@ steps:
     - failure
 
 trigger:
-  status:
-  - success
-  - failure
+  branch:
+    exclude:
+    - renovate/*
+    - dependabot/*
 
 depends_on:
 - default
