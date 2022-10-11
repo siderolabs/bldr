@@ -2,7 +2,7 @@
 
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2022-09-12T16:20:38Z by kres 2e9342e.
+# Generated on 2022-10-11T17:00:26Z by kres bcb3684.
 
 ARG TOOLCHAIN
 
@@ -14,7 +14,7 @@ FROM ghcr.io/siderolabs/ca-certificates:v1.2.0 AS image-ca-certificates
 FROM ghcr.io/siderolabs/fhs:v1.2.0 AS image-fhs
 
 # runs markdownlint
-FROM docker.io/node:18.9.0-alpine3.16 AS lint-markdown
+FROM docker.io/node:18.10.0-alpine3.16 AS lint-markdown
 WORKDIR /src
 RUN npm i -g markdownlint-cli@0.32.2
 RUN npm i sentences-per-line@0.2.1
@@ -29,7 +29,8 @@ RUN apk --update --no-cache add bash curl build-base protoc protobuf-dev
 # build tools
 FROM --platform=${BUILDPLATFORM} toolchain AS tools
 ENV GO111MODULE on
-ENV CGO_ENABLED 0
+ARG CGO_ENABLED
+ENV CGO_ENABLED ${CGO_ENABLED}
 ENV GOPATH /go
 ARG GOLANGCILINT_VERSION
 RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCILINT_VERSION} \
@@ -37,6 +38,8 @@ RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCILIN
 ARG GOFUMPT_VERSION
 RUN go install mvdan.cc/gofumpt@${GOFUMPT_VERSION} \
 	&& mv /go/bin/gofumpt /bin/gofumpt
+RUN go install golang.org/x/vuln/cmd/govulncheck@latest \
+	&& mv /go/bin/govulncheck /bin/govulncheck
 ARG GOIMPORTS_VERSION
 RUN go install golang.org/x/tools/cmd/goimports@${GOIMPORTS_VERSION} \
 	&& mv /go/bin/goimports /bin/goimports
@@ -59,37 +62,45 @@ RUN --mount=type=cache,target=/go/pkg go list -mod=readonly all >/dev/null
 FROM base AS bldr-darwin-amd64-build
 COPY --from=generate / /
 WORKDIR /src/cmd/bldr
+ARG GO_BUILDFLAGS
+ARG GO_LDFLAGS
 ARG VERSION_PKG="github.com/siderolabs/bldr/internal/version"
 ARG SHA
 ARG TAG
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=amd64 GOOS=darwin go build -ldflags "-s -w -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-darwin-amd64
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=amd64 GOOS=darwin go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-darwin-amd64
 
 # builds bldr-darwin-arm64
 FROM base AS bldr-darwin-arm64-build
 COPY --from=generate / /
 WORKDIR /src/cmd/bldr
+ARG GO_BUILDFLAGS
+ARG GO_LDFLAGS
 ARG VERSION_PKG="github.com/siderolabs/bldr/internal/version"
 ARG SHA
 ARG TAG
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=arm64 GOOS=darwin go build -ldflags "-s -w -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-darwin-arm64
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=arm64 GOOS=darwin go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-darwin-arm64
 
 # builds bldr-linux-amd64
 FROM base AS bldr-linux-amd64-build
 COPY --from=generate / /
 WORKDIR /src/cmd/bldr
+ARG GO_BUILDFLAGS
+ARG GO_LDFLAGS
 ARG VERSION_PKG="github.com/siderolabs/bldr/internal/version"
 ARG SHA
 ARG TAG
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=amd64 GOOS=linux go build -ldflags "-s -w -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-linux-amd64
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=amd64 GOOS=linux go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-linux-amd64
 
 # builds bldr-linux-arm64
 FROM base AS bldr-linux-arm64-build
 COPY --from=generate / /
 WORKDIR /src/cmd/bldr
+ARG GO_BUILDFLAGS
+ARG GO_LDFLAGS
 ARG VERSION_PKG="github.com/siderolabs/bldr/internal/version"
 ARG SHA
 ARG TAG
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=arm64 GOOS=linux go build -ldflags "-s -w -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-linux-arm64
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=arm64 GOOS=linux go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-linux-arm64
 
 # builds the integration test binary
 FROM base AS integration-build
@@ -112,6 +123,10 @@ FROM base AS lint-golangci-lint
 COPY .golangci.yml .
 ENV GOGC 50
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/.cache/golangci-lint --mount=type=cache,target=/go/pkg golangci-lint run --config .golangci.yml
+
+# runs govulncheck
+FROM base AS lint-govulncheck
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg govulncheck ./...
 
 # runs unit-tests with race detector
 FROM base AS unit-tests-race
