@@ -9,7 +9,7 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/alessio/shellescape v1.4.1
-	github.com/containerd/containerd v1.6.11
+	github.com/containerd/containerd v1.6.13
 	github.com/emicklei/dot v1.2.0
 	github.com/google/go-github/v35 v35.3.0
 	github.com/hashicorp/go-multierror v1.1.1

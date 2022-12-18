@@ -33,6 +33,8 @@ github.com/cncf/xds/go v0.0.0-20211001041855-01bcc9b48dfe/go.mod h1:eXthEFrGJvWH
 github.com/cncf/xds/go v0.0.0-20211011173535-cb28da3451f1/go.mod h1:eXthEFrGJvWHgFFCl3hGmgk+/aYT6PnTQLykKQRLhEs=
 github.com/containerd/containerd v1.6.11 h1:uIn0uKrRhETIPyAb0lz6WY2xhYBObUOF1bBi5rqZ5x4=
 github.com/containerd/containerd v1.6.11/go.mod h1:K4Bw7gjgh4TnkmQY+py/PYQGp4e7xgnHAeg87VeWb3A=
+github.com/containerd/containerd v1.6.13 h1:7llWEzjLH/fao0f2lppn1L6NhjsvxqMdUQa2mgVCs+U=
+github.com/containerd/containerd v1.6.13/go.mod h1:vDm+BbU+dD9uvuUlHr+KmcY0HKX8WDyI6dzJjNi4ee8=
 github.com/containerd/continuity v0.1.0/go.mod h1:ICJu0PwR54nI0yPEnJ6jcS+J7CZAUXrLh8lPo2knzsM=
 github.com/containerd/ttrpc v1.1.0 h1:GbtyLRxb0gOLR0TYQWt3O6B0NvT8tMdorEHqIQo/lWI=
 github.com/containerd/ttrpc v1.1.0/go.mod h1:XX4ZTnoOId4HklF4edwc4DcqskFZuvXB1Evzy5KFQpQ=
