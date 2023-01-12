@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-github/v35/github"
+	"github.com/google/go-github/v49/github"
 	"golang.org/x/oauth2"
 )
 
@@ -241,7 +241,7 @@ func (g *gitHub) getTags(ctx context.Context, owner, repo string) ([]*github.Rep
 
 // getCommitTime returns commit's time.
 func (g *gitHub) getCommitTime(ctx context.Context, owner, repo, sha string) (time.Time, error) {
-	commit, _, err := g.c.Repositories.GetCommit(ctx, owner, repo, sha)
+	commit, _, err := g.c.Repositories.GetCommit(ctx, owner, repo, sha, &github.ListOptions{})
 	if err != nil {
 		return time.Time{}, err
 	}
