@@ -15,6 +15,7 @@ import (
 	ctrplatforms "github.com/containerd/containerd/platforms"
 	"github.com/moby/buildkit/client/llb"
 	"github.com/moby/buildkit/exporter/containerimage/exptypes"
+	"github.com/moby/buildkit/exporter/containerimage/image"
 	"github.com/moby/buildkit/frontend/dockerfile/dockerfile2llb"
 	"github.com/moby/buildkit/frontend/gateway/client"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
@@ -162,13 +163,13 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 					RootFS: specs.RootFS{
 						Type: "layers",
 					},
+					Variant: platform.PlatformSpec.Variant,
 				},
-				Config: dockerfile2llb.ImageConfig{
+				Config: image.ImageConfig{
 					ImageConfig: specs.ImageConfig{
 						Labels: packages.ImageLabels(),
 					},
 				},
-				Variant: platform.PlatformSpec.Variant,
 			}
 
 			config, err := json.Marshal(img)
