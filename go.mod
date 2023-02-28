@@ -1,22 +1,22 @@
 module github.com/siderolabs/bldr
 
-go 1.19
+go 1.20
 
 require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/alessio/shellescape v1.4.1
-	github.com/containerd/containerd v1.6.15
-	github.com/emicklei/dot v1.2.0
-	github.com/google/go-github/v49 v49.1.0
+	github.com/containerd/containerd v1.6.19
+	github.com/emicklei/dot v1.3.1
+	github.com/google/go-github/v50 v50.1.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/moby/buildkit v0.11.1
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0-rc2
 	github.com/otiai10/copy v1.9.0
 	github.com/spf13/cobra v1.6.1
-	github.com/stretchr/testify v1.8.1
-	golang.org/x/oauth2 v0.4.0
+	github.com/stretchr/testify v1.8.2
+	golang.org/x/oauth2 v0.5.0
 	golang.org/x/sync v0.1.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -60,9 +60,9 @@ require (
 	go.opentelemetry.io/otel v1.4.1 // indirect
 	go.opentelemetry.io/otel/trace v1.4.1 // indirect
 	golang.org/x/crypto v0.3.0 // indirect
-	golang.org/x/net v0.5.0 // indirect
-	golang.org/x/sys v0.4.0 // indirect
-	golang.org/x/text v0.6.0 // indirect
+	golang.org/x/net v0.7.0 // indirect
+	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20220706185917-7780775163c4 // indirect
 	google.golang.org/grpc v1.50.1 // indirect

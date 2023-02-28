@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-github/v49/github"
+	"github.com/google/go-github/v50/github"
 	"golang.org/x/oauth2"
 )
 
@@ -251,7 +251,7 @@ func (g *gitHub) getCommitTime(ctx context.Context, owner, repo, sha string) (ti
 		return time.Time{}, fmt.Errorf("no commit date")
 	}
 
-	return t, nil
+	return t.Time, nil
 }
 
 // getTagTarGZ returns .tar.gz URL.
