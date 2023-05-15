@@ -16,7 +16,6 @@ import (
 	"github.com/moby/buildkit/client/llb"
 	"github.com/moby/buildkit/exporter/containerimage/exptypes"
 	"github.com/moby/buildkit/exporter/containerimage/image"
-	"github.com/moby/buildkit/frontend/dockerfile/dockerfile2llb"
 	"github.com/moby/buildkit/frontend/gateway/client"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"golang.org/x/sync/errgroup"
@@ -156,14 +155,16 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 				return err
 			}
 
-			img := dockerfile2llb.Image{
+			img := image.Image{
 				Image: specs.Image{
-					Architecture: platform.PlatformSpec.Architecture,
-					OS:           platform.PlatformSpec.OS,
+					Platform: specs.Platform{
+						Architecture: platform.PlatformSpec.Architecture,
+						OS:           platform.PlatformSpec.OS,
+						Variant:      platform.PlatformSpec.Variant,
+					},
 					RootFS: specs.RootFS{
 						Type: "layers",
 					},
-					Variant: platform.PlatformSpec.Variant,
 				},
 				Config: image.ImageConfig{
 					ImageConfig: specs.ImageConfig{
