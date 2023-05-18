@@ -265,6 +265,10 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 				llb.WithCustomName(fmt.Sprintf("%s%s-%d", node.Prefix, script.Desc, i)),
 			)
 
+			if node.Graph.Options.NoCache {
+				runOptions = append(runOptions, llb.IgnoreCache)
+			}
+
 			root = root.Run(runOptions...).Root()
 		}
 	}

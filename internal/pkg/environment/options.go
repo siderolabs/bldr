@@ -21,6 +21,7 @@ type Options struct {
 	ProxyEnv         *llb.ProxyEnv
 	SourceDateEpoch  time.Time
 	CacheIDNamespace string
+	NoCache          bool
 }
 
 // GetVariables returns set of variables set for options.

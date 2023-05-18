@@ -30,6 +30,7 @@ const (
 	keyTarget         = "target"
 	keyTargetPlatform = "platform"
 	keyMultiPlatform  = "multi-platform"
+	keyNoCache        = "no-cache"
 
 	buildArgPrefix          = "build-arg:"
 	buildArgSourceDateEpoch = buildArgPrefix + "SOURCE_DATE_EPOCH"
@@ -47,6 +48,7 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 
 	options.Target = opts[keyTarget]
 	options.ProxyEnv = proxyEnvFromBuildArgs(filter(opts, buildArgPrefix))
+	_, options.NoCache = opts[keyNoCache]
 
 	if sourceDateEpoch, ok := opts[buildArgSourceDateEpoch]; ok {
 		timestamp, err := strconv.ParseInt(sourceDateEpoch, 10, 64)
