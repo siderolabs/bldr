@@ -5,7 +5,7 @@ project_name = "bldr"
 github_repo = "siderolabs/bldr"
 match_deps = "^github.com/(siderolabs/[a-zA-Z0-9-]+)$"
 
-# previous = -
-# pre_release = true
+#previous = 
+pre_release = false
 
 # [notes]
