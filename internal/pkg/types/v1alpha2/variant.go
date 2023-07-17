@@ -14,10 +14,12 @@ const (
 	Alpine Variant = iota
 	// Scratch variant uses scratch image as base image for the build.
 	Scratch
+	// Debian variant uses Debian as base image for the build.
+	Debian
 )
 
 func (v Variant) String() string {
-	return []string{"alpine", "scratch"}[v]
+	return []string{"alpine", "scratch", "debian"}[v]
 }
 
 // UnmarshalYAML implements yaml.Unmarshaller interface.
@@ -35,6 +37,8 @@ func (v *Variant) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		val = Alpine
 	case Scratch.String():
 		val = Scratch
+	case Debian.String():
+		val = Debian
 	default:
 		return fmt.Errorf("unknown variant %q", aux)
 	}

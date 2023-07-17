@@ -73,13 +73,29 @@ func (node *NodeLLB) base() llb.State {
 
 func (node *NodeLLB) install(root llb.State) llb.State {
 	if len(node.Pkg.Install) > 0 {
-		root = root.Run(
-			append(node.Graph.commonRunOptions,
-				llb.Args(
-					append([]string{"/sbin/apk", "add", "--no-cache"}, node.Pkg.Install...)),
-				llb.WithCustomName(node.Prefix+"apk-install"),
-			)...,
-		).Root()
+		switch node.Pkg.Variant {
+		case v1alpha2.Scratch:
+		case v1alpha2.Alpine:
+			root = root.Run(
+				append(node.Graph.commonRunOptions,
+					llb.Args(
+						append([]string{"/sbin/apk", "add", "--no-cache"}, node.Pkg.Install...)),
+					llb.WithCustomName(node.Prefix+"apk-install"),
+				)...,
+			).Root()
+		case v1alpha2.Debian:
+			options := node.Graph.commonRunOptions
+			options = append(options, llb.Args(
+				[]string{"/usr/bin/apt", "update", "-qq"}),
+				llb.WithCustomName(node.Prefix+"apt-update"),
+			)
+			options = append(options, llb.Args(
+				append([]string{"/usr/bin/apt", "install", "-y"}, node.Pkg.Install...)),
+				llb.WithCustomName(node.Prefix+"apt-install"),
+			)
+
+			root = root.Run(options...).Root()
+		}
 	}
 
 	return root

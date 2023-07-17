@@ -56,7 +56,7 @@ func (node *PackageNode) DumpDot(g *dot.Graph) dot.Node {
 	}
 
 	for _, dep := range node.Pkg.Install {
-		packageNode := g.Node("Alpine: " + dep)
+		packageNode := g.Node(node.Pkg.Variant.String() + ": " + dep)
 		packageNode.Box()
 		packageNode.Attr("fillcolor", "aquamarine")
 		packageNode.Attr("style", "filled")

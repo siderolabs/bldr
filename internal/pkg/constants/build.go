@@ -10,6 +10,10 @@ import "os"
 // renovate: datasource=docker versioning=docker depName=alpine
 const DefaultBaseImage = "docker.io/alpine:3.18"
 
+// DefaultDebianImage for debian builds.
+// renovate: datasource=docker versioning=docker depName=debian
+const DefaultDebianImage = "docker.io/debian:12.0-slim"
+
 // DefaultDirMode is UNIX file mode for mkdir.
 const DefaultDirMode os.FileMode = 0o755
 

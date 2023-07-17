@@ -101,6 +101,22 @@ func (graph *GraphLLB) buildBaseImages() {
 		)...,
 	).Root())
 
+	graph.BaseImages[v1alpha2.Debian] = graph.baseImageProcessor(llb.Image(
+		constants.DefaultDebianImage,
+		llb.WithCustomName(graph.Options.CommonPrefix+"base"),
+	).Run(
+		append(graph.commonRunOptions,
+			llb.Shlex("apt update -qq"),
+			llb.WithCustomName(graph.Options.CommonPrefix+"base-aptupdate"),
+		)...,
+	).Run(
+		append(graph.commonRunOptions,
+			// debian image has /bin/sh symlinked to /bin/dash, let's change it to bash
+			llb.Args([]string{"ln", "-svf", "/bin/bash", "/bin/sh"}),
+			llb.WithCustomName(graph.Options.CommonPrefix+"base-symlink"),
+		)...,
+	).Root())
+
 	graph.BaseImages[v1alpha2.Scratch] = graph.baseImageProcessor(llb.Scratch())
 }
 
