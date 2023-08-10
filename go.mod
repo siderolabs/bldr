@@ -10,7 +10,7 @@ require (
 	github.com/emicklei/dot v1.4.2
 	github.com/google/go-github/v52 v52.0.1-0.20230514113659-60429b4ba0ba
 	github.com/hashicorp/go-multierror v1.1.1
-	github.com/moby/buildkit v0.11.0-rc3.0.20230515120052-a9e8e39bae29
+	github.com/moby/buildkit v0.11.4
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0-rc3
 	github.com/otiai10/copy v1.11.0
@@ -28,6 +28,7 @@ require (
 	github.com/ProtonMail/go-crypto v0.0.0-20230217124315-7d5c6f04bbb8 // indirect
 	github.com/cloudflare/circl v1.3.3 // indirect
 	github.com/containerd/continuity v0.3.0 // indirect
+	github.com/containerd/typeurl v1.0.2 // indirect
 	github.com/containerd/typeurl/v2 v2.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/distribution v2.8.2+incompatible // indirect
