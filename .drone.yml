@@ -1,7 +1,7 @@
 ---
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2023-03-21T07:09:40Z by kres f8f4e55.
+# Generated on 2023-08-10T14:47:54Z by kres latest.
 
 kind: pipeline
 type: kubernetes
@@ -261,7 +261,7 @@ steps:
 
 services:
 - name: docker
-  image: docker:23.0-dind
+  image: docker:24.0-dind
   entrypoint:
   - dockerd
   commands:
