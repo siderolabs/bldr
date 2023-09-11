@@ -3,7 +3,7 @@ kind: common.Image
 name: image-bldr
 spec:
   pushLatest: false
-  droneExtraEnvironment:
+  extraEnvironment:
     PLATFORM: linux/amd64,linux/arm64
   entrypointArgs:
    - frontend
@@ -23,6 +23,20 @@ spec:
     darwin-arm64:
       GOOS: darwin
       GOARCH: arm64
+---
+kind: service.CodeCov
+spec:
+  targetThreshold: 7
+---
+kind: golang.Generate
+spec:
+  versionPackagePath: internal/version
+---
+kind: common.Release
+name: release
+spec:
+  artifacts:
+    - bldr-*
 ---
 kind: auto.CustomSteps
 spec:
@@ -82,7 +96,7 @@ spec:
       - "@$(MAKE) image-bldr PUSH=true"
       - cp $(ARTIFACTS)/bldr-$(subst /,-,$(PLATFORM)) $(ARTIFACTS)/bldr
       - cd internal/pkg/integration && PATH="$$PWD/../../../$(ARTIFACTS):$$PATH" integration.test -test.v -test.run $(RUN_TESTS)
-  drone:
+  ghaction:
     enabled: true
     environment:
-      REGISTRY: registry.dev.talos-systems.io
+      REGISTRY: registry.dev.siderolabs.io

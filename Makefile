@@ -1,6 +1,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2023-08-10T15:46:20Z by kres latest.
+# Generated on 2023-09-11T14:47:35Z by kres 8540947-dirty.
 
 # common variables
 
@@ -14,12 +14,12 @@ WITH_RACE ?= false
 REGISTRY ?= ghcr.io
 USERNAME ?= siderolabs
 REGISTRY_AND_USERNAME ?= $(REGISTRY)/$(USERNAME)
-PROTOBUF_GO_VERSION ?= 1.28.1
+PROTOBUF_GO_VERSION ?= 1.31.0
 GRPC_GO_VERSION ?= 1.3.0
-GRPC_GATEWAY_VERSION ?= 2.16.2
+GRPC_GATEWAY_VERSION ?= 2.17.1
 VTPROTOBUF_VERSION ?= 0.4.0
 DEEPCOPY_VERSION ?= v0.5.5
-GOLANGCILINT_VERSION ?= v1.54.0
+GOLANGCILINT_VERSION ?= v1.54.2
 GOFUMPT_VERSION ?= v0.5.0
 GO_VERSION ?= 1.21
 GOIMPORTS_VERSION ?= v0.12.0
@@ -40,6 +40,7 @@ PROGRESS ?= auto
 PUSH ?= false
 CI_ARGS ?=
 COMMON_ARGS = --file=Dockerfile
+COMMON_ARGS += --provenance=false
 COMMON_ARGS += --progress=$(PROGRESS)
 COMMON_ARGS += --platform=$(PLATFORM)
 COMMON_ARGS += --push=$(PUSH)
@@ -126,6 +127,9 @@ target-%:  ## Builds the specified target defined in the Dockerfile. The build r
 
 local-%:  ## Builds the specified target defined in the Dockerfile using the local output type. The build result will be output to the specified local destination.
 	@$(MAKE) target-$* TARGET_ARGS="--output=type=local,dest=$(DEST) $(TARGET_ARGS)"
+
+generate:  ## Generate .proto definitions.
+	@$(MAKE) local-$@ DEST=./
 
 lint-golangci-lint:  ## Runs golangci-lint linter.
 	@$(MAKE) target-$@

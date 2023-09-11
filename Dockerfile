@@ -2,19 +2,16 @@
 
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2023-08-10T14:47:54Z by kres latest.
+# Generated on 2023-09-11T14:47:35Z by kres 8540947-dirty.
 
 ARG TOOLCHAIN
 
-# cleaned up specs and compiled versions
-FROM scratch AS generate
+FROM ghcr.io/siderolabs/ca-certificates:v1.6.0-alpha.0-10-gd3d7d29 AS image-ca-certificates
 
-FROM ghcr.io/siderolabs/ca-certificates:v1.5.0 AS image-ca-certificates
-
-FROM ghcr.io/siderolabs/fhs:v1.5.0 AS image-fhs
+FROM ghcr.io/siderolabs/fhs:v1.6.0-alpha.0-10-gd3d7d29 AS image-fhs
 
 # runs markdownlint
-FROM docker.io/node:20.5.0-alpine3.18 AS lint-markdown
+FROM docker.io/node:20.5.1-alpine3.18 AS lint-markdown
 WORKDIR /src
 RUN npm i -g markdownlint-cli@0.35.0
 RUN npm i sentences-per-line@0.2.1
@@ -64,49 +61,13 @@ COPY ./cmd ./cmd
 COPY ./internal ./internal
 RUN --mount=type=cache,target=/go/pkg go list -mod=readonly all >/dev/null
 
-# builds bldr-darwin-amd64
-FROM base AS bldr-darwin-amd64-build
-COPY --from=generate / /
-WORKDIR /src/cmd/bldr
-ARG GO_BUILDFLAGS
-ARG GO_LDFLAGS
-ARG VERSION_PKG="github.com/siderolabs/bldr/internal/version"
+FROM tools AS embed-generate
 ARG SHA
 ARG TAG
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=amd64 GOOS=darwin go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-darwin-amd64
-
-# builds bldr-darwin-arm64
-FROM base AS bldr-darwin-arm64-build
-COPY --from=generate / /
-WORKDIR /src/cmd/bldr
-ARG GO_BUILDFLAGS
-ARG GO_LDFLAGS
-ARG VERSION_PKG="github.com/siderolabs/bldr/internal/version"
-ARG SHA
-ARG TAG
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=arm64 GOOS=darwin go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-darwin-arm64
-
-# builds bldr-linux-amd64
-FROM base AS bldr-linux-amd64-build
-COPY --from=generate / /
-WORKDIR /src/cmd/bldr
-ARG GO_BUILDFLAGS
-ARG GO_LDFLAGS
-ARG VERSION_PKG="github.com/siderolabs/bldr/internal/version"
-ARG SHA
-ARG TAG
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=amd64 GOOS=linux go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-linux-amd64
-
-# builds bldr-linux-arm64
-FROM base AS bldr-linux-arm64-build
-COPY --from=generate / /
-WORKDIR /src/cmd/bldr
-ARG GO_BUILDFLAGS
-ARG GO_LDFLAGS
-ARG VERSION_PKG="github.com/siderolabs/bldr/internal/version"
-ARG SHA
-ARG TAG
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=arm64 GOOS=linux go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-linux-arm64
+WORKDIR /src
+RUN mkdir -p internal/version/data && \
+    echo -n ${SHA} > internal/version/data/sha && \
+    echo -n ${TAG} > internal/version/data/tag
 
 # builds the integration test binary
 FROM base AS integration-build
@@ -148,6 +109,71 @@ WORKDIR /src
 ARG TESTPKGS
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg --mount=type=cache,target=/tmp go test -v -covermode=atomic -coverprofile=coverage.txt -coverpkg=${TESTPKGS} -count 1 ${TESTPKGS}
 
+FROM embed-generate AS embed-abbrev-generate
+WORKDIR /src
+ARG ABBREV_TAG
+RUN echo -n 'undefined' > internal/version/data/sha && \
+    echo -n ${ABBREV_TAG} > internal/version/data/tag
+
+# copies out the integration test binary
+FROM scratch AS integration.test
+COPY --from=integration-build /src/integration.test /integration.test
+
+FROM scratch AS unit-tests
+COPY --from=unit-tests-run /src/coverage.txt /coverage-unit-tests.txt
+
+# cleaned up specs and compiled versions
+FROM scratch AS generate
+COPY --from=embed-abbrev-generate /src/internal/version internal/version
+
+# builds bldr-darwin-amd64
+FROM base AS bldr-darwin-amd64-build
+COPY --from=generate / /
+COPY --from=embed-generate / /
+WORKDIR /src/cmd/bldr
+ARG GO_BUILDFLAGS
+ARG GO_LDFLAGS
+ARG VERSION_PKG="internal/version"
+ARG SHA
+ARG TAG
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=amd64 GOOS=darwin go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-darwin-amd64
+
+# builds bldr-darwin-arm64
+FROM base AS bldr-darwin-arm64-build
+COPY --from=generate / /
+COPY --from=embed-generate / /
+WORKDIR /src/cmd/bldr
+ARG GO_BUILDFLAGS
+ARG GO_LDFLAGS
+ARG VERSION_PKG="internal/version"
+ARG SHA
+ARG TAG
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=arm64 GOOS=darwin go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-darwin-arm64
+
+# builds bldr-linux-amd64
+FROM base AS bldr-linux-amd64-build
+COPY --from=generate / /
+COPY --from=embed-generate / /
+WORKDIR /src/cmd/bldr
+ARG GO_BUILDFLAGS
+ARG GO_LDFLAGS
+ARG VERSION_PKG="internal/version"
+ARG SHA
+ARG TAG
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=amd64 GOOS=linux go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-linux-amd64
+
+# builds bldr-linux-arm64
+FROM base AS bldr-linux-arm64-build
+COPY --from=generate / /
+COPY --from=embed-generate / /
+WORKDIR /src/cmd/bldr
+ARG GO_BUILDFLAGS
+ARG GO_LDFLAGS
+ARG VERSION_PKG="internal/version"
+ARG SHA
+ARG TAG
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg GOARCH=arm64 GOOS=linux go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-linux-arm64
+
 FROM scratch AS bldr-darwin-amd64
 COPY --from=bldr-darwin-amd64-build /bldr-darwin-amd64 /bldr-darwin-amd64
 
@@ -159,13 +185,6 @@ COPY --from=bldr-linux-amd64-build /bldr-linux-amd64 /bldr-linux-amd64
 
 FROM scratch AS bldr-linux-arm64
 COPY --from=bldr-linux-arm64-build /bldr-linux-arm64 /bldr-linux-arm64
-
-# copies out the integration test binary
-FROM scratch AS integration.test
-COPY --from=integration-build /src/integration.test /integration.test
-
-FROM scratch AS unit-tests
-COPY --from=unit-tests-run /src/coverage.txt /coverage-unit-tests.txt
 
 FROM bldr-linux-${TARGETARCH} AS bldr
 
