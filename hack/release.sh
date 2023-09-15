@@ -2,7 +2,7 @@
 
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2022-08-29T16:54:01Z by kres bb965bb.
+# Generated on 2023-09-15T14:46:13Z by kres latest.
 
 set -e
 

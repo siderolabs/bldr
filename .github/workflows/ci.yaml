@@ -1,3 +1,7 @@
+# THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
+#
+# Generated on 2023-09-15T14:46:13Z by kres latest.
+
 name: default
 "on":
   push:
@@ -16,6 +20,7 @@ jobs:
     runs-on:
       - self-hosted
       - X64
+    if: ${{ !startsWith(github.head_ref, 'renovate/') || !startsWith(github.head_ref, 'renovate/') }}
     steps:
       - name: checkout
         uses: actions/checkout@v3

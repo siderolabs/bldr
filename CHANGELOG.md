@@ -1,3 +1,38 @@
+## [bldr 0.2.2](https://github.com/siderolabs/bldr/releases/tag/v0.2.2) (2023-09-15)
+
+Welcome to the v0.2.2 release of bldr!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/bldr/issues.
+
+### Contributors
+
+* Noel Georgi
+* Andrey Smirnov
+
+### Changes
+<details><summary>3 commits</summary>
+<p>
+
+* [`20de986`](https://github.com/siderolabs/bldr/commit/20de986bf1d15d50bd05cf62da99266af0b590a5) feat: support --cache-from/--cache-imports
+* [`38bee98`](https://github.com/siderolabs/bldr/commit/38bee98982471791133abaaa89dbffe225adeb3a) chore: rekres to support gh actions
+* [`d7f236f`](https://github.com/siderolabs/bldr/commit/d7f236f3fb0d91382a328b54ebe791b59c9e1f45) chore: add a no-op github workflow
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/containerd/containerd**  v1.7.3 -> v1.7.6
+* **github.com/moby/buildkit**          v0.12.1 -> v0.12.2
+* **golang.org/x/oauth2**               v0.11.0 -> v0.12.0
+
+Previous release can be found at [v0.2.1](https://github.com/siderolabs/bldr/releases/tag/v0.2.1)
+
+
+
+
 ## [bldr 0.2.0](https://github.com/siderolabs/bldr/releases/tag/v0.2.0) (2023-05-19)
 
 Welcome to the v0.2.0 release of bldr!
