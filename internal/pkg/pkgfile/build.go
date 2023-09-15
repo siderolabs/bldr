@@ -13,6 +13,7 @@ import (
 	"time"
 
 	ctrplatforms "github.com/containerd/containerd/platforms"
+	controlapi "github.com/moby/buildkit/api/services/control"
 	"github.com/moby/buildkit/client/llb"
 	"github.com/moby/buildkit/exporter/containerimage/exptypes"
 	"github.com/moby/buildkit/exporter/containerimage/image"
@@ -31,6 +32,8 @@ const (
 	keyTargetPlatform = "platform"
 	keyMultiPlatform  = "multi-platform"
 	keyNoCache        = "no-cache"
+	keyCacheFrom      = "cache-from"    // for registry only. deprecated in favor of keyCacheImports
+	keyCacheImports   = "cache-imports" // JSON representation of []CacheOptionsEntry
 
 	buildArgPrefix          = "build-arg:"
 	buildArgSourceDateEpoch = buildArgPrefix + "SOURCE_DATE_EPOCH"
@@ -42,7 +45,7 @@ const (
 
 // Build is an entrypoint for buildkit frontend.
 //
-//nolint:gocyclo,cyclop,gocognit
+//nolint:gocyclo,cyclop,gocognit,maintidx
 func Build(ctx context.Context, c client.Client, options *environment.Options) (*client.Result, error) {
 	opts := c.BuildOpts().Opts
 
@@ -145,8 +148,40 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 				return err
 			}
 
+			var cacheImports []client.CacheOptionsEntry
+
+			// new API
+			if cacheImportsStr := opts[keyCacheImports]; cacheImportsStr != "" {
+				var cacheImportsUM []controlapi.CacheOptionsEntry
+
+				if err = json.Unmarshal([]byte(cacheImportsStr), &cacheImportsUM); err != nil {
+					return fmt.Errorf("failed to unmarshal %s (%q): %w", keyCacheImports, cacheImportsStr, err)
+				}
+
+				for _, um := range cacheImportsUM {
+					cacheImports = append(cacheImports, client.CacheOptionsEntry{Type: um.Type, Attrs: um.Attrs})
+				}
+			}
+
+			// old API
+			if cacheFromStr := opts[keyCacheFrom]; cacheFromStr != "" {
+				cacheFrom := strings.Split(cacheFromStr, ",")
+
+				for _, s := range cacheFrom {
+					im := client.CacheOptionsEntry{
+						Type: "registry",
+						Attrs: map[string]string{
+							"ref": s,
+						},
+					}
+
+					cacheImports = append(cacheImports, im)
+				}
+			}
+
 			r, err := c.Solve(ctx, client.SolveRequest{
-				Definition: def.ToPB(),
+				Definition:   def.ToPB(),
+				CacheImports: cacheImports,
 			})
 			if err != nil {
 				return fmt.Errorf("failed to solve LLB: %w", err)
