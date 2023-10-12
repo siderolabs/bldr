@@ -8,7 +8,8 @@ require (
 	github.com/alessio/shellescape v1.4.2
 	github.com/containerd/containerd v1.7.6
 	github.com/emicklei/dot v1.6.0
-	github.com/google/go-github/v52 v52.0.1-0.20230514113659-60429b4ba0ba
+	github.com/google/go-github/v52 v52.0.0
+	github.com/google/go-github/v56 v56.0.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/moby/buildkit v0.12.2
 	github.com/opencontainers/go-digest v1.0.0
