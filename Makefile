@@ -1,6 +1,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2023-09-11T14:47:35Z by kres 8540947-dirty.
+# Generated on 2023-10-30T17:28:15Z by kres latest.
 
 # common variables
 
@@ -16,13 +16,13 @@ USERNAME ?= siderolabs
 REGISTRY_AND_USERNAME ?= $(REGISTRY)/$(USERNAME)
 PROTOBUF_GO_VERSION ?= 1.31.0
 GRPC_GO_VERSION ?= 1.3.0
-GRPC_GATEWAY_VERSION ?= 2.17.1
-VTPROTOBUF_VERSION ?= 0.4.0
+GRPC_GATEWAY_VERSION ?= 2.18.0
+VTPROTOBUF_VERSION ?= 0.5.0
 DEEPCOPY_VERSION ?= v0.5.5
-GOLANGCILINT_VERSION ?= v1.54.2
+GOLANGCILINT_VERSION ?= v1.55.1
 GOFUMPT_VERSION ?= v0.5.0
-GO_VERSION ?= 1.21
-GOIMPORTS_VERSION ?= v0.12.0
+GO_VERSION ?= 1.21.3
+GOIMPORTS_VERSION ?= v0.14.0
 GO_BUILDFLAGS ?=
 GO_LDFLAGS ?=
 CGO_ENABLED ?= 0
@@ -222,7 +222,7 @@ integration: integration.test bldr
 .PHONY: rekres
 rekres:
 	@docker pull $(KRES_IMAGE)
-	@docker run --rm -v $(PWD):/src -w /src -e GITHUB_TOKEN $(KRES_IMAGE)
+	@docker run --rm --net=host -v $(PWD):/src -w /src -e GITHUB_TOKEN $(KRES_IMAGE)
 
 .PHONY: help
 help:  ## This help menu.
