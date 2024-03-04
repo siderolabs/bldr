@@ -1,6 +1,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2023-10-30T17:28:15Z by kres latest.
+# Generated on 2024-03-05T05:52:53Z by kres latest.
 
 name: default
 concurrency:
@@ -22,17 +22,16 @@ jobs:
     permissions:
       actions: read
       contents: write
+      issues: read
       packages: write
       pull-requests: read
     runs-on:
       - self-hosted
       - generic
     if: (!startsWith(github.head_ref, 'renovate/') && !startsWith(github.head_ref, 'dependabot/'))
-    outputs:
-      labels: ${{ steps.workflow-run-info.outputs.pullRequestLabels }}
     services:
       buildkitd:
-        image: moby/buildkit:v0.12.2
+        image: moby/buildkit:v0.12.5
         options: --privileged
         ports:
           - 1234:1234
@@ -50,6 +49,7 @@ jobs:
         with:
           driver: remote
           endpoint: tcp://localhost:1234
+        timeout-minutes: 1
       - name: base
         run: |
           make base
@@ -90,11 +90,6 @@ jobs:
           REGISTRY: registry.dev.siderolabs.io
         run: |
           make integration
-      - name: Retrieve workflow info
-        id: workflow-run-info
-        uses: potiuk/get-workflow-origin@v1_5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Generate Checksums
         if: startsWith(github.ref, 'refs/tags/')
         run: |

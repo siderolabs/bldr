@@ -12,6 +12,7 @@ import (
 
 	"github.com/moby/buildkit/client/llb"
 	"github.com/opencontainers/go-digest"
+	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 
 	"github.com/siderolabs/bldr/internal/pkg/constants"
 	"github.com/siderolabs/bldr/internal/pkg/environment"
@@ -94,6 +95,23 @@ func (node *NodeLLB) context(root llb.State) llb.State {
 	)
 }
 
+func (node *NodeLLB) convertPlatform(platform string) (v1.Platform, error) {
+	switch platform {
+	case "linux/amd64":
+		return v1.Platform{
+			OS:           "linux",
+			Architecture: "amd64",
+		}, nil
+	case "linux/arm64":
+		return v1.Platform{
+			OS:           "linux",
+			Architecture: "arm64",
+		}, nil
+	default:
+		return v1.Platform{}, fmt.Errorf("unknown platform %q", platform)
+	}
+}
+
 func (node *NodeLLB) convertDependency(dep solver.PackageDependency) (depState llb.State, srcName string, err error) {
 	if dep.IsInternal() {
 		depState, err = NewNodeLLB(dep.Node, node.Graph).Build()
@@ -105,6 +123,15 @@ func (node *NodeLLB) convertDependency(dep solver.PackageDependency) (depState l
 	} else {
 		depState = llb.Image(dep.Image)
 		srcName = dep.Image
+
+		if dep.Platform != "" {
+			platform, err := node.convertPlatform(dep.Platform)
+			if err != nil {
+				return llb.Scratch(), "", err
+			}
+
+			depState = llb.Image(dep.Image, llb.Platform(platform))
+		}
 	}
 
 	return

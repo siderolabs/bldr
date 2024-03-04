@@ -12,11 +12,12 @@ import (
 
 // Dependency on another image or stage.
 type Dependency struct {
-	Image   string `yaml:"image,omitempty"`
-	Stage   string `yaml:"stage,omitempty"`
-	From    string `yaml:"from,omitempty"`
-	To      string `yaml:"to,omitempty"`
-	Runtime bool   `yaml:"runtime,omitempty"`
+	Image    string `yaml:"image,omitempty"`
+	Stage    string `yaml:"stage,omitempty"`
+	From     string `yaml:"from,omitempty"`
+	To       string `yaml:"to,omitempty"`
+	Platform string `yaml:"platform,omitempty"`
+	Runtime  bool   `yaml:"runtime,omitempty"`
 }
 
 // IsInternal checks whether dependency is internal to some stage.

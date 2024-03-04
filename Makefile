@@ -1,6 +1,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2023-10-30T17:28:15Z by kres latest.
+# Generated on 2024-03-05T05:52:53Z by kres latest.
 
 # common variables
 
@@ -14,20 +14,19 @@ WITH_RACE ?= false
 REGISTRY ?= ghcr.io
 USERNAME ?= siderolabs
 REGISTRY_AND_USERNAME ?= $(REGISTRY)/$(USERNAME)
-PROTOBUF_GO_VERSION ?= 1.31.0
+PROTOBUF_GO_VERSION ?= 1.32.0
 GRPC_GO_VERSION ?= 1.3.0
-GRPC_GATEWAY_VERSION ?= 2.18.0
-VTPROTOBUF_VERSION ?= 0.5.0
-DEEPCOPY_VERSION ?= v0.5.5
-GOLANGCILINT_VERSION ?= v1.55.1
-GOFUMPT_VERSION ?= v0.5.0
-GO_VERSION ?= 1.21.3
-GOIMPORTS_VERSION ?= v0.14.0
+GRPC_GATEWAY_VERSION ?= 2.19.1
+VTPROTOBUF_VERSION ?= 0.6.0
+DEEPCOPY_VERSION ?= v0.5.6
+GOLANGCILINT_VERSION ?= v1.56.2
+GOFUMPT_VERSION ?= v0.6.0
+GO_VERSION ?= 1.22.0
+GOIMPORTS_VERSION ?= v0.18.0
 GO_BUILDFLAGS ?=
 GO_LDFLAGS ?=
 CGO_ENABLED ?= 0
 GOTOOLCHAIN ?= local
-GOEXPERIMENT ?= loopvar
 TESTPKGS ?= ./...
 KRES_IMAGE ?= ghcr.io/siderolabs/kres:latest
 CONFORMANCE_IMAGE ?= ghcr.io/siderolabs/conform:latest
@@ -65,7 +64,7 @@ COMMON_ARGS += --build-arg=GOLANGCILINT_VERSION="$(GOLANGCILINT_VERSION)"
 COMMON_ARGS += --build-arg=GOIMPORTS_VERSION="$(GOIMPORTS_VERSION)"
 COMMON_ARGS += --build-arg=GOFUMPT_VERSION="$(GOFUMPT_VERSION)"
 COMMON_ARGS += --build-arg=TESTPKGS="$(TESTPKGS)"
-TOOLCHAIN ?= docker.io/golang:1.21-alpine
+TOOLCHAIN ?= docker.io/golang:1.22-alpine
 
 # extra variables
 
@@ -92,6 +91,23 @@ To create a builder instance, run:
 
 	docker buildx create --name local --use
 
+If running builds that needs to be cached aggresively create a builder instance with the following:
+
+	docker buildx create --name local --use --config=config.toml
+
+config.toml contents:
+
+[worker.oci]
+  gc = true
+  gckeepstorage = 50000
+
+  [[worker.oci.gcpolicy]]
+    keepBytes = 10737418240
+    keepDuration = 604800
+    filters = [ "type==source.local", "type==exec.cachemount", "type==source.git.checkout"]
+  [[worker.oci.gcpolicy]]
+    all = true
+    keepBytes = 53687091200
 
 If you already have a compatible builder instance, you may use that instead.
 
@@ -113,7 +129,7 @@ endif
 ifneq (, $(filter $(WITH_DEBUG), t true TRUE y yes 1))
 GO_BUILDFLAGS += -tags sidero.debug
 else
-GO_LDFLAGS += -s -w
+GO_LDFLAGS += -s
 endif
 
 all: unit-tests bldr image-bldr integration.test integration lint
@@ -140,7 +156,7 @@ lint-gofumpt:  ## Runs gofumpt linter.
 .PHONY: fmt
 fmt:  ## Formats the source code
 	@docker run --rm -it -v $(PWD):/src -w /src golang:$(GO_VERSION) \
-		bash -c "export GOEXPERIMENT=loopvar; export GOTOOLCHAIN=local; \
+		bash -c "export GOTOOLCHAIN=local; \
 		export GO111MODULE=on; export GOPROXY=https://proxy.golang.org; \
 		go install mvdan.cc/gofumpt@$(GOFUMPT_VERSION) && \
 		gofumpt -w ."
@@ -222,7 +238,7 @@ integration: integration.test bldr
 .PHONY: rekres
 rekres:
 	@docker pull $(KRES_IMAGE)
-	@docker run --rm --net=host -v $(PWD):/src -w /src -e GITHUB_TOKEN $(KRES_IMAGE)
+	@docker run --rm --net=host --user $(shell id -u):$(shell id -g) -v $(PWD):/src -w /src -e GITHUB_TOKEN $(KRES_IMAGE)
 
 .PHONY: help
 help:  ## This help menu.

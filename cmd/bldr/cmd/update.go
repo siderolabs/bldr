@@ -122,7 +122,7 @@ var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update pkgs",
 	Args:  cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		if !updateCmdFlag.dry {
 			log.Fatal("Real update is not implemented yet; pass `--dry` flag.")
 		}

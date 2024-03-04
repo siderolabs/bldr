@@ -30,7 +30,7 @@ var llbCmd = &cobra.Command{
 and outputs buildkit LLB to stdout. This can be used as 'bldr pack ... | buildctl ...'.
 `,
 	Args: cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		loader := solver.FilesystemPackageLoader{
 			Root:    pkgRoot,
 			Context: options.GetVariables(),

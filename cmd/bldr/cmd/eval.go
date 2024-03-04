@@ -27,7 +27,7 @@ var evalCmd = &cobra.Command{
  Variables are looked up for the target specified as the '--target' flag.'.
  `,
 	Args: cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, args []string) {
 		context := options.GetVariables().Copy()
 
 		for _, buildArg := range evalCmdFlags.buildArgs {

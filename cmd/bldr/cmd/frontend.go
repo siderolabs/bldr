@@ -30,7 +30,7 @@ Run with:
 
   docker buildx build -f ./Pkgfile --target <target> .
 `,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		if err := grpcclient.RunFromEnvironment(
 			appcontext.Context(),
 			func(ctx context.Context, c client.Client) (*client.Result, error) {
