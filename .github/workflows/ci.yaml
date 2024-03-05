@@ -92,7 +92,7 @@ jobs:
           make integration
       - name: Retrieve workflow info
         id: workflow-run-info
-        uses: potiuk/get-workflow-origin@v1_5
+        uses: potiuk/get-workflow-origin@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Generate Checksums
