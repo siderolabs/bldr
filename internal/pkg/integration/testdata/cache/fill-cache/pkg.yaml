@@ -1,6 +1,7 @@
 name: fill-cache
 steps:
-- cache: /.cache
+- cachePaths:
+    - /.cache
   prepare:
     -  echo "foo" > /.cache/foo
 

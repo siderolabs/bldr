@@ -196,7 +196,9 @@ steps:
         destination: bison.tar.xz
         sha256: 075cef2e814642e30e10e8155e93022e4a91ca38a65aa1d5467d4e969f97f338
         sha512: 00b448db8abe91b07e32ff5273c6617bc1350d806f92073a9472f4c2f0de5d22c152795674171b74f2eb9eff8d36f8173b82dacb215601bb071ae39404d4a8a2
-    cache: "/.cache" # cache mount to be used across builds
+    cachePaths:
+      - /.cache/go-build
+      - /go/pkg
     prepare:
       - tar -xJf bison.tar.xz --strip-components=1
       - mkdir build
@@ -320,7 +322,7 @@ Top-level keys describing phases are (all phases are optional):
 
 - `sources` (download)
 - `env` (environment variables)
-- `cache` (a cache mount to be used across builds)
+- `cachePaths` (a list of cache mount paths to be used across builds)
 - `prepare` (shell script)
 - `build` (shell script)
 - `install` (shell script)

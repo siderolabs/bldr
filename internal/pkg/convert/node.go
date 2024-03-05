@@ -13,6 +13,7 @@ import (
 	"github.com/moby/buildkit/client/llb"
 	"github.com/opencontainers/go-digest"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
+	"github.com/siderolabs/gen/xslices"
 
 	"github.com/siderolabs/bldr/internal/pkg/constants"
 	"github.com/siderolabs/bldr/internal/pkg/environment"
@@ -270,18 +271,16 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 		for _, instruction := range script.Instructions {
 			runOptions := append([]llb.RunOption(nil), node.Graph.commonRunOptions...)
 
-			if step.CachePath != "" {
-				runOptions = append(runOptions,
-					llb.AddMount(
-						step.CachePath,
-						llb.Scratch(),
-						llb.AsPersistentCacheDir(
-							path.Clean(node.Graph.Options.CacheIDNamespace+"/"+step.CachePath),
-							llb.CacheMountShared,
-						),
+			runOptions = append(runOptions, xslices.Map(step.CachePaths, func(p string) llb.RunOption {
+				return llb.AddMount(
+					p,
+					llb.Scratch(),
+					llb.AsPersistentCacheDir(
+						path.Clean(node.Graph.Options.CacheIDNamespace+"/"+p),
+						llb.CacheMountShared,
 					),
 				)
-			}
+			})...)
 
 			runOptions = append(runOptions,
 				llb.Args([]string{

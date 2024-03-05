@@ -2,8 +2,9 @@ name: check-cache
 dependencies:
   - stage: fill-cache
 steps:
-- cache: /.cache
-  prepare:
+- cachePaths:
+    - /.cache
+  test:
     -  "[ -e /.cache/foo ]"
 finalize:
   - from: /pkg
