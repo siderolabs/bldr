@@ -1,0 +1,9 @@
+---
+name: final
+platform: linux/arm64
+steps:
+- test:
+    - test `uname -m` = "aarch64"
+finalize:
+  - from: /
+    to: /

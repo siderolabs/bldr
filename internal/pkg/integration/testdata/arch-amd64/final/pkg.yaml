@@ -1,5 +1,12 @@
 ---
 name: final
+dependencies:
+  # this arm64 variant of the image  only contains the u-boot binary,
+  # so this is a good test to ensure that we can copy the binary from
+  # the arm64 image to the x86_64 image
+  - image: ghcr.io/siderolabs/u-boot:v1.7.0-alpha.0-31-gcb39126
+    platform: linux/arm64
+    from: /rpi_generic
 steps:
 - test:
     - test "${BUILD:-x}" = "x86_64-linux-musl"

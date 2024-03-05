@@ -227,6 +227,8 @@ Additionally, hermetic text functions from [Sprig](http://masterminds.github.io/
 On the root level, following properties are available:
 
 - `name` (*str*, *required*): name of the package, also used to reference this package from other packages as dependency.
+- `platform` (*str*, *optional*): platform override for the build.
+  If not set, defaults to the platform of the build.
 - `variant` (*str*, *optional*): variant of the base image of the build.
   Two variants are available:
   - `alpine`: Alpine Linux 3.16 image with `bash` package pre-installed
@@ -270,6 +272,8 @@ Properties:
   Contents of the stage are poured into the build at the location specified with `to:` parameter.
 - `image` (*str*, *external dependency*): reference to the registry container image this package depends on.
   Contents of the image are poured into the build at the location specified with `to:` parameter.
+- `platform` (*str*, *optional*): platform to pull the image for.
+  If not set, defaults to the platform of the build.
 - `runtime` (*bool*, *optional*): if set, marks dependency as runtime.
   This means that when this package is pulled in into the build, all the runtime dependencies are pulled in automatically as well.
   This also applies to transitive runtime dependencies.

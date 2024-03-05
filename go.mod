@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/alessio/shellescape v1.4.2
-	github.com/containerd/containerd v1.7.11
+	github.com/containerd/containerd v1.7.13
 	github.com/emicklei/dot v1.6.1
 	github.com/google/go-github/v60 v60.0.0
 	github.com/hashicorp/go-multierror v1.1.1

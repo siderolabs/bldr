@@ -12,11 +12,11 @@ import (
 
 	"github.com/moby/buildkit/client/llb"
 	"github.com/opencontainers/go-digest"
-	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/siderolabs/gen/xslices"
 
 	"github.com/siderolabs/bldr/internal/pkg/constants"
 	"github.com/siderolabs/bldr/internal/pkg/environment"
+	"github.com/siderolabs/bldr/internal/pkg/platform"
 	"github.com/siderolabs/bldr/internal/pkg/solver"
 	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha2"
 )
@@ -55,17 +55,24 @@ func defaultCopyOptions(options *environment.Options, reproducible bool) *llb.Co
 type NodeLLB struct {
 	*solver.PackageNode
 
-	Graph  *GraphLLB
-	Prefix string
+	Graph    *GraphLLB
+	Prefix   string
+	Platform string
 }
 
 // NewNodeLLB wraps PackageNode for LLB conversion.
-func NewNodeLLB(node *solver.PackageNode, graph *GraphLLB) *NodeLLB {
+func NewNodeLLB(node *solver.PackageNode, graph *GraphLLB, platformOverride string) *NodeLLB {
+	// set default platform if not set
+	if platformOverride == "" {
+		platformOverride = graph.Options.TargetPlatform.String()
+	}
+
 	return &NodeLLB{
 		PackageNode: node,
 
-		Graph:  graph,
-		Prefix: graph.Options.CommonPrefix + node.Name + ":",
+		Graph:    graph,
+		Prefix:   graph.Options.CommonPrefix + node.Name + ":",
+		Platform: platformOverride,
 	}
 }
 
@@ -96,26 +103,9 @@ func (node *NodeLLB) context(root llb.State) llb.State {
 	)
 }
 
-func (node *NodeLLB) convertPlatform(platform string) (v1.Platform, error) {
-	switch platform {
-	case "linux/amd64":
-		return v1.Platform{
-			OS:           "linux",
-			Architecture: "amd64",
-		}, nil
-	case "linux/arm64":
-		return v1.Platform{
-			OS:           "linux",
-			Architecture: "arm64",
-		}, nil
-	default:
-		return v1.Platform{}, fmt.Errorf("unknown platform %q", platform)
-	}
-}
-
 func (node *NodeLLB) convertDependency(dep solver.PackageDependency) (depState llb.State, srcName string, err error) {
 	if dep.IsInternal() {
-		depState, err = NewNodeLLB(dep.Node, node.Graph).Build()
+		depState, err = NewNodeLLB(dep.Node, node.Graph, node.Pkg.Platform).Build()
 		if err != nil {
 			return llb.Scratch(), "", err
 		}
@@ -126,7 +116,7 @@ func (node *NodeLLB) convertDependency(dep solver.PackageDependency) (depState l
 		srcName = dep.Image
 
 		if dep.Platform != "" {
-			platform, err := node.convertPlatform(dep.Platform)
+			platform, err := platform.ToV1Platform(dep.Platform, "")
 			if err != nil {
 				return llb.Scratch(), "", err
 			}
@@ -160,11 +150,18 @@ func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
 	stages := []llb.State{root}
 
 	for _, dep := range deps {
-		if _, alreadyProcessed := seen[dep.ID()]; alreadyProcessed {
+		depID := dep.ID() + node.Platform
+
+		// set dep platform to node platform if not set
+		if dep.Platform == "" {
+			dep.Platform = node.Platform
+		}
+
+		if _, alreadyProcessed := seen[depID]; alreadyProcessed {
 			continue
 		}
 
-		seen[dep.ID()] = struct{}{}
+		seen[depID] = struct{}{}
 
 		depState, srcName, err := node.convertDependency(dep)
 		if err != nil {
@@ -328,7 +325,12 @@ func (node *NodeLLB) finalize(root llb.State) llb.State {
 
 // Build converts PackageNode to buildkit LLB.
 func (node *NodeLLB) Build() (llb.State, error) {
-	if state, ok := node.Graph.cache[node.PackageNode]; ok {
+	cacheSt := cacheKey{
+		PackageNode: node.PackageNode,
+		Platform:    node.Platform,
+	}
+
+	if state, ok := node.Graph.cache[cacheSt]; ok {
 		return state, nil
 	}
 
@@ -348,7 +350,7 @@ func (node *NodeLLB) Build() (llb.State, error) {
 
 	root = node.finalize(root)
 
-	node.Graph.cache[node.PackageNode] = root
+	node.Graph.cache[cacheSt] = root
 
 	return root, nil
 }

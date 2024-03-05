@@ -24,6 +24,7 @@ type Pkg struct {
 	Shell        Shell           `yaml:"shell,omitempty"`
 	BaseDir      string          `yaml:"-"`
 	FileName     string          `yaml:"-"`
+	Platform     string          `yaml:"platform,omitempty"`
 	Install      Install         `yaml:"install,omitempty"`
 	Dependencies Dependencies    `yaml:"dependencies,omitempty"`
 	Steps        Steps           `yaml:"steps,omitempty"`
