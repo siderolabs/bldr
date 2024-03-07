@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	ctrplatforms "github.com/containerd/containerd/platforms"
@@ -48,15 +49,81 @@ type platformContext struct {
 	options  environment.Options
 }
 
+type platformContextCache struct { //nolint:govet
+	mu    sync.Mutex
+	cache map[string]platformContext
+
+	baseOptions environment.Options
+	exportMap   bool
+	c           client.Client
+}
+
+func newPlatformContextCache(baseOptions environment.Options, exportMap bool, c client.Client) *platformContextCache {
+	return &platformContextCache{
+		cache: make(map[string]platformContext),
+
+		baseOptions: baseOptions,
+		exportMap:   exportMap,
+		c:           c,
+	}
+}
+
+func (cache *platformContextCache) get(ctx context.Context, platform environment.Platform) (platformContext, error) {
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+
+	if pc, ok := cache.cache[platform.ID]; ok {
+		return pc, nil
+	}
+
+	options := cache.baseOptions
+	options.BuildPlatform = platform
+	options.TargetPlatform = platform
+
+	if cache.exportMap {
+		options.CommonPrefix = fmt.Sprintf("%s ", platform.ID)
+	}
+
+	pkgRef, err := fetchPkgs(ctx, cache.c)
+	if err != nil {
+		return platformContext{}, fmt.Errorf("error loading packages for %s: %w", platform, err)
+	}
+
+	opts := cache.c.BuildOpts().Opts
+
+	buildContext := options.GetVariables().Copy()
+	// push build arguments as `BUILD_ARGS_` prefixed variables
+	buildContext.Merge(prefix(filter(opts, buildArgPrefix), "BUILD_ARG_"))
+
+	loader := solver.BuildkitFrontendLoader{
+		Context: buildContext,
+		Ref:     pkgRef,
+		Ctx:     ctx,
+	}
+
+	packages, err := solver.NewPackages(&loader)
+	if err != nil {
+		return platformContext{}, fmt.Errorf("error loading packages for %s: %w", platform, err)
+	}
+
+	cache.cache[platform.ID] = platformContext{
+		options:  options,
+		packages: packages,
+	}
+
+	return cache.cache[platform.ID], nil
+}
+
 func solveTarget(
-	platformContexts map[string]platformContext, c client.Client, cacheImports []client.CacheOptionsEntry,
+	platformContextCache *platformContextCache, c client.Client, cacheImports []client.CacheOptionsEntry,
 ) func(ctx context.Context, platform environment.Platform, target string) (*client.Result, error) {
 	return func(ctx context.Context, platform environment.Platform, target string) (*client.Result, error) {
-		if _, ok := platformContexts[platform.ID]; !ok {
-			return nil, fmt.Errorf("platform %s not found", platform)
+		platformContext, err := platformContextCache.get(ctx, platform)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get platform context for %s: %w", platform, err)
 		}
 
-		options, packages := platformContexts[platform.ID].options, platformContexts[platform.ID].packages
+		options, packages := platformContext.options, platformContext.packages
 
 		if target == "" {
 			target = options.Target
@@ -67,7 +134,7 @@ func solveTarget(
 			return nil, fmt.Errorf("failed to resolve packages for platform %s and target %s: %w", platform, target, err)
 		}
 
-		def, err := convert.MarshalLLB(ctx, graph, solveTarget(platformContexts, c, cacheImports), &options)
+		def, err := convert.MarshalLLB(ctx, graph, solveTarget(platformContextCache, c, cacheImports), &options)
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal LLB for platform %s and target %s: %w", platform, target, err)
 		}
@@ -175,44 +242,8 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 	}
 
 	// prepare platform contexts
-	platformContexts := make(map[string]platformContext, len(platforms))
-
-	for _, platform := range platforms {
-		options := *options
-		options.BuildPlatform = platform
-		options.TargetPlatform = platform
-
-		if exportMap {
-			options.CommonPrefix = fmt.Sprintf("%s ", platform.ID)
-		}
-
-		pkgRef, err := fetchPkgs(ctx, c)
-		if err != nil {
-			return nil, fmt.Errorf("error loading packages for %s: %w", platform, err)
-		}
-
-		buildContext := options.GetVariables().Copy()
-		// push build arguments as `BUILD_ARGS_` prefixed variables
-		buildContext.Merge(prefix(filter(opts, buildArgPrefix), "BUILD_ARG_"))
-
-		loader := solver.BuildkitFrontendLoader{
-			Context: buildContext,
-			Ref:     pkgRef,
-			Ctx:     ctx,
-		}
-
-		packages, err := solver.NewPackages(&loader)
-		if err != nil {
-			return nil, fmt.Errorf("error loading packages for %s: %w", platform, err)
-		}
-
-		platformContexts[platform.ID] = platformContext{
-			options:  options,
-			packages: packages,
-		}
-	}
-
-	solveTarget := solveTarget(platformContexts, c, cacheImports)
+	platformContextCache := newPlatformContextCache(*options, exportMap, c)
+	solveTarget := solveTarget(platformContextCache, c, cacheImports)
 
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
@@ -232,6 +263,11 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 				return err
 			}
 
+			platformContext, err := platformContextCache.get(ctx, platform)
+			if err != nil {
+				return fmt.Errorf("failed to get platform context for %s: %w", platform, err)
+			}
+
 			img := image.Image{
 				Image: specs.Image{
 					Platform: specs.Platform{
@@ -245,7 +281,7 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 				},
 				Config: image.ImageConfig{
 					ImageConfig: specs.ImageConfig{
-						Labels: platformContexts[platform.ID].packages.ImageLabels(),
+						Labels: platformContext.packages.ImageLabels(),
 					},
 				},
 			}
