@@ -1,9 +1,8 @@
 ---
 name: final
-platform: linux/arm64
-steps:
-- test:
-    - test `uname -m` = "aarch64"
+dependencies:
+  - stage: onlyarm
+    platform: linux/arm64
 finalize:
   - from: /
     to: /

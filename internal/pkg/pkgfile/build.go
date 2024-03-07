@@ -43,9 +43,50 @@ const (
 	sharedKeyHint       = constants.PkgYaml
 )
 
+type platformContext struct {
+	packages *solver.Packages
+	options  environment.Options
+}
+
+func solveTarget(
+	platformContexts map[string]platformContext, c client.Client, cacheImports []client.CacheOptionsEntry,
+) func(ctx context.Context, platform environment.Platform, target string) (*client.Result, error) {
+	return func(ctx context.Context, platform environment.Platform, target string) (*client.Result, error) {
+		if _, ok := platformContexts[platform.ID]; !ok {
+			return nil, fmt.Errorf("platform %s not found", platform)
+		}
+
+		options, packages := platformContexts[platform.ID].options, platformContexts[platform.ID].packages
+
+		if target == "" {
+			target = options.Target
+		}
+
+		graph, err := packages.Resolve(target)
+		if err != nil {
+			return nil, fmt.Errorf("failed to resolve packages for platform %s and target %s: %w", platform, target, err)
+		}
+
+		def, err := convert.MarshalLLB(ctx, graph, solveTarget(platformContexts, c, cacheImports), &options)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal LLB for platform %s and target %s: %w", platform, target, err)
+		}
+
+		r, err := c.Solve(ctx, client.SolveRequest{
+			Definition:   def.ToPB(),
+			CacheImports: cacheImports,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to solve LLB for platform %s and target %s: %w", platform, target, err)
+		}
+
+		return r, nil
+	}
+}
+
 // Build is an entrypoint for buildkit frontend.
 //
-//nolint:gocyclo,cyclop,gocognit,maintidx
+//nolint:gocyclo,cyclop,gocognit
 func Build(ctx context.Context, c client.Client, options *environment.Options) (*client.Result, error) {
 	opts := c.BuildOpts().Opts
 
@@ -102,6 +143,77 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 	}
 	res := client.NewResult()
 
+	var cacheImports []client.CacheOptionsEntry
+
+	// new API
+	if cacheImportsStr := opts[keyCacheImports]; cacheImportsStr != "" {
+		var cacheImportsUM []controlapi.CacheOptionsEntry
+
+		if err := json.Unmarshal([]byte(cacheImportsStr), &cacheImportsUM); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal %s (%q): %w", keyCacheImports, cacheImportsStr, err)
+		}
+
+		for _, um := range cacheImportsUM {
+			cacheImports = append(cacheImports, client.CacheOptionsEntry{Type: um.Type, Attrs: um.Attrs})
+		}
+	}
+
+	// old API
+	if cacheFromStr := opts[keyCacheFrom]; cacheFromStr != "" {
+		cacheFrom := strings.Split(cacheFromStr, ",")
+
+		for _, s := range cacheFrom {
+			im := client.CacheOptionsEntry{
+				Type: "registry",
+				Attrs: map[string]string{
+					"ref": s,
+				},
+			}
+
+			cacheImports = append(cacheImports, im)
+		}
+	}
+
+	// prepare platform contexts
+	platformContexts := make(map[string]platformContext, len(platforms))
+
+	for _, platform := range platforms {
+		options := *options
+		options.BuildPlatform = platform
+		options.TargetPlatform = platform
+
+		if exportMap {
+			options.CommonPrefix = fmt.Sprintf("%s ", platform.ID)
+		}
+
+		pkgRef, err := fetchPkgs(ctx, c)
+		if err != nil {
+			return nil, fmt.Errorf("error loading packages for %s: %w", platform, err)
+		}
+
+		buildContext := options.GetVariables().Copy()
+		// push build arguments as `BUILD_ARGS_` prefixed variables
+		buildContext.Merge(prefix(filter(opts, buildArgPrefix), "BUILD_ARG_"))
+
+		loader := solver.BuildkitFrontendLoader{
+			Context: buildContext,
+			Ref:     pkgRef,
+			Ctx:     ctx,
+		}
+
+		packages, err := solver.NewPackages(&loader)
+		if err != nil {
+			return nil, fmt.Errorf("error loading packages for %s: %w", platform, err)
+		}
+
+		platformContexts[platform.ID] = platformContext{
+			options:  options,
+			packages: packages,
+		}
+	}
+
+	solveTarget := solveTarget(platformContexts, c, cacheImports)
+
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
@@ -110,81 +222,9 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 		platform := platform
 
 		eg.Go(func() error {
-			options := *options
-			options.BuildPlatform = platform
-			options.TargetPlatform = platform
-
-			if exportMap {
-				options.CommonPrefix = fmt.Sprintf("%s ", platform.ID)
-			}
-
-			pkgRef, err := fetchPkgs(ctx, c)
+			r, err := solveTarget(ctx, platform, "")
 			if err != nil {
 				return err
-			}
-
-			buildContext := options.GetVariables().Copy()
-			// push build arguments as `BUILD_ARGS_` prefixed variables
-			buildContext.Merge(prefix(filter(opts, buildArgPrefix), "BUILD_ARG_"))
-
-			loader := solver.BuildkitFrontendLoader{
-				Context: buildContext,
-				Ref:     pkgRef,
-				Ctx:     ctx,
-			}
-
-			packages, err := solver.NewPackages(&loader)
-			if err != nil {
-				return err
-			}
-
-			graph, err := packages.Resolve(options.Target)
-			if err != nil {
-				return err
-			}
-
-			def, err := convert.MarshalLLB(graph, &options) //nolint:contextcheck
-			if err != nil {
-				return err
-			}
-
-			var cacheImports []client.CacheOptionsEntry
-
-			// new API
-			if cacheImportsStr := opts[keyCacheImports]; cacheImportsStr != "" {
-				var cacheImportsUM []controlapi.CacheOptionsEntry
-
-				if err = json.Unmarshal([]byte(cacheImportsStr), &cacheImportsUM); err != nil {
-					return fmt.Errorf("failed to unmarshal %s (%q): %w", keyCacheImports, cacheImportsStr, err)
-				}
-
-				for _, um := range cacheImportsUM {
-					cacheImports = append(cacheImports, client.CacheOptionsEntry{Type: um.Type, Attrs: um.Attrs})
-				}
-			}
-
-			// old API
-			if cacheFromStr := opts[keyCacheFrom]; cacheFromStr != "" {
-				cacheFrom := strings.Split(cacheFromStr, ",")
-
-				for _, s := range cacheFrom {
-					im := client.CacheOptionsEntry{
-						Type: "registry",
-						Attrs: map[string]string{
-							"ref": s,
-						},
-					}
-
-					cacheImports = append(cacheImports, im)
-				}
-			}
-
-			r, err := c.Solve(ctx, client.SolveRequest{
-				Definition:   def.ToPB(),
-				CacheImports: cacheImports,
-			})
-			if err != nil {
-				return fmt.Errorf("failed to solve LLB: %w", err)
 			}
 
 			ref, err := r.SingleRef()
@@ -205,7 +245,7 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 				},
 				Config: image.ImageConfig{
 					ImageConfig: specs.ImageConfig{
-						Labels: packages.ImageLabels(),
+						Labels: platformContexts[platform.ID].packages.ImageLabels(),
 					},
 				},
 			}

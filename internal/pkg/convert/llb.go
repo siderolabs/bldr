@@ -5,18 +5,19 @@
 package convert
 
 import (
+	"context"
+
 	"github.com/moby/buildkit/client/llb"
+	"github.com/moby/buildkit/frontend/gateway/client"
 
 	"github.com/siderolabs/bldr/internal/pkg/environment"
 	"github.com/siderolabs/bldr/internal/pkg/solver"
 )
 
-// BuildLLB translates package graph into LLB DAG.
-func BuildLLB(graph *solver.PackageGraph, options *environment.Options) (llb.State, error) {
-	return NewGraphLLB(graph, options).Build()
-}
+// SolverFunc can be called to solve the package into the llb state via buildkit.
+type SolverFunc func(ctx context.Context, platform environment.Platform, target string) (*client.Result, error)
 
 // MarshalLLB translates package graph into LLB DAG and marshals it.
-func MarshalLLB(graph *solver.PackageGraph, options *environment.Options) (*llb.Definition, error) {
-	return NewGraphLLB(graph, options).Marshal()
+func MarshalLLB(ctx context.Context, graph *solver.PackageGraph, solver SolverFunc, options *environment.Options) (*llb.Definition, error) {
+	return NewGraphLLB(graph, solver, options).Marshal(ctx)
 }

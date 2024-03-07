@@ -12,7 +12,6 @@ import (
 
 	"github.com/siderolabs/bldr/internal/pkg/constants"
 	"github.com/siderolabs/bldr/internal/pkg/environment"
-	"github.com/siderolabs/bldr/internal/pkg/platform"
 	"github.com/siderolabs/bldr/internal/pkg/solver"
 	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha2"
 )
@@ -22,6 +21,7 @@ import (
 // GraphLLB caches common images used in the build.
 type GraphLLB struct {
 	*solver.PackageGraph
+	solverFn SolverFunc
 
 	Options *environment.Options
 
@@ -30,24 +30,20 @@ type GraphLLB struct {
 	LocalContext llb.State
 
 	baseImageProcessor llbProcessor
-	cache              map[cacheKey]llb.State
+	cache              map[*solver.PackageNode]llb.State
 
 	commonRunOptions []llb.RunOption
-}
-
-type cacheKey struct {
-	*solver.PackageNode
-	Platform string
 }
 
 type llbProcessor func(llb.State) llb.State
 
 // NewGraphLLB creates new GraphLLB and initializes shared images.
-func NewGraphLLB(graph *solver.PackageGraph, options *environment.Options) *GraphLLB {
+func NewGraphLLB(graph *solver.PackageGraph, solverFn SolverFunc, options *environment.Options) *GraphLLB {
 	result := &GraphLLB{
 		PackageGraph: graph,
 		Options:      options,
-		cache:        make(map[cacheKey]llb.State),
+		solverFn:     solverFn,
+		cache:        make(map[*solver.PackageNode]llb.State),
 	}
 
 	if options.ProxyEnv != nil {
@@ -92,12 +88,9 @@ func (graph *GraphLLB) buildBaseImages() {
 		return addEnv(addPkg(root))
 	}
 
-	platform, _ := platform.ToV1Platform(graph.Root.Pkg.Platform, graph.Options.TargetPlatform.String()) //nolint:errcheck
-
 	graph.BaseImages[v1alpha2.Alpine] = graph.baseImageProcessor(llb.Image(
 		constants.DefaultBaseImage,
 		llb.WithCustomName(graph.Options.CommonPrefix+"base"),
-		llb.Platform(platform),
 	).Run(
 		append(graph.commonRunOptions,
 			llb.Shlex("apk --no-cache --update add bash"),
@@ -114,12 +107,9 @@ func (graph *GraphLLB) buildBaseImages() {
 }
 
 func (graph *GraphLLB) buildChecksummer() {
-	platform, _ := platform.ToV1Platform(graph.Root.Pkg.Platform, graph.Options.TargetPlatform.String()) //nolint:errcheck
-
 	graph.Checksummer = llb.Image(
 		constants.DefaultBaseImage,
 		llb.WithCustomName(graph.Options.CommonPrefix+"cksum"),
-		llb.Platform(platform),
 	).Run(
 		append(graph.commonRunOptions,
 			llb.Shlex("apk --no-cache --update add coreutils"),
@@ -143,18 +133,18 @@ func (graph *GraphLLB) buildLocalContext() {
 }
 
 // Build converts package graph to LLB.
-func (graph *GraphLLB) Build() (llb.State, error) {
-	return NewNodeLLB(graph.Root, graph, graph.Root.Pkg.Platform).Build()
+func (graph *GraphLLB) Build(ctx context.Context) (llb.State, error) {
+	return NewNodeLLB(graph.Root, graph).Build(ctx)
 }
 
 // Marshal returns marshaled LLB.
-func (graph *GraphLLB) Marshal() (*llb.Definition, error) {
-	out, err := graph.Build()
+func (graph *GraphLLB) Marshal(ctx context.Context) (*llb.Definition, error) {
+	out, err := graph.Build(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	out = out.SetMarshalDefaults(graph.Options.BuildPlatform.LLBPlatform)
 
-	return out.Marshal(context.TODO())
+	return out.Marshal(ctx)
 }

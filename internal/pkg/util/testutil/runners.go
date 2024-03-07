@@ -65,14 +65,6 @@ func getRunner(manifest RunManifest) (Run, error) {
 			Target:   manifest.Target,
 			Platform: manifest.Platform,
 		}, nil
-	case "buildkit":
-		return BuildkitRunner{
-			CommandRunner: CommandRunner{
-				Expect: manifest.Expect,
-			},
-			Target:   manifest.Target,
-			Platform: manifest.Platform,
-		}, nil
 	case "eval":
 		return EvalRunner{
 			CommandRunner: CommandRunner{
@@ -81,14 +73,6 @@ func getRunner(manifest RunManifest) (Run, error) {
 			},
 			Target:   manifest.Target,
 			Template: manifest.Template,
-		}, nil
-	case "llb":
-		return LLBRunner{
-			CommandRunner: CommandRunner{
-				Expect: manifest.Expect,
-			},
-			Target:   manifest.Target,
-			Platform: manifest.Platform,
 		}, nil
 	case "validate":
 		return ValidateRunner{

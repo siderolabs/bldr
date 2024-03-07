@@ -10,20 +10,6 @@ run:
     platform: linux/arm64
     target: final
     expect: success
-  - name: buildkit
-    runner: buildkit
-    target: final
-    expect: success
-  - name: llb-amd64
-    runner: llb
-    platform: linux/amd64
-    target: final
-    expect: success
-  - name: llb-arm64
-    runner: llb
-    platform: linux/arm64
-    target: final
-    expect: success
   - name: validate
     runner: validate
     expect: success

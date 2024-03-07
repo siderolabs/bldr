@@ -5,18 +5,19 @@
 package convert
 
 import (
+	"context"
 	"fmt"
 	"path"
 	"path/filepath"
 	"sort"
 
 	"github.com/moby/buildkit/client/llb"
+	"github.com/moby/buildkit/frontend/gateway/client"
 	"github.com/opencontainers/go-digest"
 	"github.com/siderolabs/gen/xslices"
 
 	"github.com/siderolabs/bldr/internal/pkg/constants"
 	"github.com/siderolabs/bldr/internal/pkg/environment"
-	"github.com/siderolabs/bldr/internal/pkg/platform"
 	"github.com/siderolabs/bldr/internal/pkg/solver"
 	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha2"
 )
@@ -55,24 +56,17 @@ func defaultCopyOptions(options *environment.Options, reproducible bool) *llb.Co
 type NodeLLB struct {
 	*solver.PackageNode
 
-	Graph    *GraphLLB
-	Prefix   string
-	Platform string
+	Graph  *GraphLLB
+	Prefix string
 }
 
 // NewNodeLLB wraps PackageNode for LLB conversion.
-func NewNodeLLB(node *solver.PackageNode, graph *GraphLLB, platformOverride string) *NodeLLB {
-	// set default platform if not set
-	if platformOverride == "" {
-		platformOverride = graph.Options.TargetPlatform.String()
-	}
-
+func NewNodeLLB(node *solver.PackageNode, graph *GraphLLB) *NodeLLB {
 	return &NodeLLB{
 		PackageNode: node,
 
-		Graph:    graph,
-		Prefix:   graph.Options.CommonPrefix + node.Name + ":",
-		Platform: platformOverride,
+		Graph:  graph,
+		Prefix: graph.Options.CommonPrefix + node.Name + ":",
 	}
 }
 
@@ -103,11 +97,32 @@ func (node *NodeLLB) context(root llb.State) llb.State {
 	)
 }
 
-func (node *NodeLLB) convertDependency(dep solver.PackageDependency) (depState llb.State, srcName string, err error) {
+func (node *NodeLLB) convertDependency(ctx context.Context, dep solver.PackageDependency) (depState llb.State, srcName string, err error) {
 	if dep.IsInternal() {
-		depState, err = NewNodeLLB(dep.Node, node.Graph, node.Pkg.Platform).Build()
-		if err != nil {
-			return llb.Scratch(), "", err
+		if dep.Platform != "" && dep.Platform != node.Graph.Options.BuildPlatform.ID {
+			var res *client.Result
+
+			res, err = node.Graph.solverFn(ctx, environment.Platforms[dep.Platform], dep.Node.Name)
+			if err != nil {
+				return llb.Scratch(), "", err
+			}
+
+			var ref client.Reference
+
+			ref, err = res.SingleRef()
+			if err != nil {
+				return llb.Scratch(), "", err
+			}
+
+			depState, err = ref.ToState()
+			if err != nil {
+				return llb.Scratch(), "", err
+			}
+		} else {
+			depState, err = NewNodeLLB(dep.Node, node.Graph).Build(ctx)
+			if err != nil {
+				return llb.Scratch(), "", err
+			}
 		}
 
 		srcName = dep.Node.Name
@@ -116,19 +131,19 @@ func (node *NodeLLB) convertDependency(dep solver.PackageDependency) (depState l
 		srcName = dep.Image
 
 		if dep.Platform != "" {
-			platform, err := platform.ToV1Platform(dep.Platform, "")
-			if err != nil {
-				return llb.Scratch(), "", err
+			platform, ok := environment.Platforms[dep.Platform]
+			if !ok {
+				return llb.Scratch(), "", fmt.Errorf("platform %q not supported", dep.Platform)
 			}
 
-			depState = llb.Image(dep.Image, llb.Platform(platform))
+			depState = llb.Image(dep.Image, platform.LLBPlatform)
 		}
 	}
 
-	return
+	return depState, srcName, nil
 }
 
-func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
+func (node *NodeLLB) dependencies(ctx context.Context, root llb.State) (llb.State, error) {
 	deps := make([]solver.PackageDependency, 0, len(node.Dependencies))
 
 	// collect all the dependencies including transitive runtime dependencies
@@ -150,20 +165,13 @@ func (node *NodeLLB) dependencies(root llb.State) (llb.State, error) {
 	stages := []llb.State{root}
 
 	for _, dep := range deps {
-		depID := dep.ID() + node.Platform
-
-		// set dep platform to node platform if not set
-		if dep.Platform == "" {
-			dep.Platform = node.Platform
-		}
-
-		if _, alreadyProcessed := seen[depID]; alreadyProcessed {
+		if _, alreadyProcessed := seen[dep.ID()]; alreadyProcessed {
 			continue
 		}
 
-		seen[depID] = struct{}{}
+		seen[dep.ID()] = struct{}{}
 
-		depState, srcName, err := node.convertDependency(dep)
+		depState, srcName, err := node.convertDependency(ctx, dep)
 		if err != nil {
 			return llb.Scratch(), err
 		}
@@ -324,19 +332,14 @@ func (node *NodeLLB) finalize(root llb.State) llb.State {
 }
 
 // Build converts PackageNode to buildkit LLB.
-func (node *NodeLLB) Build() (llb.State, error) {
-	cacheSt := cacheKey{
-		PackageNode: node.PackageNode,
-		Platform:    node.Platform,
-	}
-
-	if state, ok := node.Graph.cache[cacheSt]; ok {
+func (node *NodeLLB) Build(ctx context.Context) (llb.State, error) {
+	if state, ok := node.Graph.cache[node.PackageNode]; ok {
 		return state, nil
 	}
 
 	root := node.base()
 
-	root, err := node.dependencies(root)
+	root, err := node.dependencies(ctx, root)
 	if err != nil {
 		return llb.Scratch(), err
 	}
@@ -350,7 +353,7 @@ func (node *NodeLLB) Build() (llb.State, error) {
 
 	root = node.finalize(root)
 
-	node.Graph.cache[cacheSt] = root
+	node.Graph.cache[node.PackageNode] = root
 
 	return root, nil
 }
