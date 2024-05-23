@@ -17,8 +17,8 @@ import (
 	controlapi "github.com/moby/buildkit/api/services/control"
 	"github.com/moby/buildkit/client/llb"
 	"github.com/moby/buildkit/exporter/containerimage/exptypes"
-	"github.com/moby/buildkit/exporter/containerimage/image"
 	"github.com/moby/buildkit/frontend/gateway/client"
+	v1 "github.com/moby/docker-image-spec/specs-go/v1"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"golang.org/x/sync/errgroup"
 
@@ -249,9 +249,6 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 	eg, ctx = errgroup.WithContext(ctx)
 
 	for i, platform := range platforms {
-		i := i
-		platform := platform
-
 		eg.Go(func() error {
 			r, err := solveTarget(ctx, platform, "")
 			if err != nil {
@@ -268,7 +265,7 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 				return fmt.Errorf("failed to get platform context for %s: %w", platform, err)
 			}
 
-			img := image.Image{
+			img := v1.DockerOCIImage{
 				Image: specs.Image{
 					Platform: specs.Platform{
 						Architecture: platform.PlatformSpec.Architecture,
@@ -279,7 +276,7 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 						Type: "layers",
 					},
 				},
-				Config: image.ImageConfig{
+				Config: v1.DockerOCIImageConfig{
 					ImageConfig: specs.ImageConfig{
 						Labels: platformContext.packages.ImageLabels(),
 					},

@@ -40,7 +40,7 @@ func checkUpdates(ctx context.Context, set solver.PackageSet, l *log.Logger) err
 	)
 
 	// start updaters
-	for i := 0; i < concurrency; i++ {
+	for range concurrency {
 		wg.Add(1)
 
 		go func() {

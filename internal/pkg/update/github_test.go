@@ -83,8 +83,6 @@ func TestLatestGithub(t *testing.T) {
 			LatestURL: "https://github.com/containerd/containerd/archive/refs/tags/v1.6.8.tar.gz",
 		},
 	} {
-		source, expected := source, expected
-
 		t.Run(source, func(t *testing.T) {
 			t.Parallel()
 
