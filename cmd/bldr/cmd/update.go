@@ -96,7 +96,7 @@ func checkUpdates(ctx context.Context, set solver.PackageSet, l *log.Logger) err
 	sort.Slice(res, func(i, j int) bool { return res[i].file < res[j].file })
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-	fmt.Fprintf(w, "%s\t%s\t%s\n", "File", "Update", "URL")
+	fmt.Fprintf(w, "%s\t%s\t%s\n", "File", "Update", "URL") //nolint:errcheck
 
 	for _, info := range res {
 		if updateCmdFlag.all || info.HasUpdate {
@@ -105,7 +105,7 @@ func checkUpdates(ctx context.Context, set solver.PackageSet, l *log.Logger) err
 				url = info.BaseURL
 			}
 
-			fmt.Fprintf(w, "%s\t%t\t%s\n", info.file, info.HasUpdate, url)
+			fmt.Fprintf(w, "%s\t%t\t%s\n", info.file, info.HasUpdate, url) //nolint:errcheck
 		}
 	}
 

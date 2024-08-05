@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	ctrplatforms "github.com/containerd/containerd/platforms"
+	ctrplatforms "github.com/containerd/platforms"
 	controlapi "github.com/moby/buildkit/api/services/control"
 	"github.com/moby/buildkit/client/llb"
 	"github.com/moby/buildkit/exporter/containerimage/exptypes"
