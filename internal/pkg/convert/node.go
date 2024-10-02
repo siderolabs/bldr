@@ -329,7 +329,7 @@ func (node *NodeLLB) finalize(root llb.State) llb.State {
 		)
 	}
 
-	return llb.Merge(stages, llb.WithCustomNamef(node.Prefix+"finalize"))
+	return llb.Merge(stages, llb.WithCustomName(node.Prefix+"finalize"))
 }
 
 // Build converts PackageNode to buildkit LLB.
