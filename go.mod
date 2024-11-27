@@ -8,6 +8,7 @@ require (
 	github.com/containerd/platforms v0.2.1
 	github.com/emicklei/dot v1.6.2
 	github.com/google/go-github/v65 v65.0.0
+	github.com/google/go-github/v67 v67.0.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/moby/buildkit v0.16.0
 	github.com/moby/docker-image-spec v1.3.1
