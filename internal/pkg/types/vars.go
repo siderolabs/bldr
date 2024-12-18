@@ -15,6 +15,8 @@ import (
 )
 
 // Variables presents generic variables for templating/environment.
+//
+//nolint:recvcheck
 type Variables map[string]string
 
 // Merge two Variables in place.

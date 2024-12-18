@@ -7,6 +7,8 @@ package v1alpha2
 import "fmt"
 
 // Variant is a kind of base build image.
+//
+//nolint:recvcheck
 type Variant int
 
 const (

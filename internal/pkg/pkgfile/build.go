@@ -220,7 +220,9 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 			return nil, fmt.Errorf("failed to unmarshal %s (%q): %w", keyCacheImports, cacheImportsStr, err)
 		}
 
-		for _, um := range cacheImportsUM {
+		for i := range cacheImportsUM {
+			um := &cacheImportsUM[i]
+
 			cacheImports = append(cacheImports, client.CacheOptionsEntry{Type: um.Type, Attrs: um.Attrs})
 		}
 	}

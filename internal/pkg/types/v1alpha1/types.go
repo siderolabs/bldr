@@ -59,6 +59,8 @@ type Finalize struct {
 }
 
 // Variant defines the variant of the package.
+//
+//nolint:recvcheck
 type Variant int
 
 const (

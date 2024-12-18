@@ -15,6 +15,8 @@ import (
 )
 
 // Platform describes build & target platforms.
+//
+//nolint:recvcheck
 type Platform struct {
 	ID           string
 	Arch         string

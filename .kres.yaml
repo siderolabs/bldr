@@ -100,3 +100,13 @@ spec:
     enabled: true
     environment:
       REGISTRY: registry.dev.siderolabs.io
+---
+kind: common.Renovate
+spec:
+  customManagers:
+    - customType: regex
+      fileMatch:
+        - internal/pkg/constants/build.go
+      matchStrings:
+        - '\/\/\s+renovate: datasource=(?<datasource>.*?)(?:\s+extractVersion=(?<extractVersion>.+?))?(?:\s+versioning=(?<versioning>.+?))?\s+depName=(?<depName>.+?)?\s.*Image\s+=\s+\"docker.io\/alpine:(?<currentValue>.+?)\"'
+      versioningTemplate: "{{#if versioning}}{{versioning}}{{else}}semver{{/if}}"
