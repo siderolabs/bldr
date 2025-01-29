@@ -230,8 +230,9 @@ func (node *NodeLLB) stepDownload(root llb.State, step v1alpha2.Step) llb.State 
 			llb.WithCustomName(node.Prefix+"cksum-prepare"),
 		).Run(
 			append(node.Graph.commonRunOptions,
-				llb.Shlex("sha512sum -c --strict /checksums"),
+				llb.Shlex("sha512sum -c -w /checksums"),
 				llb.WithCustomName(node.Prefix+"cksum-verify"),
+				llb.Network(pb.NetMode_NONE),
 			)...,
 		).Root()
 

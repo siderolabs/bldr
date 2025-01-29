@@ -108,14 +108,9 @@ func (graph *GraphLLB) buildBaseImages() {
 
 func (graph *GraphLLB) buildChecksummer() {
 	graph.Checksummer = llb.Image(
-		constants.DefaultBaseImage,
+		constants.StageXBusyboxImage,
 		llb.WithCustomName(graph.Options.CommonPrefix+"cksum"),
-	).Run(
-		append(graph.commonRunOptions,
-			llb.Shlex("apk --no-cache --update add coreutils"),
-			llb.WithCustomName(graph.Options.CommonPrefix+"cksum-apkinstall"),
-		)...,
-	).Root()
+	)
 }
 
 func (graph *GraphLLB) buildLocalContext() {
