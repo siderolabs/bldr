@@ -1,0 +1,8 @@
+variant: alpine
+name: none
+steps:
+  - test: # network none is a default mode
+      - wget https://google.com/ && exit 1 || true
+finalize:
+  - from: /
+    to: /

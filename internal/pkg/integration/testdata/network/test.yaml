@@ -1,0 +1,12 @@
+---
+run:
+  - name: none
+    runner: docker
+    platform: linux/amd64
+    target: none
+    expect: success
+  - name: default
+    runner: docker
+    platform: linux/amd64
+    target: default
+    expect: success

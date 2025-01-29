@@ -13,6 +13,7 @@ import (
 
 	"github.com/moby/buildkit/client/llb"
 	"github.com/moby/buildkit/frontend/gateway/client"
+	"github.com/moby/buildkit/solver/pb"
 	"github.com/opencontainers/go-digest"
 	"github.com/siderolabs/gen/xslices"
 
@@ -275,6 +276,14 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 	} {
 		for _, instruction := range script.Instructions {
 			runOptions := append([]llb.RunOption(nil), node.Graph.commonRunOptions...)
+
+			switch step.Network {
+			case v1alpha2.NetworkModeNone:
+				runOptions = append(runOptions, llb.Network(pb.NetMode_NONE))
+			case v1alpha2.NetworkModeHost:
+				runOptions = append(runOptions, llb.Network(pb.NetMode_HOST))
+			case v1alpha2.NetworkModeDefault: // do nothing
+			}
 
 			runOptions = append(runOptions, xslices.Map(step.CachePaths, func(p string) llb.RunOption {
 				return llb.AddMount(

@@ -36,6 +36,7 @@ type Step struct {
 	Build      Instructions `yaml:"build,omitempty"`
 	Install    Instructions `yaml:"install,omitempty"`
 	Test       Instructions `yaml:"test,omitempty"`
+	Network    NetworkMode  `yaml:"network,omitempty"`
 }
 
 // Validate the step.

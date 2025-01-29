@@ -27,24 +27,15 @@ type IntegrationTest struct {
 // Run executes integration test.
 func (test IntegrationTest) Run(t *testing.T) {
 	// copy test data to temp directory
-	tempDir, err := os.MkdirTemp("", "bldrtest")
-	if err != nil {
-		t.Fatalf("error creating temp directory: %v", err)
-	}
+	tempDir := t.TempDir()
 
-	defer func() {
-		if err = os.RemoveAll(tempDir); err != nil {
-			t.Fatalf("error cleaning up temp directory: %v", err)
-		}
-	}()
-
-	if err = copy.Copy(test.Path, tempDir); err != nil {
+	if err := copy.Copy(test.Path, tempDir); err != nil {
 		t.Fatalf("error copying to temp directory: %v", err)
 	}
 
 	var oldWd string
 
-	oldWd, err = os.Getwd()
+	oldWd, err := os.Getwd()
 	if err != nil {
 		t.Fatalf("error getting current directory: %v", err)
 	}

@@ -1,0 +1,9 @@
+variant: alpine
+name: default
+steps:
+  - network: default
+    test:
+      - wget https://google.com/
+finalize:
+  - from: /
+    to: /
