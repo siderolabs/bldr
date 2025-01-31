@@ -1,4 +1,5 @@
 name: check-cache
+variant: alpine
 dependencies:
   - stage: fill-cache
 steps:

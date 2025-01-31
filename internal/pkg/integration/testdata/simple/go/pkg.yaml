@@ -1,4 +1,5 @@
 name: go
+variant: alpine
 steps:
 - sources:
   - url: https://dl.google.com/go/go1.12.5.src.tar.gz

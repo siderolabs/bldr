@@ -37,7 +37,6 @@ func NewPkg(baseDir, fileName string, contents []byte, vars types.Variables) (*P
 		BaseDir:  baseDir,
 		FileName: fileName,
 		Shell:    "/bin/sh",
-		Variant:  Alpine,
 		Context:  vars.Copy(),
 	}
 
@@ -70,6 +69,10 @@ func (p *Pkg) Validate() error {
 
 	if p.Name == "" {
 		multiErr = multierror.Append(multiErr, errors.New("package name can't be empty"))
+	}
+
+	if p.Variant == Unset {
+		multiErr = multierror.Append(multiErr, errors.New("variant should be set"))
 	}
 
 	if len(p.Steps) > 0 && len(p.Finalize) == 0 {

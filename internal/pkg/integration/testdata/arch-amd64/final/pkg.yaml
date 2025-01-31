@@ -1,5 +1,6 @@
 ---
 name: final
+variant: alpine
 dependencies:
   # this arm64 variant of the image  only contains the u-boot binary,
   # so this is a good test to ensure that we can copy the binary from

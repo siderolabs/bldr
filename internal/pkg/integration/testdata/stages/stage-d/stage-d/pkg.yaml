@@ -1,4 +1,5 @@
 name: stage-d
+variant: alpine
 dependencies:
 - stage: stage-c
 steps:

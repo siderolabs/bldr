@@ -1,4 +1,5 @@
 name: std-vars
+variant: alpine
 steps:
 -
   prepare:

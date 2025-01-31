@@ -1,4 +1,5 @@
 name: vars-yaml-0
+variant: alpine
 dependencies:
   - stage: vars-yaml-inner
     from: /result

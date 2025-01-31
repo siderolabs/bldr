@@ -6,6 +6,7 @@ package solver
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/emicklei/dot"
 
@@ -41,7 +42,11 @@ func (node *PackageNode) DumpDot(g *dot.Graph) dot.Node {
 		if dep.IsInternal() {
 			depNode = g.Node(dep.Stage)
 		} else {
-			depNode = g.Node(dep.Image)
+			imageRef := dep.Image
+			// cut the digest
+			imageRef, _, _ = strings.Cut(imageRef, "@")
+
+			depNode = g.Node(imageRef)
 			depNode.Box()
 			depNode.Attr("fillcolor", "lemonchiffon")
 			depNode.Attr("style", "filled")
@@ -53,6 +58,15 @@ func (node *PackageNode) DumpDot(g *dot.Graph) dot.Node {
 			edge.Attr("style", "bold")
 			edge.Attr("color", "forestgreen")
 		}
+	}
+
+	if node.Pkg.Variant == v1alpha2.Alpine {
+		packageNode := g.Node("alpine")
+		packageNode.Box()
+		packageNode.Attr("fillcolor", "aquamarine")
+		packageNode.Attr("style", "filled")
+
+		packageNode.Edge(n)
 	}
 
 	for _, dep := range node.Pkg.Install {

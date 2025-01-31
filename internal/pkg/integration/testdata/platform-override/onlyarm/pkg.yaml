@@ -1,5 +1,6 @@
 ---
 name: onlyarm
+variant: alpine
 steps:
 - test:
     - test "${BUILD:-x}" = "aarch64-linux-musl"

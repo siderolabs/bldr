@@ -1,5 +1,6 @@
 ---
 name: final
+variant: scratch
 dependencies:
   - stage: onlyarm
     platform: linux/arm64

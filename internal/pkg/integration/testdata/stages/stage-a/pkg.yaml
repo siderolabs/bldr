@@ -1,4 +1,5 @@
 name: stage-a
+variant: alpine
 steps:
 - prepare:
     - mkdir -p /root

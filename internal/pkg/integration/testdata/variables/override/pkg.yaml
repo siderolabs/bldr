@@ -1,4 +1,5 @@
 name: override
+variant: alpine
 steps:
 - prepare:
     - mkdir -p /root

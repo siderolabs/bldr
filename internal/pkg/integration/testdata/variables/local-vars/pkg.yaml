@@ -1,4 +1,5 @@
 name: local-vars
+variant: alpine
 steps:
 - prepare:
     - mkdir -p /root

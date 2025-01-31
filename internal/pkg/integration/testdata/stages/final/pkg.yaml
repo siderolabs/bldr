@@ -1,4 +1,5 @@
 name: final
+variant: alpine
 dependencies:
 - stage: stage-a
 - stage: stage-b

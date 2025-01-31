@@ -12,14 +12,16 @@ import "fmt"
 type Variant int
 
 const (
+	// Unset is a variant that is not set.
+	Unset Variant = iota
 	// Alpine variant uses Alpine as base image for the build.
-	Alpine Variant = iota
+	Alpine
 	// Scratch variant uses scratch image as base image for the build.
 	Scratch
 )
 
 func (v Variant) String() string {
-	return []string{"alpine", "scratch"}[v]
+	return []string{"unset", "alpine", "scratch"}[v]
 }
 
 // UnmarshalYAML implements yaml.Unmarshaller interface.

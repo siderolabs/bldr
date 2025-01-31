@@ -1,4 +1,5 @@
 name: fill-cache
+variant: alpine
 steps:
 - cachePaths:
     - /.cache
