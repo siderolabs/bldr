@@ -10,7 +10,7 @@ steps:
     - test -f /result/global_A
     - test -f /result/global_B
     - test -f /result/talos
-    - test -d /result/toolchain
+    - test -d /result/a-talos
     - test -f /result/toplevel
     - test -f /result/toplevel-toplevel-packagelevel
     - test -f /result/testtag
