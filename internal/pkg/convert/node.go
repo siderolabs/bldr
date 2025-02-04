@@ -24,8 +24,8 @@ import (
 )
 
 const (
-	tmpDirTemplate = "/tmp/build/%d"
-	pkgDir         = "/pkg"
+	tmpDir = "/tmp/build"
+	pkgDir = "/pkg"
 )
 
 func defaultCopyOptions(options *environment.Options, reproducible bool) *llb.CopyInfo {
@@ -197,9 +197,9 @@ func (node *NodeLLB) dependencies(ctx context.Context, root llb.State) (llb.Stat
 	return root.WithOutput(llb.Merge(stages, llb.WithCustomName(node.Prefix+"copy")).Output()), nil
 }
 
-func (node *NodeLLB) stepTmpDir(root llb.State, i int, step *v1alpha2.Step) llb.State {
+func (node *NodeLLB) stepTmpDir(root llb.State, step *v1alpha2.Step) llb.State {
 	if step.TmpDir == "" {
-		step.TmpDir = fmt.Sprintf(tmpDirTemplate, i)
+		step.TmpDir = tmpDir
 	}
 
 	return root.File(
@@ -319,7 +319,7 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 }
 
 func (node *NodeLLB) step(root llb.State, i int, step v1alpha2.Step) llb.State {
-	root = node.stepTmpDir(root, i, &step)
+	root = node.stepTmpDir(root, &step)
 	root = node.stepDownload(root, step)
 	root = node.stepEnvironment(root, step)
 	root = node.stepScripts(root, i, step)
