@@ -1,3 +1,69 @@
+## [bldr 0.4.1](https://github.com/siderolabs/bldr/releases/tag/v0.4.1) (2025-02-06)
+
+Welcome to the v0.4.1 release of bldr!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/bldr/issues.
+
+### Contributors
+
+* Andrey Smirnov
+* Dmitriy Matrenichev
+* Noel Georgi
+
+### Changes
+<details><summary>9 commits</summary>
+<p>
+
+* [`b2a223d`](https://github.com/siderolabs/bldr/commit/b2a223d14d48b88e39ead81772953efc2f4dbdb5) fix: exclude test script output from the result
+* [`76a2c8f`](https://github.com/siderolabs/bldr/commit/76a2c8f404b546e5d1d1088c3a0e2406d371ff6d) fix: use single build directory
+* [`62ed470`](https://github.com/siderolabs/bldr/commit/62ed470038fb769502600ffb5a3630bbb20c58f5) release(v0.4.0): prepare release
+* [`4a79aeb`](https://github.com/siderolabs/bldr/commit/4a79aebb10957f23c7fc82378b4498686bb6fe73) feat: make variant in `pkg.yaml` explicit
+* [`d978bcc`](https://github.com/siderolabs/bldr/commit/d978bcc7571839ff65d8a139be600c57135cdbf6) fix: drop TOOLCHAIN from std vars
+* [`66b078d`](https://github.com/siderolabs/bldr/commit/66b078d12e99b92c7e9b3a9ceee71936ad52bd4e) fix: drop alpine for `md5sum` step
+* [`24a37b0`](https://github.com/siderolabs/bldr/commit/24a37b0f070182ce8706e852f22f54f799761f33) feat: implement support for network mode
+* [`40ad501`](https://github.com/siderolabs/bldr/commit/40ad5014b4fc1a187d2c83e1ebcd18f40890a24b) chore: rekres to simplify `.kres.yaml` defaults
+* [`73fad60`](https://github.com/siderolabs/bldr/commit/73fad60813195cef4458685335e5e907726bd21e) chore: bump deps
+</p>
+</details>
+
+### Changes since v0.4.0
+<details><summary>2 commits</summary>
+<p>
+
+* [`b2a223d`](https://github.com/siderolabs/bldr/commit/b2a223d14d48b88e39ead81772953efc2f4dbdb5) fix: exclude test script output from the result
+* [`76a2c8f`](https://github.com/siderolabs/bldr/commit/76a2c8f404b546e5d1d1088c3a0e2406d371ff6d) fix: use single build directory
+</p>
+</details>
+
+### Changes from siderolabs/gen
+<details><summary>4 commits</summary>
+<p>
+
+* [`5ae3afe`](https://github.com/siderolabs/gen/commit/5ae3afee65490ca9f4bd32ea41803ab3a17cad7e) chore: update hashtriemap implementation from the latest upstream
+* [`e847d2a`](https://github.com/siderolabs/gen/commit/e847d2ace9ede4a17283426dfbc8229121f2909b) chore: add more utilities to xiter
+* [`f3c5a2b`](https://github.com/siderolabs/gen/commit/f3c5a2b5aba74e4935d073a0135c4904ef3bbfef) chore: add `Empty` and `Empty2` iterators
+* [`c53b90b`](https://github.com/siderolabs/gen/commit/c53b90b4a418b8629d938af06900249ce5acd9e6) chore: add packages xiter/xstrings/xbytes
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/Masterminds/sprig/v3**  v3.2.3 -> v3.3.0
+* **github.com/containerd/platforms**  v0.2.1 -> v1.0.0-rc.1
+* **github.com/emicklei/dot**          v1.6.2 -> v1.6.4
+* **github.com/google/go-github/v67**  v67.0.0 **_new_**
+* **github.com/moby/buildkit**         v0.15.1 -> v0.19.0
+* **github.com/otiai10/copy**          v1.14.0 -> v1.14.1
+* **github.com/siderolabs/gen**        v0.5.0 -> v0.8.0
+* **github.com/stretchr/testify**      v1.9.0 -> v1.10.0
+* **golang.org/x/oauth2**              v0.22.0 -> v0.26.0
+* **golang.org/x/sync**                v0.8.0 -> v0.11.0
+
+Previous release can be found at [v0.3.2](https://github.com/siderolabs/bldr/releases/tag/v0.3.2)
+
 ## [bldr 0.4.0](https://github.com/siderolabs/bldr/releases/tag/v0.4.0) (2025-01-31)
 
 Welcome to the v0.4.0 release of bldr!
