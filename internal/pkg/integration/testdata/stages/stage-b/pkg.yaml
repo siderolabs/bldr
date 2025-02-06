@@ -7,6 +7,10 @@ steps:
   build:
     - touch /root/b
 
+  test:
+    - test -f /root/b
+    - touch /root/bb # this should not persist, as it's part of test instructions
+
 finalize:
   - from: /root
     to: /stage-b

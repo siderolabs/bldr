@@ -269,12 +269,20 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 	for _, script := range []struct {
 		Desc         string
 		Instructions v1alpha2.Instructions
+		// Detached script modifications to the files are  not propagated to the next steps.
+		Detached bool
 	}{
-		{"prepare", step.Prepare},
-		{"build", step.Build},
-		{"install", step.Install},
-		{"test", step.Test},
+		{"prepare", step.Prepare, false},
+		{"build", step.Build, false},
+		{"install", step.Install, false},
+		{"test", step.Test, true},
 	} {
+		if len(script.Instructions) == 0 {
+			continue
+		}
+
+		scriptRoot := root
+
 		for _, instruction := range script.Instructions {
 			runOptions := append([]llb.RunOption(nil), node.Graph.commonRunOptions...)
 
@@ -311,7 +319,19 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 				runOptions = append(runOptions, llb.IgnoreCache)
 			}
 
-			root = root.Run(runOptions...).Root()
+			scriptRoot = scriptRoot.Run(runOptions...).Root()
+		}
+
+		if script.Detached {
+			scriptRoot = scriptRoot.File(
+				llb.Mkdir("/empty", constants.DefaultDirMode),
+			)
+
+			root = root.File(
+				llb.Copy(scriptRoot, "/empty", "/", defaultCopyOptions(node.Graph.Options, false)),
+			)
+		} else {
+			root = scriptRoot
 		}
 	}
 

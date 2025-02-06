@@ -8,6 +8,7 @@ steps:
 - test:
     - test -f /stage-a/a
     - test -f /stage-b/b
+    - test ! -f /stage-b/bb # stage-b/bb should not exist
     - test -f /stage-d/c
     - test -f /stage-d/d
 finalize:
