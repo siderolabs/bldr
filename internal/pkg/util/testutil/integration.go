@@ -33,24 +33,7 @@ func (test IntegrationTest) Run(t *testing.T) {
 		t.Fatalf("error copying to temp directory: %v", err)
 	}
 
-	var oldWd string
-
-	oldWd, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("error getting current directory: %v", err)
-	}
-
-	err = os.Chdir(tempDir)
-	if err != nil {
-		t.Fatalf("error changing working directory: %v", err)
-	}
-
-	defer func() {
-		err = os.Chdir(oldWd)
-		if err != nil {
-			t.Fatalf("error restoring working directory: %v", err)
-		}
-	}()
+	t.Chdir(tempDir)
 
 	test.run(t)
 }

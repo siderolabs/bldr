@@ -5,7 +5,6 @@
 package update_test
 
 import (
-	"context"
 	"net/http"
 	"testing"
 
@@ -92,7 +91,7 @@ func TestLatestGithub(t *testing.T) {
 			require.Equal(t, 200, resp.StatusCode)
 			require.NoError(t, resp.Body.Close())
 
-			actual, err := update.Latest(context.Background(), source)
+			actual, err := update.Latest(t.Context(), source)
 			require.NoError(t, err)
 			assert.Equal(t, expected, actual)
 		})

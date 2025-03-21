@@ -8,7 +8,7 @@ import "os"
 
 // DefaultBaseImage for non-scratch builds.
 // renovate: datasource=docker versioning=docker depName=alpine
-const DefaultBaseImage = "docker.io/alpine:3.21"
+const DefaultBaseImage = "docker.io/alpine:3.21@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c"
 
 // DefaultDirMode is UNIX file mode for mkdir.
 const DefaultDirMode os.FileMode = 0o755
