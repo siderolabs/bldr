@@ -1,0 +1,15 @@
+---
+name: pkg
+variant: scratch
+steps:
+- sbom:
+    outputPath: /rootfs/usr/share/spdx/containerd.spdx.json
+    version: 2.1.2
+    cpes:
+      - cpe:2.3:a:containerd:containerd:2.1.2:*:*:*:*:*:*:*
+    purl: pkg:github/containerd/containerd@2.1.2
+    licenses:
+      - Apache-2.0
+finalize:
+  - from: /
+    to: /

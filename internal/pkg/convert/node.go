@@ -19,6 +19,7 @@ import (
 
 	"github.com/siderolabs/bldr/internal/pkg/constants"
 	"github.com/siderolabs/bldr/internal/pkg/environment"
+	"github.com/siderolabs/bldr/internal/pkg/sbom"
 	"github.com/siderolabs/bldr/internal/pkg/solver"
 	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha2"
 )
@@ -338,11 +339,38 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 	return root
 }
 
+func (node *NodeLLB) stepSBOM(root llb.State, step v1alpha2.Step) llb.State {
+	if step.SBOM.OutputPath == "" {
+		return root
+	}
+
+	sbomDoc, err := sbom.CreatePackageSBOM(node.Pkg, node.Graph.Options.TargetPlatform.Arch)
+	if err != nil {
+		return root
+	}
+
+	sbomJSON, err := sbom.ToSpdxJSON(*sbomDoc, node.Graph.Options.SourceDateEpoch)
+	if err != nil {
+		return root
+	}
+
+	root = root.File(
+		llb.Mkdir(filepath.Dir(step.SBOM.OutputPath), constants.DefaultDirMode, llb.WithParents(true)),
+	)
+
+	root = root.File(
+		llb.Mkfile(step.SBOM.OutputPath, 0o644, []byte(sbomJSON)),
+	)
+
+	return root
+}
+
 func (node *NodeLLB) step(root llb.State, i int, step v1alpha2.Step) llb.State {
 	root = node.stepTmpDir(root, &step)
 	root = node.stepDownload(root, step)
 	root = node.stepEnvironment(root, step)
 	root = node.stepScripts(root, i, step)
+	root = node.stepSBOM(root, step)
 
 	return root
 }

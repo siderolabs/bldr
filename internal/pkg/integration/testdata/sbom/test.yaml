@@ -1,0 +1,7 @@
+---
+run:
+  - name: docker
+    runner: docker
+    platform: linux/amd64
+    target: final
+    expect: success

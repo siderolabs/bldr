@@ -8,6 +8,8 @@ import (
 	"os/exec"
 	"sync"
 	"testing"
+
+	"github.com/siderolabs/bldr/internal/pkg/constants"
 )
 
 // DockerRunner runs bldr via docker buildx.
@@ -26,11 +28,12 @@ func (runner DockerRunner) Run(t *testing.T) {
 	args := []string{
 		"buildx",
 		"build",
+		"--progress=plain",
 		"-f", "./Pkgfile",
 		"--target", runner.Target,
 		"--build-arg", "TAG=testtag",
+		"--build-arg", "BLDR_TAG=" + constants.Version,
 	}
-
 	if runner.Platform != "" {
 		args = append(args, "--platform", runner.Platform)
 	}

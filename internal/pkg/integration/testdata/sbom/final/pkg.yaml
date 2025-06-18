@@ -1,0 +1,13 @@
+---
+name: final
+variant: alpine
+dependencies:
+  - stage: pkg
+steps:
+- test:
+    - cp /pkg/ref.json /tmp/ref.json
+    - sed -i 's/BLDR_TAG/{{ .BUILD_ARG_BLDR_TAG }}/g' /tmp/ref.json
+    - diff /tmp/ref.json /rootfs/usr/share/spdx/containerd.spdx.json
+finalize:
+  - from: /
+    to: /
