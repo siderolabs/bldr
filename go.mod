@@ -4,17 +4,18 @@ go 1.24.1
 
 toolchain go1.24.4
 
-replace github.com/anchore/syft => github.com/dsseng/syft v0.0.0-20250703101014-f39c35d156d9
+replace github.com/anchore/syft => github.com/dsseng/syft v1.28.0
 
 require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/Masterminds/sprig/v3 v3.3.0
-	github.com/anchore/syft v1.27.1
+	github.com/anchore/syft v1.28.0
 	github.com/containerd/platforms v1.0.0-rc.1
 	github.com/emicklei/dot v1.8.0
 	github.com/google/go-github/v67 v67.0.0
+	github.com/google/go-github/v73 v73.0.0
 	github.com/hashicorp/go-multierror v1.1.1
-	github.com/moby/buildkit v0.23.0
+	github.com/moby/buildkit v0.23.2
 	github.com/moby/docker-image-spec v1.3.1
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.1
@@ -69,7 +70,7 @@ require (
 	github.com/charmbracelet/x/cellbuf v0.0.13 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/cncf/xds/go v0.0.0-20250326154945-ae57f3c0d45f // indirect
-	github.com/containerd/containerd/v2 v2.1.2 // indirect
+	github.com/containerd/containerd/v2 v2.1.3 // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/containerd/ttrpc v1.2.7 // indirect
