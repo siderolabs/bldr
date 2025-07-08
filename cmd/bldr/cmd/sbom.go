@@ -41,7 +41,7 @@ and outputs a Software Bill of Materials (SBOM) for it in SPDX format.
 
 		pkg := graph.Root.Pkg
 
-		sbomDoc, err := sbom.CreatePackageSBOM(pkg, options.TargetPlatform.Arch)
+		sbomDoc, err := sbom.CreatePackageSBOM(pkg)
 		if err != nil {
 			log.Fatalf("failed to create SBOM for package %q: %v", pkg.Name, err)
 		}

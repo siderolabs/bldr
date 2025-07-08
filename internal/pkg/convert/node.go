@@ -344,7 +344,7 @@ func (node *NodeLLB) stepSBOM(root llb.State, step v1alpha2.Step) llb.State {
 		return root
 	}
 
-	sbomDoc, err := sbom.CreatePackageSBOM(node.Pkg, node.Graph.Options.TargetPlatform.Arch)
+	sbomDoc, err := sbom.CreatePackageSBOM(node.Pkg)
 	if err != nil {
 		return root
 	}

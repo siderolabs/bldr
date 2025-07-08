@@ -65,7 +65,7 @@ func addPkgSources(sbomDoc *sbom.SBOM, bldrPkg *v1alpha2.Pkg, syftPkg pkg.Packag
 }
 
 // CreatePackageSBOM populates an SBOM document with data from the provided package.
-func CreatePackageSBOM(bldrPkg *v1alpha2.Pkg, arch string) (*sbom.SBOM, error) {
+func CreatePackageSBOM(bldrPkg *v1alpha2.Pkg) (*sbom.SBOM, error) {
 	// Sample. Actually we would get metadata when instructed to generate SBOM
 	sbomMetadata := bldrPkg.Steps[0].SBOM
 
@@ -78,7 +78,7 @@ func CreatePackageSBOM(bldrPkg *v1alpha2.Pkg, arch string) (*sbom.SBOM, error) {
 		Source: source.Description{
 			ID:       "sidero-pkgs",
 			Metadata: source.DirectoryMetadata{},
-			Name:     "sidero-pkgs-" + bldrPkg.Name + "-" + arch,
+			Name:     "sidero-pkgs-" + bldrPkg.Name,
 			Version:  sbomMetadata.Version,
 		},
 		Descriptor: sbom.Descriptor{
@@ -93,7 +93,7 @@ func CreatePackageSBOM(bldrPkg *v1alpha2.Pkg, arch string) (*sbom.SBOM, error) {
 	}
 
 	syftPkg := pkg.Package{
-		Name:    bldrPkg.Name + "-" + arch,
+		Name:    bldrPkg.Name,
 		Version: sbomMetadata.Version,
 		PURL:    sbomMetadata.PURL,
 		Type:    pkg.Type("bldr-package"),

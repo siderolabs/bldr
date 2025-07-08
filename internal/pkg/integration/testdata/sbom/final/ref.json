@@ -2,8 +2,8 @@
  "spdxVersion": "SPDX-2.3",
  "dataLicense": "CC0-1.0",
  "SPDXID": "SPDXRef-DOCUMENT",
- "name": "sidero-pkgs-pkg-x86_64",
- "documentNamespace": "https://anchore.com/bldr/dir/sidero-pkgs-pkg-x86_64-97243b75-0983-540c-895d-1cd532c9e5df",
+ "name": "sidero-pkgs-pkg",
+ "documentNamespace": "https://anchore.com/bldr/dir/sidero-pkgs-pkg-a8cdf0e2-4206-53f6-8d4e-0aa423d0c72c",
  "creationInfo": {
   "licenseListVersion": "3.25",
   "creators": [
@@ -14,8 +14,8 @@
  },
  "packages": [
   {
-   "name": "pkg-x86_64",
-   "SPDXID": "SPDXRef-Package-bldr-package-pkg-x86-64-925d1dbf64888231",
+   "name": "pkg",
+   "SPDXID": "SPDXRef-Package-bldr-package-pkg-aa88761304262ca3",
    "versionInfo": "2.1.2",
    "supplier": "NOASSERTION",
    "downloadLocation": "NOASSERTION",
@@ -38,8 +38,8 @@
    ]
   },
   {
-   "name": "sidero-pkgs-pkg-x86_64",
-   "SPDXID": "SPDXRef-DocumentRoot-Directory-sidero-pkgs-pkg-x86-64",
+   "name": "sidero-pkgs-pkg",
+   "SPDXID": "SPDXRef-DocumentRoot-Directory-sidero-pkgs-pkg",
    "versionInfo": "2.1.2",
    "supplier": "NOASSERTION",
    "downloadLocation": "NOASSERTION",
@@ -52,13 +52,13 @@
  ],
  "relationships": [
   {
-   "spdxElementId": "SPDXRef-DocumentRoot-Directory-sidero-pkgs-pkg-x86-64",
-   "relatedSpdxElement": "SPDXRef-Package-bldr-package-pkg-x86-64-925d1dbf64888231",
+   "spdxElementId": "SPDXRef-DocumentRoot-Directory-sidero-pkgs-pkg",
+   "relatedSpdxElement": "SPDXRef-Package-bldr-package-pkg-aa88761304262ca3",
    "relationshipType": "CONTAINS"
   },
   {
    "spdxElementId": "SPDXRef-DOCUMENT",
-   "relatedSpdxElement": "SPDXRef-DocumentRoot-Directory-sidero-pkgs-pkg-x86-64",
+   "relatedSpdxElement": "SPDXRef-DocumentRoot-Directory-sidero-pkgs-pkg",
    "relationshipType": "DESCRIBES"
   }
  ]
