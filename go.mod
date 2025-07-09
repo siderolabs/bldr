@@ -2,9 +2,9 @@ module github.com/siderolabs/bldr
 
 go 1.24.1
 
-toolchain go1.24.4
+toolchain go1.24.5
 
-replace github.com/anchore/syft => github.com/dsseng/syft v0.0.0-20250703101014-f39c35d156d9
+replace github.com/anchore/syft => github.com/dsseng/syft v1.28.0
 
 require (
 	github.com/Masterminds/semver v1.5.0
@@ -13,6 +13,7 @@ require (
 	github.com/containerd/platforms v1.0.0-rc.1
 	github.com/emicklei/dot v1.8.0
 	github.com/google/go-github/v67 v67.0.0
+	github.com/google/go-github/v73 v73.0.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/moby/buildkit v0.23.2
 	github.com/moby/docker-image-spec v1.3.1
