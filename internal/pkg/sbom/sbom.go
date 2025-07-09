@@ -65,10 +65,7 @@ func addPkgSources(sbomDoc *sbom.SBOM, bldrPkg *v1alpha2.Pkg, syftPkg pkg.Packag
 }
 
 // CreatePackageSBOM populates an SBOM document with data from the provided package.
-func CreatePackageSBOM(bldrPkg *v1alpha2.Pkg) (*sbom.SBOM, error) {
-	// Sample. Actually we would get metadata when instructed to generate SBOM
-	sbomMetadata := bldrPkg.Steps[0].SBOM
-
+func CreatePackageSBOM(bldrPkg *v1alpha2.Pkg, sbomMetadata v1alpha2.SBOMStep) (*sbom.SBOM, error) {
 	cpes, err := parseCPEs(sbomMetadata.CPEs)
 	if err != nil {
 		return nil, err
@@ -99,7 +96,7 @@ func CreatePackageSBOM(bldrPkg *v1alpha2.Pkg) (*sbom.SBOM, error) {
 		Type:    pkg.Type("bldr-package"),
 		FoundBy: "bldr",
 		Locations: file.NewLocationSet(
-			file.NewLocation("/" + bldrPkg.BaseDir + "/Pkgfile"),
+			file.NewLocation("/Pkgfile"),
 		),
 		CPEs:     cpes,
 		Licenses: pkg.NewLicenseSet(pkg.NewLicensesFromValues(sbomMetadata.Licenses...)...),

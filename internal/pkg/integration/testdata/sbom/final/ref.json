@@ -3,7 +3,7 @@
  "dataLicense": "CC0-1.0",
  "SPDXID": "SPDXRef-DOCUMENT",
  "name": "sidero-pkgs-pkg",
- "documentNamespace": "https://anchore.com/bldr/dir/sidero-pkgs-pkg-a8cdf0e2-4206-53f6-8d4e-0aa423d0c72c",
+ "documentNamespace": "https://anchore.com/bldr/dir/sidero-pkgs-pkg-fc5b1a23-fa78-5de5-ba21-bb3ed393d708",
  "creationInfo": {
   "licenseListVersion": "3.25",
   "creators": [
@@ -15,12 +15,12 @@
  "packages": [
   {
    "name": "pkg",
-   "SPDXID": "SPDXRef-Package-bldr-package-pkg-aa88761304262ca3",
+   "SPDXID": "SPDXRef-Package-bldr-package-pkg-b34b3a9a3be1820f",
    "versionInfo": "2.1.2",
    "supplier": "NOASSERTION",
    "downloadLocation": "NOASSERTION",
    "filesAnalyzed": false,
-   "sourceInfo": "acquired package info from the following paths: //pkg/Pkgfile",
+   "sourceInfo": "acquired package info from the following paths: /Pkgfile",
    "licenseConcluded": "NOASSERTION",
    "licenseDeclared": "Apache-2.0",
    "copyrightText": "NOASSERTION",
@@ -53,7 +53,7 @@
  "relationships": [
   {
    "spdxElementId": "SPDXRef-DocumentRoot-Directory-sidero-pkgs-pkg",
-   "relatedSpdxElement": "SPDXRef-Package-bldr-package-pkg-aa88761304262ca3",
+   "relatedSpdxElement": "SPDXRef-Package-bldr-package-pkg-b34b3a9a3be1820f",
    "relationshipType": "CONTAINS"
   },
   {
