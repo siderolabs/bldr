@@ -1,3 +1,55 @@
+## [bldr 0.5.0](https://github.com/siderolabs/bldr/releases/tag/v0.5.0) (2025-07-09)
+
+Welcome to the v0.5.0 release of bldr!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/bldr/issues.
+
+### Contributors
+
+* Dmitrii Sharshakov
+* Artem Chernyshev
+* Andrey Smirnov
+* Dmitriy Matrenichev
+* Utku Ozdemir
+
+### Changes
+<details><summary>4 commits</summary>
+<p>
+
+* [`dafc274`](https://github.com/siderolabs/bldr/commit/dafc274b9454472233f7e4788195d5fc47a6c57f) fix: make SBOM generation work in a multi-step build
+* [`38d5691`](https://github.com/siderolabs/bldr/commit/38d5691bb40874088e734aa4c22862166017ca9f) fix: sbom: do not append arch
+* [`e45241d`](https://github.com/siderolabs/bldr/commit/e45241de914f4be03ee8311005e1f2d380b1fa2f) feat: add SBOM support
+* [`d09e69c`](https://github.com/siderolabs/bldr/commit/d09e69caf574060feb26ae8ead006b9161da8e5c) feat: update dependencies
+</p>
+</details>
+
+### Changes from siderolabs/gen
+<details><summary>4 commits</summary>
+<p>
+
+* [`dcb2b74`](https://github.com/siderolabs/gen/commit/dcb2b7417879f230a569ce834dad5c89bd09d6bf) feat: add `panicsafe` package
+* [`b36ee43`](https://github.com/siderolabs/gen/commit/b36ee43f667a7a56b340a3e769868ff2a609bb5b) feat: make `xyaml.CheckUnknownKeys` public
+* [`3e319e7`](https://github.com/siderolabs/gen/commit/3e319e7e52c5a74d1730be8e47952b3d16d91148) feat: implement `xyaml.UnmarshalStrict`
+* [`7c0324f`](https://github.com/siderolabs/gen/commit/7c0324fee9a7cfbdd117f43702fa273689f0db97) chore: future-proof HashTrieMap
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/anchore/syft**               v1.27.1 **_new_**
+* **github.com/emicklei/dot**               v1.6.4 -> v1.8.0
+* **github.com/moby/buildkit**              v0.19.0 -> v0.23.0
+* **github.com/opencontainers/image-spec**  v1.1.0 -> v1.1.1
+* **github.com/siderolabs/gen**             v0.8.0 -> v0.8.4
+* **github.com/spf13/cobra**                v1.8.1 -> v1.9.1
+* **golang.org/x/oauth2**                   v0.26.0 -> v0.30.0
+* **golang.org/x/sync**                     v0.11.0 -> v0.15.0
+
+Previous release can be found at [v0.4.1](https://github.com/siderolabs/bldr/releases/tag/v0.4.1)
+
 ## [bldr 0.4.1](https://github.com/siderolabs/bldr/releases/tag/v0.4.1) (2025-02-06)
 
 Welcome to the v0.4.1 release of bldr!

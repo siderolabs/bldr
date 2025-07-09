@@ -37,7 +37,7 @@ type FilesystemPackageLoader struct {
 func (fspl *FilesystemPackageLoader) walkFunc() filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			fspl.Logger.Printf("error walking %q: %s", path, err)
+			fspl.Printf("error walking %q: %s", path, err)
 
 			return nil
 		}
@@ -94,11 +94,11 @@ func (fspl *FilesystemPackageLoader) Load() (*LoadResult, error) {
 
 		for _, path := range fspl.varFilePaths {
 			if err = fspl.loadVariables(path); err != nil {
-				fspl.Logger.Printf("error loading variables %q: %s", path, err)
+				fspl.Printf("error loading variables %q: %s", path, err)
 				fspl.multiErr = multierror.Append(fspl.multiErr, fmt.Errorf("error loading variables %q: %w", path, err))
 			}
 
-			fspl.Logger.Printf("loaded variables from %q", path)
+			fspl.Printf("loaded variables from %q", path)
 		}
 
 		for _, path := range fspl.pkgFilePaths {
@@ -106,13 +106,13 @@ func (fspl *FilesystemPackageLoader) Load() (*LoadResult, error) {
 
 			pkg, err = fspl.loadPkg(path)
 			if err != nil {
-				fspl.Logger.Printf("error loading %q: %s", path, err)
+				fspl.Printf("error loading %q: %s", path, err)
 				fspl.multiErr = multierror.Append(fspl.multiErr, fmt.Errorf("error loading %q: %w", path, err))
 
 				continue
 			}
 
-			fspl.Logger.Printf("loaded pkg %q from %q", pkg.Name, path)
+			fspl.Printf("loaded pkg %q from %q", pkg.Name, path)
 			fspl.pkgs = append(fspl.pkgs, pkg)
 		}
 	}
@@ -201,7 +201,7 @@ func (fspl *FilesystemPackageLoader) loadPkgfile() error {
 	f, err := os.Open(filepath.Join(fspl.Root, constants.Pkgfile))
 	if err != nil {
 		if os.IsNotExist(err) {
-			fspl.Logger.Printf("skipping %q: %s", constants.Pkgfile, err)
+			fspl.Printf("skipping %q: %s", constants.Pkgfile, err)
 
 			return nil
 		}
@@ -222,7 +222,7 @@ func (fspl *FilesystemPackageLoader) loadPkgfile() error {
 	}
 
 	fspl.Context.Merge(fspl.pkgFile.Vars)
-	fspl.Logger.Printf("loaded %q", constants.Pkgfile)
+	fspl.Printf("loaded %q", constants.Pkgfile)
 
 	return nil
 }

@@ -12,8 +12,8 @@
         {
             "customType": "regex",
             "versioningTemplate": "{{#if versioning}}{{versioning}}{{else}}semver{{/if}}",
-            "fileMatch": [
-                "internal/pkg/constants/build.go"
+            "managerFilePatterns": [
+                "/internal/pkg/constants/build.go/"
             ],
             "matchStrings": [
                 "\\/\\/\\s+renovate: datasource=(?<datasource>.*?)(?:\\s+extractVersion=(?<extractVersion>.+?))?(?:\\s+versioning=(?<versioning>.+?))?\\s+depName=(?<depName>.+?)?\\s.*Image\\s+=\\s+\\\"docker.io\\/alpine:(?<currentValue>.+?)\\\""
