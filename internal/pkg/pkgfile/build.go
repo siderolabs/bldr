@@ -247,8 +247,7 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 	platformContextCache := newPlatformContextCache(*options, exportMap, c)
 	solveTarget := solveTarget(platformContextCache, c, cacheImports)
 
-	var eg *errgroup.Group
-	eg, ctx = errgroup.WithContext(ctx)
+	eg, ctx := errgroup.WithContext(ctx)
 
 	for i, platform := range platforms {
 		eg.Go(func() error {

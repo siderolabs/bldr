@@ -266,7 +266,6 @@ func (g *gitHub) wrapGitHubError(err error) error {
 	}
 
 	var ghe *github.RateLimitError
-
 	if errors.As(err, &ghe) {
 		err = fmt.Errorf("%w\nSet `BLDR_GITHUB_TOKEN` or `GITHUB_TOKEN` environment variable", err)
 	}

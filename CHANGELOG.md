@@ -1,3 +1,31 @@
+## [bldr 0.5.1](https://github.com/siderolabs/bldr/releases/tag/v0.5.1) (2025-07-15)
+
+Welcome to the v0.5.1 release of bldr!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/bldr/issues.
+
+### Contributors
+
+* Dmitrii Sharshakov
+
+### Changes
+<details><summary>1 commit</summary>
+<p>
+
+* [`3ea108b`](https://github.com/siderolabs/bldr/commit/3ea108b0dce619891052792c4dcb5b179109ca42) feat: add `name` parameter to override names in SBOM
+</p>
+</details>
+
+### Dependency Changes
+
+This release has no dependency changes
+
+Previous release can be found at [v0.5.0](https://github.com/siderolabs/bldr/releases/tag/v0.5.0)
+
+
 ## [bldr 0.5.0](https://github.com/siderolabs/bldr/releases/tag/v0.5.0) (2025-07-09)
 
 Welcome to the v0.5.0 release of bldr!
