@@ -1,0 +1,65 @@
+{
+ "spdxVersion": "SPDX-2.3",
+ "dataLicense": "CC0-1.0",
+ "SPDXID": "SPDXRef-DOCUMENT",
+ "name": "sidero-pkgs-runc",
+ "documentNamespace": "https://anchore.com/bldr/dir/sidero-pkgs-runc-096b39da-b937-5033-a23e-9554b61f75e8",
+ "creationInfo": {
+  "licenseListVersion": "3.25",
+  "creators": [
+   "Organization: Anchore, Inc",
+   "Tool: bldr-BLDR_TAG"
+  ],
+  "created": "0001-01-01T00:00:00Z"
+ },
+ "packages": [
+  {
+   "name": "runc",
+   "SPDXID": "SPDXRef-Package-bldr-package-runc-e3c63cb53b493066",
+   "versionInfo": "1.3.0",
+   "supplier": "NOASSERTION",
+   "downloadLocation": "NOASSERTION",
+   "filesAnalyzed": false,
+   "sourceInfo": "acquired package info from the following paths: /Pkgfile",
+   "licenseConcluded": "NOASSERTION",
+   "licenseDeclared": "Apache-2.0",
+   "copyrightText": "NOASSERTION",
+   "externalRefs": [
+    {
+     "referenceCategory": "SECURITY",
+     "referenceType": "cpe23Type",
+     "referenceLocator": "cpe:2.3:a:opencontainers:runc:1.3.0:*:*:*:*:*:*:*"
+    },
+    {
+     "referenceCategory": "SECURITY",
+     "referenceType": "cpe23Type",
+     "referenceLocator": "cpe:2.3:a:linuxfoundation:runc:1.3.0:*:*:*:*:*:*:*"
+    }
+   ]
+  },
+  {
+   "name": "sidero-pkgs-runc",
+   "SPDXID": "SPDXRef-DocumentRoot-Directory-sidero-pkgs-runc",
+   "versionInfo": "1.3.0",
+   "supplier": "NOASSERTION",
+   "downloadLocation": "NOASSERTION",
+   "filesAnalyzed": false,
+   "licenseConcluded": "NOASSERTION",
+   "licenseDeclared": "NOASSERTION",
+   "copyrightText": "NOASSERTION",
+   "primaryPackagePurpose": "FILE"
+  }
+ ],
+ "relationships": [
+  {
+   "spdxElementId": "SPDXRef-DocumentRoot-Directory-sidero-pkgs-runc",
+   "relatedSpdxElement": "SPDXRef-Package-bldr-package-runc-e3c63cb53b493066",
+   "relationshipType": "CONTAINS"
+  },
+  {
+   "spdxElementId": "SPDXRef-DOCUMENT",
+   "relatedSpdxElement": "SPDXRef-DocumentRoot-Directory-sidero-pkgs-runc",
+   "relationshipType": "DESCRIBES"
+  }
+ ]
+}

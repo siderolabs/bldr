@@ -5,6 +5,9 @@ dependencies:
   - stage: pkg
 steps:
 - test:
+    - cp /pkg/runc.json /tmp/runc.json
+    - sed -i 's/BLDR_TAG/{{ .BUILD_ARG_BLDR_TAG }}/g' /tmp/runc.json
+    - diff /tmp/runc.json /rootfs/usr/share/spdx/runc.spdx.json
     - cp /pkg/ref.json /tmp/ref.json
     - sed -i 's/BLDR_TAG/{{ .BUILD_ARG_BLDR_TAG }}/g' /tmp/ref.json
     - diff /tmp/ref.json /rootfs/usr/share/spdx/containerd.spdx.json

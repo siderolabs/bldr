@@ -71,11 +71,16 @@ func CreatePackageSBOM(bldrPkg *v1alpha2.Pkg, sbomMetadata v1alpha2.SBOMStep) (*
 		return nil, err
 	}
 
+	name := bldrPkg.Name
+	if sbomMetadata.Name != "" {
+		name = sbomMetadata.Name
+	}
+
 	sbomDoc := &sbom.SBOM{
 		Source: source.Description{
 			ID:       "sidero-pkgs",
 			Metadata: source.DirectoryMetadata{},
-			Name:     "sidero-pkgs-" + bldrPkg.Name,
+			Name:     "sidero-pkgs-" + name,
 			Version:  sbomMetadata.Version,
 		},
 		Descriptor: sbom.Descriptor{
@@ -90,7 +95,7 @@ func CreatePackageSBOM(bldrPkg *v1alpha2.Pkg, sbomMetadata v1alpha2.SBOMStep) (*
 	}
 
 	syftPkg := pkg.Package{
-		Name:    bldrPkg.Name,
+		Name:    name,
 		Version: sbomMetadata.Version,
 		PURL:    sbomMetadata.PURL,
 		Type:    pkg.Type("bldr-package"),
