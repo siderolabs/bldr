@@ -1,0 +1,6 @@
+# syntax = SHEBANG
+
+format: v1alpha2
+vars:
+    A: global_A
+    B: global_B

@@ -330,6 +330,7 @@ func fetchPkgs(ctx context.Context, c client.Client) (client.Reference, error) {
 			constants.Pkgfile,
 			"**/" + constants.PkgYaml,
 			"**/" + constants.VarsYaml,
+			"**/*" + constants.TemplateExt,
 			"*/",
 		}),
 		llb.SessionID(c.BuildOpts().SessionID),

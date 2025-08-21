@@ -1,8 +1,6 @@
 module github.com/siderolabs/bldr
 
-go 1.24.1
-
-toolchain go1.24.4
+go 1.25.0
 
 replace github.com/anchore/syft => github.com/dsseng/syft v0.0.0-20250703101014-f39c35d156d9
 
@@ -11,19 +9,19 @@ require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/anchore/syft v1.28.0
 	github.com/containerd/platforms v1.0.0-rc.1
-	github.com/emicklei/dot v1.8.0
-	github.com/google/go-github/v67 v67.0.0
+	github.com/emicklei/dot v1.9.0
+	github.com/google/go-github/v74 v74.0.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/moby/buildkit v0.23.2
 	github.com/moby/docker-image-spec v1.3.1
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/otiai10/copy v1.14.1
-	github.com/siderolabs/gen v0.8.4
+	github.com/siderolabs/gen v0.8.5
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/oauth2 v0.30.0
-	golang.org/x/sync v0.15.0
+	golang.org/x/sync v0.16.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 

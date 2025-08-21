@@ -93,10 +93,28 @@ func (node *NodeLLB) install(root llb.State) llb.State {
 func (node *NodeLLB) context(root llb.State) llb.State {
 	relPath := node.Pkg.BaseDir
 
-	return root.File(
+	root = root.File(
 		llb.Copy(node.Graph.LocalContext, filepath.Join("/", relPath), pkgDir, defaultCopyOptions(node.Graph.Options, false)),
 		llb.WithCustomNamef(node.Prefix+"context %s -> %s", relPath, pkgDir),
 	)
+
+	for _, extraFile := range node.Pkg.GetTemplatedFiles() {
+		directory := filepath.Dir(extraFile.Path)
+
+		if directory != "." {
+			root = root.File(
+				llb.Mkdir(filepath.Join(pkgDir, directory), constants.DefaultDirMode, llb.WithParents(true)),
+				llb.WithCustomNamef(node.Prefix+"mkdir %s", filepath.Join(pkgDir, directory)),
+			)
+		}
+
+		root = root.File(
+			llb.Mkfile(filepath.Join(pkgDir, extraFile.Path), 0o644, extraFile.Content),
+			llb.WithCustomNamef(node.Prefix+"mkfile %s", filepath.Join(pkgDir, extraFile.Path)),
+		)
+	}
+
+	return root
 }
 
 func (node *NodeLLB) convertDependency(ctx context.Context, dep solver.PackageDependency) (depState llb.State, srcName string, err error) {

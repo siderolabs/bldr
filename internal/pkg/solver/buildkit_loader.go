@@ -32,9 +32,10 @@ type BuildkitFrontendLoader struct {
 	pkgFile      *v1alpha2.Pkgfile
 }
 
-type processor func(baseDir string, contents []byte) error
+type processor func(baseDir, filename string, contents []byte) error
 
-func (bkfl *BuildkitFrontendLoader) walk(path string, processVars, processPkgs processor) error {
+//nolint:gocognit
+func (bkfl *BuildkitFrontendLoader) walk(path string, processVars, processPkgs, processTemplatedFile processor) error {
 	entries, err := bkfl.Ref.ReadDir(bkfl.Ctx, client.ReadDirRequest{
 		Path: path,
 	})
@@ -54,7 +55,7 @@ func (bkfl *BuildkitFrontendLoader) walk(path string, processVars, processPkgs p
 				return fmt.Errorf("error reading %q under %q: %w", entry.GetPath(), path, err)
 			}
 
-			err = processVars(path, contents)
+			err = processVars(path, entry.GetPath(), contents)
 			if err != nil {
 				return err
 			}
@@ -73,17 +74,36 @@ func (bkfl *BuildkitFrontendLoader) walk(path string, processVars, processPkgs p
 				return fmt.Errorf("error reading %q under %q: %w", entry.GetPath(), path, err)
 			}
 
-			err = processPkgs(path, contents)
+			err = processPkgs(path, entry.GetPath(), contents)
 			if err != nil {
 				return err
 			}
 		}
 	}
 
-	// 3. descend into subdirectories
+	// 3. find and load templated files, attach them to closest package
+	for _, entry := range entries {
+		if strings.HasSuffix(entry.GetPath(), constants.TemplateExt) {
+			var contents []byte
+
+			contents, err = bkfl.Ref.ReadFile(bkfl.Ctx, client.ReadRequest{
+				Filename: filepath.Join(path, entry.GetPath()),
+			})
+			if err != nil {
+				return fmt.Errorf("error reading %q under %q: %w", entry.GetPath(), path, err)
+			}
+
+			err = processTemplatedFile(path, entry.GetPath(), contents)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// 4. descend into subdirectories
 	for _, entry := range entries {
 		if os.FileMode(entry.GetMode())&os.ModeDir > 0 {
-			if err = bkfl.walk(filepath.Join(path, entry.GetPath()), processVars, processPkgs); err != nil {
+			if err = bkfl.walk(filepath.Join(path, entry.GetPath()), processVars, processPkgs, processTemplatedFile); err != nil {
 				return err
 			}
 		}
@@ -114,7 +134,7 @@ func (bkfl *BuildkitFrontendLoader) resolveContext(basePath string) types.Variab
 	return context
 }
 
-func (bkfl *BuildkitFrontendLoader) loadVariables(baseDir string, contents []byte) error {
+func (bkfl *BuildkitFrontendLoader) loadVariables(baseDir, _ string, contents []byte) error {
 	baseContext := bkfl.resolveContext(baseDir)
 
 	var vars types.Variables
@@ -159,7 +179,7 @@ func (bkfl *BuildkitFrontendLoader) Load() (*LoadResult, error) {
 		multiErr *multierror.Error
 	)
 
-	processPackage := func(baseDir string, contents []byte) error {
+	processPackage := func(baseDir, _ string, contents []byte) error {
 		pkg, err2 := v1alpha2.NewPkg(baseDir, "", contents, bkfl.resolveContext(baseDir))
 		if err2 != nil {
 			log.Printf("error loading %q: %s", baseDir, err2)
@@ -174,7 +194,24 @@ func (bkfl *BuildkitFrontendLoader) Load() (*LoadResult, error) {
 		return nil
 	}
 
-	err = bkfl.walk("/", bkfl.loadVariables, processPackage)
+	processTemplatedFile := func(baseDir, filename string, contents []byte) error {
+		// the way we walk the tree top->down implies that templated file is always attached to the last package
+		if len(pkgs) == 0 {
+			return fmt.Errorf("no package found to attach templated file %q", filename)
+		}
+
+		pkg := pkgs[len(pkgs)-1]
+
+		// templated file should be rooted under the package base directory
+		basePath, err2 := filepath.Rel(pkg.BaseDir, baseDir)
+		if err2 != nil {
+			return fmt.Errorf("error resolving relative path for templated file %q: %w", filename, err2)
+		}
+
+		return pkg.AttachTemplatedFile(filepath.Join(basePath, filename), contents)
+	}
+
+	err = bkfl.walk("/", bkfl.loadVariables, processPackage, processTemplatedFile)
 
 	return &LoadResult{
 		Pkgfile: bkfl.pkgFile,

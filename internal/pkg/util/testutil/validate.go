@@ -16,7 +16,7 @@ type ValidateRunner struct {
 
 // Run implements Run interface.
 func (runner ValidateRunner) Run(t *testing.T) {
-	cmd := exec.Command("bldr", "validate")
+	cmd := exec.CommandContext(t.Context(), "bldr", "validate")
 
 	runner.run(t, cmd, "bldr validate")
 }

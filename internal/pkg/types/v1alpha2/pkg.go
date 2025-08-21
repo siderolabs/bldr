@@ -19,6 +19,8 @@ import (
 
 // Pkg represents build instructions for a single package.
 type Pkg struct {
+	templatedFiles []TemplatedFile
+
 	Context      types.Variables `yaml:"-"`
 	Name         string          `yaml:"name,omitempty"`
 	Shell        Shell           `yaml:"shell,omitempty"`

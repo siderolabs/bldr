@@ -1,0 +1,9 @@
+name: pkg-a
+variant: alpine
+dependencies:
+  - stage: pkg-b
+finalize:
+  - from: /pkg/manifest.yaml
+    to: /a/manifest.yaml
+  - from: /b
+    to: /b

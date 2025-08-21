@@ -1,0 +1,5 @@
+name: pkg-b
+variant: alpine
+finalize:
+  - from: /pkg/subdir/manifest.yaml
+    to: /b/manifest.yaml

@@ -1,0 +1,9 @@
+---
+run:
+  - name: docker
+    runner: docker
+    target: final
+    expect: success
+  - name: validate
+    runner: validate
+    expect: success

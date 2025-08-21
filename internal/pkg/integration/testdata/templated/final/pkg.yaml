@@ -1,0 +1,15 @@
+name: final
+variant: alpine
+dependencies:
+  - stage: pkg-a
+steps:
+- test:
+    - test -f /a/manifest.yaml
+    - cat /a/manifest.yaml
+    - 'if [ "$(cat /a/manifest.yaml)" != "global_A: pkg-a - toplevel" ]; then exit 1; fi'
+    - test -f /b/manifest.yaml
+    - cat /b/manifest.yaml
+    - 'if [ "$(cat /b/manifest.yaml)" != "global_B: pkg-b - toplevel" ]; then exit 1; fi'
+finalize:
+  - from: /
+    to: /

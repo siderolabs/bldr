@@ -21,7 +21,7 @@ type DockerRunner struct {
 
 // Run implements Run interface.
 func (runner DockerRunner) Run(t *testing.T) {
-	if err := IsDockerAvailable(); err != nil {
+	if err := IsDockerAvailable(t); err != nil {
 		t.Skipf("docker buildx is not available: %q", err)
 	}
 
@@ -38,7 +38,7 @@ func (runner DockerRunner) Run(t *testing.T) {
 		args = append(args, "--platform", runner.Platform)
 	}
 
-	cmd := exec.Command("docker", append(args, ".")...)
+	cmd := exec.CommandContext(t.Context(), "docker", append(args, ".")...)
 
 	runner.run(t, cmd, "docker buildx")
 }
@@ -50,9 +50,9 @@ var (
 )
 
 // IsDockerAvailable returns nil if docker buildx is ready to use.
-func IsDockerAvailable() error {
+func IsDockerAvailable(t *testing.T) error {
 	dockerCheckOnce.Do(func() {
-		dockerCheckError = exec.Command("docker", "buildx", "ls").Run()
+		dockerCheckError = exec.CommandContext(t.Context(), "docker", "buildx", "ls").Run()
 	})
 
 	return dockerCheckError

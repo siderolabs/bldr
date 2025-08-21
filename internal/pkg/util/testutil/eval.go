@@ -19,7 +19,7 @@ type EvalRunner struct {
 
 // Run implements Run interface.
 func (runner EvalRunner) Run(t *testing.T) {
-	cmd := exec.Command("bldr", "eval", "--target", runner.Target, runner.Template)
+	cmd := exec.CommandContext(t.Context(), "bldr", "eval", "--target", runner.Target, runner.Template)
 
 	runner.run(t, cmd, "bldr eval")
 }
