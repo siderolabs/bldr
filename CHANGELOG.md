@@ -1,3 +1,45 @@
+## [bldr 0.5.2](https://github.com/siderolabs/bldr/releases/tag/v0.5.2) (2025-08-26)
+
+Welcome to the v0.5.2 release of bldr!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/bldr/issues.
+
+### Contributors
+
+* Andrey Smirnov
+* Dmitrii Sharshakov
+* Mateusz Urbanek
+
+### Changes
+<details><summary>3 commits</summary>
+<p>
+
+* [`73b4eaa`](https://github.com/siderolabs/bldr/commit/73b4eaa7d798f1afe460f9114b9284bde6e0efd9) feat: implement a dump command
+* [`42e5c02`](https://github.com/siderolabs/bldr/commit/42e5c0290f6aca41a6ab3a8f52b970f360c81e2d) feat: add support for automatic templating
+* [`c517c50`](https://github.com/siderolabs/bldr/commit/c517c50c23888093d94de462010e31158a52c830) release(v0.5.1): prepare release
+</p>
+</details>
+
+### Changes from siderolabs/gen
+<details><summary>1 commit</summary>
+<p>
+
+* [`044d921`](https://github.com/siderolabs/gen/commit/044d921685bbd8b603a64175ea63b07efe9a64a7) feat: add xslices.Deduplicate
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/emicklei/dot**          v1.8.0 -> v1.9.0
+* **github.com/google/go-github/v74**  v74.0.0 **_new_**
+* **github.com/siderolabs/gen**        v0.8.4 -> v0.8.5
+* **golang.org/x/sync**                v0.15.0 -> v0.16.0
+
+Previous release can be found at [v0.5.1](https://github.com/siderolabs/bldr/releases/tag/v0.5.1)
+
 ## [bldr 0.5.1](https://github.com/siderolabs/bldr/releases/tag/v0.5.1) (2025-07-15)
 
 Welcome to the v0.5.1 release of bldr!
