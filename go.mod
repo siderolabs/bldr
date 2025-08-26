@@ -2,12 +2,12 @@ module github.com/siderolabs/bldr
 
 go 1.25.0
 
-replace github.com/anchore/syft => github.com/dsseng/syft v0.0.0-20250703101014-f39c35d156d9
+replace github.com/anchore/syft => github.com/dsseng/syft v1.28.0
 
 require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/Masterminds/sprig/v3 v3.3.0
-	github.com/anchore/syft v1.28.0
+	github.com/anchore/syft v1.31.0
 	github.com/containerd/platforms v1.0.0-rc.1
 	github.com/emicklei/dot v1.9.0
 	github.com/google/go-github/v74 v74.0.0
@@ -19,7 +19,7 @@ require (
 	github.com/otiai10/copy v1.14.1
 	github.com/siderolabs/gen v0.8.5
 	github.com/spf13/cobra v1.9.1
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.0
 	golang.org/x/oauth2 v0.30.0
 	golang.org/x/sync v0.16.0
 	gopkg.in/yaml.v3 v3.0.1
