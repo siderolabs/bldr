@@ -35,7 +35,7 @@ func (p *Pkg) AttachTemplatedFile(path string, content []byte) error {
 		return fmt.Errorf("failed to template file %s: %w", path, err)
 	}
 
-	p.templatedFiles = append(p.templatedFiles, TemplatedFile{
+	p.TemplatedFiles = append(p.TemplatedFiles, TemplatedFile{
 		Path:    strings.TrimSuffix(path, constants.TemplateExt),
 		Content: buf.Bytes(),
 	})
@@ -45,5 +45,5 @@ func (p *Pkg) AttachTemplatedFile(path string, content []byte) error {
 
 // GetTemplatedFiles return a list of templated files in the package.
 func (p *Pkg) GetTemplatedFiles() []TemplatedFile {
-	return p.templatedFiles
+	return p.TemplatedFiles
 }

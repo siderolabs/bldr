@@ -19,18 +19,17 @@ import (
 
 // Pkg represents build instructions for a single package.
 type Pkg struct {
-	templatedFiles []TemplatedFile
-
-	Context      types.Variables `yaml:"-"`
-	Name         string          `yaml:"name,omitempty"`
-	Shell        Shell           `yaml:"shell,omitempty"`
-	BaseDir      string          `yaml:"-"`
-	FileName     string          `yaml:"-"`
-	Install      Install         `yaml:"install,omitempty"`
-	Dependencies Dependencies    `yaml:"dependencies,omitempty"`
-	Steps        Steps           `yaml:"steps,omitempty"`
-	Finalize     []Finalize      `yaml:"finalize,omitempty"`
-	Variant      Variant         `yaml:"variant,omitempty"`
+	TemplatedFiles []TemplatedFile `yaml:"-"`
+	Context        types.Variables `yaml:"-"`
+	Name           string          `yaml:"name,omitempty"`
+	Shell          Shell           `yaml:"shell,omitempty"`
+	BaseDir        string          `yaml:"-"`
+	FileName       string          `yaml:"-"`
+	Install        Install         `yaml:"install,omitempty"`
+	Dependencies   Dependencies    `yaml:"dependencies,omitempty"`
+	Steps          Steps           `yaml:"steps,omitempty"`
+	Finalize       []Finalize      `yaml:"finalize,omitempty"`
+	Variant        Variant         `yaml:"variant,omitempty"`
 }
 
 // NewPkg loads Pkg structure from file.

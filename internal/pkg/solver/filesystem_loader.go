@@ -23,15 +23,16 @@ import (
 // FilesystemPackageLoader loads packages by walking file system tree.
 type FilesystemPackageLoader struct {
 	*log.Logger
-	Context      types.Variables
-	pathContexts map[string]types.Variables
-	multiErr     *multierror.Error
-	pkgFile      *v1alpha2.Pkgfile
-	Root         string
-	absRootPath  string
-	pkgFilePaths []string
-	varFilePaths []string
-	pkgs         []*v1alpha2.Pkg
+	Context           types.Variables
+	pathContexts      map[string]types.Variables
+	multiErr          *multierror.Error
+	pkgFile           *v1alpha2.Pkgfile
+	Root              string
+	absRootPath       string
+	pkgFilePaths      []string
+	varFilePaths      []string
+	templateFilePaths []string
+	pkgs              []*v1alpha2.Pkg
 }
 
 func (fspl *FilesystemPackageLoader) walkFunc() filepath.WalkFunc {
@@ -50,11 +51,13 @@ func (fspl *FilesystemPackageLoader) walkFunc() filepath.WalkFunc {
 			return nil
 		}
 
-		switch info.Name() {
-		case constants.PkgYaml:
+		switch {
+		case info.Name() == constants.PkgYaml:
 			fspl.pkgFilePaths = append(fspl.pkgFilePaths, path)
-		case constants.VarsYaml:
+		case info.Name() == constants.VarsYaml:
 			fspl.varFilePaths = append(fspl.varFilePaths, path)
+		case strings.HasSuffix(info.Name(), constants.TemplateExt):
+			fspl.templateFilePaths = append(fspl.templateFilePaths, path)
 		}
 
 		return nil
@@ -114,6 +117,17 @@ func (fspl *FilesystemPackageLoader) Load() (*LoadResult, error) {
 
 			fspl.Printf("loaded pkg %q from %q", pkg.Name, path)
 			fspl.pkgs = append(fspl.pkgs, pkg)
+		}
+
+		for _, path := range fspl.templateFilePaths {
+			var pkg *v1alpha2.Pkg
+
+			if pkg, err = fspl.attachTemplate(path); err != nil {
+				fspl.Printf("error attaching template %q: %s", path, err)
+				fspl.multiErr = multierror.Append(fspl.multiErr, fmt.Errorf("error attaching template %q: %w", path, err))
+			} else {
+				fspl.Printf("attached template %q to %q", path, pkg.Name)
+			}
 		}
 	}
 
@@ -195,6 +209,38 @@ func (fspl *FilesystemPackageLoader) loadPkg(path string) (*v1alpha2.Pkg, error)
 	}
 
 	return v1alpha2.NewPkg(filepath.Dir(basePath), path, contents, context)
+}
+
+func (fspl *FilesystemPackageLoader) attachTemplate(path string) (*v1alpha2.Pkg, error) {
+	// find the closest pkgs in relative path
+	var (
+		closestPkg  *v1alpha2.Pkg
+		shortestRel string
+	)
+
+	for _, pkg := range fspl.pkgs {
+		rel, err := filepath.Rel(pkg.BaseDir, filepath.Dir(path))
+		if err != nil || strings.HasPrefix(rel, "..") {
+			continue
+		}
+
+		if shortestRel == "" || len(rel) < len(shortestRel) {
+			closestPkg = pkg
+			shortestRel = rel
+		}
+	}
+
+	if closestPkg == nil {
+		return nil, fmt.Errorf("no suitable package found for template %q", path)
+	}
+
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	// attach the template to the closest package
+	return closestPkg, closestPkg.AttachTemplatedFile(filepath.Join(shortestRel, filepath.Base(path)), content)
 }
 
 func (fspl *FilesystemPackageLoader) loadPkgfile() error {
