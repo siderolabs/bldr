@@ -1,3 +1,30 @@
+## [bldr 0.5.3](https://github.com/siderolabs/bldr/releases/tag/v0.5.3) (2025-09-04)
+
+Welcome to the v0.5.3 release of bldr!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/bldr/issues.
+
+### Contributors
+
+* Andrey Smirnov
+
+### Changes
+<details><summary>1 commit</summary>
+<p>
+
+* [`9613ee4`](https://github.com/siderolabs/bldr/commit/9613ee4788ce2ab8308b313f57c9b3d00fdac35c) fix: update graph for build-arg support
+</p>
+</details>
+
+### Dependency Changes
+
+This release has no dependency changes
+
+Previous release can be found at [v0.5.2](https://github.com/siderolabs/bldr/releases/tag/v0.5.2)
+
 ## [bldr 0.5.2](https://github.com/siderolabs/bldr/releases/tag/v0.5.2) (2025-08-26)
 
 Welcome to the v0.5.2 release of bldr!
