@@ -218,8 +218,20 @@ func (fspl *FilesystemPackageLoader) attachTemplate(path string) (*v1alpha2.Pkg,
 		shortestRel string
 	)
 
+	absFile, err := filepath.Abs(path)
+	if err != nil {
+		return nil, err
+	}
+
+	relPath, err := filepath.Rel(fspl.absRootPath, absFile)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, pkg := range fspl.pkgs {
-		rel, err := filepath.Rel(pkg.BaseDir, filepath.Dir(path))
+		var rel string
+
+		rel, err = filepath.Rel(pkg.BaseDir, filepath.Dir(relPath))
 		if err != nil || strings.HasPrefix(rel, "..") {
 			continue
 		}

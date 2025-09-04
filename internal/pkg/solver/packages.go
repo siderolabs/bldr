@@ -41,6 +41,15 @@ func NewPackages(loader PackageLoader) (*Packages, error) {
 	return result, nil
 }
 
+// FilterInPlace filters packages in place using the given filter function.
+func (pkgs *Packages) FilterInPlace(f func(pkg *v1alpha2.Pkg) bool) {
+	for name, pkg := range pkgs.packages {
+		if !f(pkg) {
+			delete(pkgs.packages, name)
+		}
+	}
+}
+
 func (pkgs *Packages) resolve(name string, path []string, cache map[string]*PackageNode) (*PackageNode, error) {
 	if node := cache[name]; node != nil {
 		return node, nil

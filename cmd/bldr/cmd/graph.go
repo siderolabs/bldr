@@ -7,11 +7,17 @@ package cmd
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 
 	"github.com/siderolabs/bldr/internal/pkg/solver"
+	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha2"
 )
+
+var graphCmdFlags struct {
+	buildArgs []string
+}
 
 // graphCmd represents the graph command.
 var graphCmd = &cobra.Command{
@@ -26,15 +32,27 @@ Typical usage:
 `,
 	Args: cobra.NoArgs,
 	Run: func(_ *cobra.Command, _ []string) {
+		context := options.GetVariables().Copy()
+
+		for _, buildArg := range graphCmdFlags.buildArgs {
+			name, value, _ := strings.Cut(buildArg, "=")
+
+			context["BUILD_ARG_"+name] = value
+		}
+
 		loader := solver.FilesystemPackageLoader{
 			Root:    pkgRoot,
-			Context: options.GetVariables(),
+			Context: context,
 		}
 
 		packages, err := solver.NewPackages(&loader)
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		packages.FilterInPlace(func(pkg *v1alpha2.Pkg) bool {
+			return pkg.Context["GRAPH_IGNORE"] != "true"
+		})
 
 		var packageSet solver.PackageSet
 
@@ -55,5 +73,6 @@ Typical usage:
 
 func init() {
 	graphCmd.Flags().StringVarP(&options.Target, "target", "t", "", "Target image to graph, if not set - graph all stages")
+	graphCmd.Flags().StringSliceVar(&graphCmdFlags.buildArgs, "build-arg", nil, "Build arguments to pass similar to docker buildx")
 	rootCmd.AddCommand(graphCmd)
 }
