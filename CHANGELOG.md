@@ -1,3 +1,30 @@
+## [bldr 0.5.4](https://github.com/siderolabs/bldr/releases/tag/v0.5.4) (2025-09-15)
+
+Welcome to the v0.5.4 release of bldr!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/bldr/issues.
+
+### Contributors
+
+* Andrey Smirnov
+
+### Changes
+<details><summary>1 commit</summary>
+<p>
+
+* [`7babde6`](https://github.com/siderolabs/bldr/commit/7babde68fec305eda70a843231603c6fc0af3869) feat: automatic checksum updater
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/cheggaaa/pb/v3**  v3.1.7 **_new_**
+
+Previous release can be found at [v0.5.3](https://github.com/siderolabs/bldr/releases/tag/v0.5.3)
+
 ## [bldr 0.5.3](https://github.com/siderolabs/bldr/releases/tag/v0.5.3) (2025-09-04)
 
 Welcome to the v0.5.3 release of bldr!
