@@ -1,6 +1,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2025-08-20T12:12:40Z by kres 18c31cf.
+# Generated on 2025-09-15T14:59:48Z by kres d1c95db.
 
 # common variables
 
@@ -239,6 +239,9 @@ lint-markdown:  ## Runs markdownlint.
 
 .PHONY: lint
 lint: lint-golangci-lint lint-gofumpt lint-govulncheck lint-markdown  ## Run all linters for the project.
+
+.PHONY: lint-fmt
+lint-fmt: lint-golangci-lint-fmt  ## Run all linter formatters and fix up the source tree.
 
 .PHONY: image-bldr
 image-bldr:  ## Builds image for bldr.

@@ -5,12 +5,11 @@ go 1.25.0
 replace github.com/anchore/syft => github.com/dsseng/syft v0.0.0-20250703101014-f39c35d156d9
 
 require (
-	github.com/Masterminds/semver v1.5.0
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/anchore/syft v1.28.0
+	github.com/cheggaaa/pb/v3 v3.1.7
 	github.com/containerd/platforms v1.0.0-rc.1
 	github.com/emicklei/dot v1.9.0
-	github.com/google/go-github/v74 v74.0.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/moby/buildkit v0.23.2
 	github.com/moby/docker-image-spec v1.3.1
@@ -20,7 +19,6 @@ require (
 	github.com/siderolabs/gen v0.8.5
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/oauth2 v0.30.0
 	golang.org/x/sync v0.16.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -42,6 +40,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.53.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
+	github.com/VividCortex/ewma v1.2.0 // indirect
 	github.com/acobaugh/osrelease v0.1.0 // indirect
 	github.com/adrg/xdg v0.5.3 // indirect
 	github.com/anchore/archiver/v3 v3.5.3-0.20241210171143-5b1d8d1c7c51 // indirect
@@ -99,7 +98,6 @@ require (
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/go-containerregistry v0.20.6 // indirect
-	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/licensecheck v0.3.1 // indirect
 	github.com/google/pprof v0.0.0-20250630185457-6e76a2b096b5 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
@@ -184,6 +182,7 @@ require (
 	golang.org/x/crypto v0.39.0 // indirect
 	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b // indirect
 	golang.org/x/net v0.41.0 // indirect
+	golang.org/x/oauth2 v0.30.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/term v0.32.0 // indirect
 	golang.org/x/text v0.26.0 // indirect

@@ -23,7 +23,11 @@ import (
 // FilesystemPackageLoader loads packages by walking file system tree.
 type FilesystemPackageLoader struct {
 	*log.Logger
-	Context           types.Variables
+	Context types.Variables
+
+	HookOnLoad      func(path string, contents []byte)
+	HookOnVariables func(path string, vars types.Variables)
+
 	pathContexts      map[string]types.Variables
 	multiErr          *multierror.Error
 	pkgFile           *v1alpha2.Pkgfile
@@ -172,10 +176,25 @@ func (fspl *FilesystemPackageLoader) loadVariables(path string) error {
 
 	baseContext := fspl.resolveContext(filepath.Dir(basePath))
 
+	if fspl.HookOnLoad != nil {
+		var contents []byte
+
+		contents, err = os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+
+		fspl.HookOnLoad(basePath, contents)
+	}
+
 	var vars types.Variables
 
 	if err = vars.Load(path, baseContext); err != nil {
 		return err
+	}
+
+	if fspl.HookOnVariables != nil {
+		fspl.HookOnVariables(basePath, vars)
 	}
 
 	fspl.pathContexts[filepath.Dir(basePath)] = vars
@@ -274,9 +293,17 @@ func (fspl *FilesystemPackageLoader) loadPkgfile() error {
 		return err
 	}
 
+	if fspl.HookOnLoad != nil {
+		fspl.HookOnLoad(constants.Pkgfile, contents)
+	}
+
 	fspl.pkgFile, err = v1alpha2.NewPkgfile(contents)
 	if err != nil {
 		return fmt.Errorf("error parsing %q: %w", constants.Pkgfile, err)
+	}
+
+	if fspl.HookOnVariables != nil {
+		fspl.HookOnVariables(constants.Pkgfile, fspl.pkgFile.Vars)
 	}
 
 	fspl.Context.Merge(fspl.pkgFile.Vars)
