@@ -33,12 +33,12 @@ func NewTestManifest(path string) (manifest TestManifest, err error) {
 
 	f, err = os.Open(path)
 	if err != nil {
-		return
+		return manifest, err
 	}
 
 	defer f.Close() //nolint:errcheck
 
 	err = yaml.NewDecoder(f).Decode(&manifest)
 
-	return
+	return manifest, err
 }

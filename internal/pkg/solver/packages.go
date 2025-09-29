@@ -120,7 +120,7 @@ func (pkgs *Packages) ToSet() (set PackageSet) {
 		})
 	}
 
-	return
+	return set
 }
 
 // ImageLabels returns set of image labels to apply to the output image.

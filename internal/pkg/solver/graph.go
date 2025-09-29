@@ -94,7 +94,7 @@ func (node *PackageNode) RuntimeDependencies() (deps []PackageDependency) {
 		}
 	}
 
-	return
+	return deps
 }
 
 // PackageGraph capture root of the DAG.

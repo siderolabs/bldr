@@ -9,17 +9,17 @@ require (
 	github.com/anchore/syft v1.28.0
 	github.com/cheggaaa/pb/v3 v3.1.7
 	github.com/containerd/platforms v1.0.0-rc.1
-	github.com/emicklei/dot v1.9.0
+	github.com/emicklei/dot v1.9.1
 	github.com/hashicorp/go-multierror v1.1.1
-	github.com/moby/buildkit v0.23.2
+	github.com/moby/buildkit v0.24.0
 	github.com/moby/docker-image-spec v1.3.1
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/otiai10/copy v1.14.1
 	github.com/siderolabs/gen v0.8.5
-	github.com/spf13/cobra v1.9.1
-	github.com/stretchr/testify v1.10.0
-	golang.org/x/sync v0.16.0
+	github.com/spf13/cobra v1.10.1
+	github.com/stretchr/testify v1.11.1
+	golang.org/x/sync v0.17.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -66,7 +66,7 @@ require (
 	github.com/charmbracelet/x/cellbuf v0.0.13 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/cncf/xds/go v0.0.0-20250501225837-2ac532fd4443 // indirect
-	github.com/containerd/containerd/v2 v2.1.3 // indirect
+	github.com/containerd/containerd/v2 v2.1.4 // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/containerd/ttrpc v1.2.7 // indirect
@@ -74,7 +74,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/diskfs/go-diskfs v1.6.1-0.20250601133945-2af1c7ece24c // indirect
 	github.com/distribution/reference v0.6.0 // indirect
-	github.com/docker/cli v28.3.1+incompatible // indirect
+	github.com/docker/cli v28.3.3+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.9.3 // indirect
 	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-events v0.0.0-20250114142523-c867878c5e32 // indirect
@@ -155,14 +155,14 @@ require (
 	github.com/spdx/tools-golang v0.5.5 // indirect
 	github.com/spf13/afero v1.14.0 // indirect
 	github.com/spf13/cast v1.9.2 // indirect
-	github.com/spf13/pflag v1.0.6 // indirect
+	github.com/spf13/pflag v1.0.9 // indirect
 	github.com/spf13/viper v1.20.1 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.5.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/sylabs/squashfs v1.0.6 // indirect
 	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/tonistiigi/fsutil v0.0.0-20250605211040-586307ad452f // indirect
-	github.com/ulikunitz/xz v0.5.12 // indirect
+	github.com/ulikunitz/xz v0.5.15 // indirect
 	github.com/wagoodman/go-partybus v0.0.0-20230516145632-8ccac152c651 // indirect
 	github.com/wagoodman/go-progress v0.0.0-20230925121702-07e42b3cdba0 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect

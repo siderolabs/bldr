@@ -75,6 +75,8 @@ func diffUpdater(ctx context.Context) {
 		switch {
 		case strings.HasPrefix(line, "+++ b/"):
 			currentPath = strings.TrimPrefix(line, "+++ b/")
+		case strings.HasPrefix(line, "+++ w/"):
+			currentPath = strings.TrimPrefix(line, "+++ w/")
 		case strings.HasPrefix(line, "+"):
 			variableName, _, ok := strings.Cut(strings.TrimPrefix(line, "+"), ": ")
 			if !ok {
