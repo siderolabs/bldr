@@ -1,6 +1,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2025-09-29T13:07:19Z by kres fdbc9fc.
+# Generated on 2025-11-06T11:34:13Z by kres 4ba9b0c.
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
@@ -89,11 +89,6 @@ jobs:
           PUSH: "true"
         run: |
           make image-bldr
-      - name: integration
-        env:
-          REGISTRY: registry.dev.siderolabs.io
-        run: |
-          make integration
       - name: Generate Checksums
         if: startsWith(github.ref, 'refs/tags/')
         run: |
@@ -106,13 +101,62 @@ jobs:
           make release-notes
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')
-        uses: crazy-max/ghaction-github-release@v2
+        uses: softprops/action-gh-release@v2
         with:
           body_path: _out/RELEASE_NOTES.md
           draft: "true"
           files: |-
             _out/bldr-*
             _out/sha*.txt
+  integration:
+    runs-on:
+      group: generic
+    if: github.event_name == 'pull_request'
+    needs:
+      - default
+    steps:
+      - name: gather-system-info
+        id: system-info
+        uses: kenchan0130/actions-system-info@v1.4.0
+        continue-on-error: true
+      - name: print-system-info
+        run: |
+          MEMORY_GB=$((${{ steps.system-info.outputs.totalmem }}/1024/1024/1024))
+
+          OUTPUTS=(
+            "CPU Core: ${{ steps.system-info.outputs.cpu-core }}"
+            "CPU Model: ${{ steps.system-info.outputs.cpu-model }}"
+            "Hostname: ${{ steps.system-info.outputs.hostname }}"
+            "NodeName: ${NODE_NAME}"
+            "Kernel release: ${{ steps.system-info.outputs.kernel-release }}"
+            "Kernel version: ${{ steps.system-info.outputs.kernel-version }}"
+            "Name: ${{ steps.system-info.outputs.name }}"
+            "Platform: ${{ steps.system-info.outputs.platform }}"
+            "Release: ${{ steps.system-info.outputs.release }}"
+            "Total memory: ${MEMORY_GB} GB"
+          )
+
+          for OUTPUT in "${OUTPUTS[@]}";do
+            echo "${OUTPUT}"
+          done
+        continue-on-error: true
+      - name: checkout
+        uses: actions/checkout@v5
+      - name: Unshallow
+        run: |
+          git fetch --prune --unshallow
+      - name: Set up Docker Buildx
+        id: setup-buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: remote
+          endpoint: tcp://buildkit-amd64.ci.svc.cluster.local:1234
+        timeout-minutes: 10
+      - name: integration
+        env:
+          REGISTRY: registry.dev.siderolabs.io
+        run: |
+          make integration
   lint:
     runs-on:
       group: generic

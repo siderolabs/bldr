@@ -36,7 +36,7 @@ var updateCmd = &cobra.Command{
 	Long: `This command updates checksums of all sources that reference given variable
 in their URL.
 
-Example: 
+Example:
 
   bldr update Pkgfile linux_version
 
@@ -98,7 +98,7 @@ func diffUpdater(ctx context.Context) {
 
 //nolint:gocognit
 func singleVariableUpdater(ctx context.Context, varsPath, varName string) {
-	const phase1Repl = "XXXXXXXXXXXXX----YYYYYYYYYYYYYY"
+	const phase1Repl = "XXXXXXXXXXXXX^^^^YYYYYYYYYYYYYY"
 
 	var (
 		affectedSources []v1alpha2.Source

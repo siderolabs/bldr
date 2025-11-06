@@ -24,6 +24,12 @@ spec:
       GOOS: darwin
       GOARCH: arm64
 ---
+# TODO: remove after syft upstream PR is merged. See https://github.com/anchore/syft/pull/4029
+kind: golang.GoVulnCheck
+spec:
+  ignore:
+    - GO-2025-4020
+---
 kind: service.CodeCov
 spec:
   targetThreshold: 1
@@ -98,6 +104,9 @@ spec:
       - cd internal/pkg/integration && PATH="$$PWD/../../../$(ARTIFACTS):$$PATH" integration.test -test.v -test.run $(RUN_TESTS)
   ghaction:
     enabled: true
+    parallelJob:
+      name: integration
+      runnerGroup: generic
     environment:
       REGISTRY: registry.dev.siderolabs.io
 ---

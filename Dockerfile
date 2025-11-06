@@ -1,17 +1,17 @@
-# syntax = docker/dockerfile-upstream:1.18.0-labs
+# syntax = docker/dockerfile-upstream:1.19.0-labs
 
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2025-09-29T13:07:19Z by kres fdbc9fc.
+# Generated on 2025-11-07T08:10:04Z by kres 4ba9b0c.
 
-ARG TOOLCHAIN
+ARG TOOLCHAIN=scratch
 
 FROM ghcr.io/siderolabs/ca-certificates:v1.11.0 AS image-ca-certificates
 
 FROM ghcr.io/siderolabs/fhs:v1.11.0 AS image-fhs
 
 # runs markdownlint
-FROM docker.io/oven/bun:1.2.22-alpine AS lint-markdown
+FROM docker.io/oven/bun:1.3.0-alpine AS lint-markdown
 WORKDIR /src
 RUN bun i markdownlint-cli@0.45.0 sentences-per-line@0.3.0
 COPY .markdownlint.json .
@@ -96,7 +96,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build,id=bldr/root/.cache/go-build
 FROM base AS lint-govulncheck
 WORKDIR /src
 COPY --chmod=0755 hack/govulncheck.sh ./hack/govulncheck.sh
-RUN --mount=type=cache,target=/root/.cache/go-build,id=bldr/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=bldr/go/pkg ./hack/govulncheck.sh ./...
+RUN --mount=type=cache,target=/root/.cache/go-build,id=bldr/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=bldr/go/pkg ./hack/govulncheck.sh -exclude 'GO-2025-4020' ./...
 
 # runs unit-tests with race detector
 FROM base AS unit-tests-race

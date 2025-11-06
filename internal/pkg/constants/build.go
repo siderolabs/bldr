@@ -25,7 +25,7 @@ const VarsYaml = "vars.yaml"
 // Pkgfile is the filename of 'Pkgfile'.
 const Pkgfile = "Pkgfile"
 
-// Template extension.
+// TemplateExt extension.
 const TemplateExt = ".tmpl"
 
 // StageXBusyboxImage is the image name for busybox from stageX.
