@@ -22,6 +22,7 @@ import (
 	"github.com/siderolabs/bldr/internal/pkg/sbom"
 	"github.com/siderolabs/bldr/internal/pkg/solver"
 	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha2"
+	"github.com/siderolabs/bldr/internal/version"
 )
 
 const (
@@ -237,6 +238,7 @@ func (node *NodeLLB) stepDownload(root llb.State, step v1alpha2.Step) llb.State 
 	for _, source := range step.Sources {
 		download := llb.HTTP(
 			source.URL,
+			llb.Header(llb.HTTPHeader{Accept: "*/*", UserAgent: fmt.Sprintf("BLDR/%s", version.Tag)}),
 			llb.Filename(filepath.Join("/", source.Destination)),
 			llb.Checksum(digest.NewDigestFromEncoded(digest.SHA256, source.SHA256)),
 			llb.WithCustomNamef(node.Prefix+"download %s -> %s", source.URL, source.Destination),
