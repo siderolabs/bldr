@@ -2,11 +2,11 @@ module github.com/siderolabs/bldr
 
 go 1.25.3
 
-replace github.com/anchore/syft => github.com/dsseng/syft v1.26.2-0.20250703101014-f39c35d156d9
+replace github.com/anchore/syft => github.com/dsseng/syft v1.28.0
 
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
-	github.com/anchore/syft v1.37.0
+	github.com/anchore/syft v1.38.0
 	github.com/cheggaaa/pb/v3 v3.1.7
 	github.com/containerd/platforms v1.0.0-rc.2
 	github.com/emicklei/dot v1.9.2
