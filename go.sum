@@ -836,6 +836,8 @@ github.com/dsnet/compress v0.0.2-0.20230904184137-39efe44ab707/go.mod h1:qssHWj6
 github.com/dsnet/golib v0.0.0-20171103203638-1ea166775780/go.mod h1:Lj+Z9rebOhdfkVLjJ8T6VcRQv3SXugXy999NBtR9aFY=
 github.com/dsseng/syft v1.26.2-0.20250703101014-f39c35d156d9 h1:oG9Q5NQkAJ5F+yHL7oNH1U1xH7KtZn96Th2Pg4CoyD8=
 github.com/dsseng/syft v1.26.2-0.20250703101014-f39c35d156d9/go.mod h1:jGpfAy5lRvOUrOxWAfbbu9t3TK8VwJpAAJHz6HFQofw=
+github.com/dsseng/syft v1.28.0 h1:ZRhj+OiAGbf/HuqldMPIXZhfJPCvDNDAykblDPPE4SY=
+github.com/dsseng/syft v1.28.0/go.mod h1:jGpfAy5lRvOUrOxWAfbbu9t3TK8VwJpAAJHz6HFQofw=
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
 github.com/emicklei/dot v1.9.2 h1:E/Wjz+BAH+JDhybEpISbo+QyDMNSiu/wqmIW9y922P8=
 github.com/emicklei/dot v1.9.2/go.mod h1:DeV7GvQtIw4h2u73RKBkkFdvVAz0D9fzeJrgPW6gy/s=
