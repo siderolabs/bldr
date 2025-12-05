@@ -6,6 +6,7 @@
 package upgrade
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha1"
@@ -20,15 +21,7 @@ func convertDeps(stageNames []string, old []*v1alpha1.Dependency) v1alpha2.Depen
 		parts := strings.Split(src, "/")
 		src = parts[len(parts)-1]
 
-		isStage := false
-
-		for _, stageName := range stageNames {
-			if src == stageName {
-				isStage = true
-
-				break
-			}
-		}
+		isStage := slices.Contains(stageNames, src)
 
 		if isStage {
 			newDep = append(newDep, v1alpha2.Dependency{

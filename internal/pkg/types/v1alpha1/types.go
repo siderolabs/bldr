@@ -75,7 +75,7 @@ func (v Variant) String() string {
 }
 
 // UnmarshalYAML implements the yaml.Unmarshaler interface.
-func (v *Variant) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (v *Variant) UnmarshalYAML(unmarshal func(any) error) error {
 	var aux string
 
 	if err := unmarshal(&aux); err != nil {

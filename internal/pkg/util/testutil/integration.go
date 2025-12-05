@@ -49,7 +49,7 @@ func (test IntegrationTest) patch(t *testing.T) {
 		t.Fatalf("error reading %q: %v", constants.Pkgfile, err)
 	}
 
-	contents = bytes.ReplaceAll(contents, []byte("SHEBANG"), []byte(fmt.Sprintf("%s/%s/bldr:%s", constants.DefaultRegistry, constants.DefaultOrganization, constants.Version)))
+	contents = bytes.ReplaceAll(contents, []byte("SHEBANG"), fmt.Appendf(nil, "%s/%s/bldr:%s", constants.DefaultRegistry, constants.DefaultOrganization, constants.Version))
 
 	_, err = pkgfile.Seek(0, io.SeekStart)
 	if err != nil {

@@ -179,7 +179,7 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 	if opts[keyTargetPlatform] != "" {
 		platforms = nil
 
-		for _, p := range strings.Split(opts[keyTargetPlatform], ",") {
+		for p := range strings.SplitSeq(opts[keyTargetPlatform], ",") {
 			var platform environment.Platform
 
 			if err := platform.Set(p); err != nil {
@@ -229,9 +229,9 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 
 	// old API
 	if cacheFromStr := opts[keyCacheFrom]; cacheFromStr != "" {
-		cacheFrom := strings.Split(cacheFromStr, ",")
+		cacheFrom := strings.SplitSeq(cacheFromStr, ",")
 
-		for _, s := range cacheFrom {
+		for s := range cacheFrom {
 			im := client.CacheOptionsEntry{
 				Type: "registry",
 				Attrs: map[string]string{
@@ -393,8 +393,8 @@ func filter(opt map[string]string, key string) map[string]string {
 	m := map[string]string{}
 
 	for k, v := range opt {
-		if strings.HasPrefix(k, key) {
-			m[strings.TrimPrefix(k, key)] = v
+		if after, ok := strings.CutPrefix(k, key); ok {
+			m[after] = v
 		}
 	}
 

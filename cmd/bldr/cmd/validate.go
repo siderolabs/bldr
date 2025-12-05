@@ -29,11 +29,7 @@ func validateChecksums(ctx context.Context, set solver.PackageSet, l *log.Logger
 
 	// start downloaders
 	for range concurrency {
-		wg.Add(1)
-
-		go func() {
-			defer wg.Done()
-
+		wg.Go(func() {
 			for pkg := range pkgs {
 				for _, step := range pkg.Steps {
 					for _, src := range step.Sources {
@@ -46,7 +42,7 @@ func validateChecksums(ctx context.Context, set solver.PackageSet, l *log.Logger
 					}
 				}
 			}
-		}()
+		})
 	}
 
 	var (

@@ -6,6 +6,7 @@ package solver
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha2"
 )
@@ -60,10 +61,8 @@ func (pkgs *Packages) resolve(name string, path []string, cache map[string]*Pack
 		return nil, fmt.Errorf("package %q not defined", name)
 	}
 
-	for _, pathName := range path {
-		if pathName == name {
-			return nil, fmt.Errorf("circular dependency detected %v -> %q", path, name)
-		}
+	if slices.Contains(path, name) {
+		return nil, fmt.Errorf("circular dependency detected %v -> %q", path, name)
 	}
 
 	path = append(path, name)

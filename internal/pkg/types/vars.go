@@ -7,6 +7,7 @@ package types
 
 import (
 	"bytes"
+	"maps"
 	"path/filepath"
 	"text/template"
 
@@ -32,9 +33,7 @@ func (v Variables) Merge(other Variables) Variables {
 func (v Variables) Copy() Variables {
 	result := make(Variables, len(v))
 
-	for key, val := range v {
-		result[key] = val
-	}
+	maps.Copy(result, v)
 
 	return result
 }
