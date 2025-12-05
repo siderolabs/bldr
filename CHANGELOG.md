@@ -1,3 +1,35 @@
+## [bldr 0.5.6](https://github.com/siderolabs/bldr/releases/tag/v0.5.6) (2025-12-05)
+
+Welcome to the v0.5.6 release of bldr!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/bldr/issues.
+
+### Contributors
+
+* Andrey Smirnov
+* Gilbert Gilb's
+
+### Changes
+<details><summary>3 commits</summary>
+<p>
+
+* [`6737494`](https://github.com/siderolabs/bldr/commit/6737494b46b0a1d44f26da0a85a678d5e3661615) chore: rekres using latest settings
+* [`d7bd0d1`](https://github.com/siderolabs/bldr/commit/d7bd0d1a451f92781c1c0e70db17ba02d8bf4004) fix: ignore artifacts directory in local context
+* [`33e25e2`](https://github.com/siderolabs/bldr/commit/33e25e2c04157b3002af2a2f0022df181d211fd3) fix(download): always send User-Agent and Accept headers
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/moby/buildkit**  v0.25.2 -> v0.26.2
+* **go.yaml.in/yaml/v4**        v4.0.0-rc.2 -> v4.0.0-rc.3
+* **golang.org/x/sync**         v0.17.0 -> v0.18.0
+
+Previous release can be found at [v0.5.5](https://github.com/siderolabs/bldr/releases/tag/v0.5.5)
+
 ## [bldr 0.5.4](https://github.com/siderolabs/bldr/releases/tag/v0.5.4) (2025-09-15)
 
 Welcome to the v0.5.4 release of bldr!
