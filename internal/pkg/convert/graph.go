@@ -123,6 +123,9 @@ func (graph *GraphLLB) buildLocalContext() {
 				"**/" + constants.VarsYaml,
 			},
 		),
+		llb.ExcludePatterns([]string{
+			"_out/",
+		}),
 		llb.WithCustomName(graph.Options.CommonPrefix+"context"),
 	)
 }

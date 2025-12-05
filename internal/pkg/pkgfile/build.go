@@ -333,6 +333,9 @@ func fetchPkgs(ctx context.Context, c client.Client) (client.Reference, error) {
 			"**/*" + constants.TemplateExt,
 			"*/",
 		}),
+		llb.ExcludePatterns([]string{
+			"_out/",
+		}),
 		llb.SessionID(c.BuildOpts().SessionID),
 		llb.SharedKeyHint(sharedKeyHint),
 		llb.WithCustomName(name),
