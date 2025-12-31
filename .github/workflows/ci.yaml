@@ -1,6 +1,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2025-12-05T14:08:35Z by kres 571923f.
+# Generated on 2025-12-31T05:18:26Z by kres 26be706.
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
@@ -55,7 +55,7 @@ jobs:
           done
         continue-on-error: true
       - name: checkout
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # version: v6.0.0
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # version: v6.0.1
       - name: Unshallow
         run: |
           git fetch --prune --unshallow
@@ -141,7 +141,7 @@ jobs:
           done
         continue-on-error: true
       - name: checkout
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # version: v6.0.0
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # version: v6.0.1
       - name: Unshallow
         run: |
           git fetch --prune --unshallow
@@ -190,7 +190,7 @@ jobs:
           done
         continue-on-error: true
       - name: checkout
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # version: v6.0.0
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # version: v6.0.1
       - name: Unshallow
         run: |
           git fetch --prune --unshallow
@@ -237,7 +237,7 @@ jobs:
           done
         continue-on-error: true
       - name: checkout
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # version: v6.0.0
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # version: v6.0.1
       - name: Unshallow
         run: |
           git fetch --prune --unshallow
@@ -255,7 +255,7 @@ jobs:
         run: |
           make unit-tests-race
       - name: coverage
-        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # version: v5.5.1
+        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # version: v5.5.2
         with:
           files: _out/coverage-unit-tests.txt
           flags: unit-tests

@@ -17,6 +17,9 @@ spec:
     linux-arm64:
       GOOS: linux
       GOARCH: arm64
+    linux-riscv64:
+      GOOS: linux
+      GOARCH: riscv64
     darwin-amd64:
       GOOS: darwin
       GOARCH: amd64
@@ -115,7 +118,7 @@ spec:
   customManagers:
     - customType: regex
       managerFilePatterns:
-        - internal/pkg/constants/build.go
+        - internal/pkg/constants/constants.go
       matchStrings:
         - '\/\/\s+renovate: datasource=(?<datasource>.*?)(?:\s+extractVersion=(?<extractVersion>.+?))?(?:\s+versioning=(?<versioning>.+?))?\s+depName=(?<depName>.+?)?\s.*Image\s+=\s+\"docker.io\/alpine:(?<currentValue>.+?)\"'
       versioningTemplate: "{{#if versioning}}{{versioning}}{{else}}semver{{/if}}"

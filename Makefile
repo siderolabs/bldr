@@ -1,15 +1,16 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2025-12-05T14:08:35Z by kres 571923f.
+# Generated on 2025-12-31T05:18:26Z by kres 26be706.
 
 # common variables
 
 SHA := $(shell git describe --match=none --always --abbrev=8 --dirty)
 TAG := $(shell git describe --tag --always --dirty --match v[0-9]\*)
+TAG_SUFFIX ?=
 ABBREV_TAG := $(shell git describe --tags >/dev/null 2>/dev/null && git describe --tag --always --match v[0-9]\* --abbrev=0 || echo 'undefined')
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 ARTIFACTS := _out
-IMAGE_TAG ?= $(TAG)
+IMAGE_TAG ?= $(TAG)$(TAG_SUFFIX)
 OPERATING_SYSTEM := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 GOARCH := $(shell uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')
 WITH_DEBUG ?= false
@@ -17,21 +18,23 @@ WITH_RACE ?= false
 REGISTRY ?= ghcr.io
 USERNAME ?= siderolabs
 REGISTRY_AND_USERNAME ?= $(REGISTRY)/$(USERNAME)
-PROTOBUF_GO_VERSION ?= 1.36.10
+PROTOBUF_GO_VERSION ?= 1.36.11
 GRPC_GO_VERSION ?= 1.6.0
 GRPC_GATEWAY_VERSION ?= 2.27.3
 VTPROTOBUF_VERSION ?= 0.6.0
-GOIMPORTS_VERSION ?= 0.39.0
+GOIMPORTS_VERSION ?= 0.40.0
 GOMOCK_VERSION ?= 0.6.0
 DEEPCOPY_VERSION ?= v0.5.8
-GOLANGCILINT_VERSION ?= v2.6.2
+GOLANGCILINT_VERSION ?= v2.7.2
 GOFUMPT_VERSION ?= v0.9.2
-GO_VERSION ?= 1.25.4
+GO_VERSION ?= 1.25.5
 GO_BUILDFLAGS ?=
+GO_BUILDTAGS ?= ,
 GO_LDFLAGS ?=
 CGO_ENABLED ?= 0
 GOTOOLCHAIN ?= local
 GOEXPERIMENT ?=
+GO_BUILDFLAGS += -tags $(GO_BUILDTAGS)
 TESTPKGS ?= ./...
 KRES_IMAGE ?= ghcr.io/siderolabs/kres:latest
 CONFORMANCE_IMAGE ?= ghcr.io/siderolabs/conform:latest
@@ -135,7 +138,7 @@ GO_LDFLAGS += -linkmode=external -extldflags '-static'
 endif
 
 ifneq (, $(filter $(WITH_DEBUG), t true TRUE y yes 1))
-GO_BUILDFLAGS += -tags sidero.debug
+GO_BUILDTAGS := $(GO_BUILDTAGS)sidero.debug,
 else
 GO_LDFLAGS += -s
 endif
@@ -230,8 +233,15 @@ $(ARTIFACTS)/bldr-linux-arm64:
 .PHONY: bldr-linux-arm64
 bldr-linux-arm64: $(ARTIFACTS)/bldr-linux-arm64  ## Builds executable for bldr-linux-arm64.
 
+.PHONY: $(ARTIFACTS)/bldr-linux-riscv64
+$(ARTIFACTS)/bldr-linux-riscv64:
+	@$(MAKE) local-bldr-linux-riscv64 DEST=$(ARTIFACTS)
+
+.PHONY: bldr-linux-riscv64
+bldr-linux-riscv64: $(ARTIFACTS)/bldr-linux-riscv64  ## Builds executable for bldr-linux-riscv64.
+
 .PHONY: bldr
-bldr: bldr-darwin-amd64 bldr-darwin-arm64 bldr-linux-amd64 bldr-linux-arm64  ## Builds executables for bldr.
+bldr: bldr-darwin-amd64 bldr-darwin-arm64 bldr-linux-amd64 bldr-linux-arm64 bldr-linux-riscv64  ## Builds executables for bldr.
 
 .PHONY: lint-markdown
 lint-markdown:  ## Runs markdownlint.

@@ -2,18 +2,18 @@
 
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2025-12-05T14:08:35Z by kres 571923f.
+# Generated on 2025-12-31T05:18:26Z by kres 26be706.
 
 ARG TOOLCHAIN=scratch
 
-FROM ghcr.io/siderolabs/ca-certificates:v1.12.0 AS image-ca-certificates
+FROM --platform=linux/amd64 ghcr.io/siderolabs/ca-certificates:v1.12.0 AS image-ca-certificates
 
-FROM ghcr.io/siderolabs/fhs:v1.12.0 AS image-fhs
+FROM --platform=linux/amd64 ghcr.io/siderolabs/fhs:v1.12.0 AS image-fhs
 
 # runs markdownlint
-FROM docker.io/oven/bun:1.3.1-alpine AS lint-markdown
+FROM docker.io/oven/bun:1.3.4-alpine AS lint-markdown
 WORKDIR /src
-RUN bun i markdownlint-cli@0.46.0 sentences-per-line@0.3.0
+RUN bun i markdownlint-cli@0.47.0 sentences-per-line@0.3.0
 COPY .markdownlint.json .
 COPY ./CHANGELOG.md ./CHANGELOG.md
 COPY ./README.md ./README.md
@@ -179,6 +179,18 @@ ARG SHA
 ARG TAG
 RUN --mount=type=cache,target=/root/.cache/go-build,id=bldr/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=bldr/go/pkg GOARCH=arm64 GOOS=linux go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-linux-arm64
 
+# builds bldr-linux-riscv64
+FROM base AS bldr-linux-riscv64-build
+COPY --from=generate / /
+COPY --from=embed-generate / /
+WORKDIR /src/cmd/bldr
+ARG GO_BUILDFLAGS
+ARG GO_LDFLAGS
+ARG VERSION_PKG="internal/version"
+ARG SHA
+ARG TAG
+RUN --mount=type=cache,target=/root/.cache/go-build,id=bldr/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=bldr/go/pkg GOARCH=riscv64 GOOS=linux go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${VERSION_PKG}.Name=bldr -X ${VERSION_PKG}.SHA=${SHA} -X ${VERSION_PKG}.Tag=${TAG}" -o /bldr-linux-riscv64
+
 FROM scratch AS bldr-darwin-amd64
 COPY --from=bldr-darwin-amd64-build /bldr-darwin-amd64 /bldr-darwin-amd64
 
@@ -191,6 +203,9 @@ COPY --from=bldr-linux-amd64-build /bldr-linux-amd64 /bldr-linux-amd64
 FROM scratch AS bldr-linux-arm64
 COPY --from=bldr-linux-arm64-build /bldr-linux-arm64 /bldr-linux-arm64
 
+FROM scratch AS bldr-linux-riscv64
+COPY --from=bldr-linux-riscv64-build /bldr-linux-riscv64 /bldr-linux-riscv64
+
 FROM bldr-linux-${TARGETARCH} AS bldr
 
 FROM scratch AS bldr-all
@@ -198,6 +213,7 @@ COPY --from=bldr-darwin-amd64 / /
 COPY --from=bldr-darwin-arm64 / /
 COPY --from=bldr-linux-amd64 / /
 COPY --from=bldr-linux-arm64 / /
+COPY --from=bldr-linux-riscv64 / /
 
 FROM scratch AS image-bldr
 ARG TARGETARCH
