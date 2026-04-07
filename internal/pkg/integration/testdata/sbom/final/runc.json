@@ -5,7 +5,7 @@
  "name": "sidero-pkgs-runc",
  "documentNamespace": "https://anchore.com/bldr/dir/sidero-pkgs-runc-096b39da-b937-5033-a23e-9554b61f75e8",
  "creationInfo": {
-  "licenseListVersion": "3.25",
+  "licenseListVersion": "3.27",
   "creators": [
    "Organization: Anchore, Inc",
    "Tool: bldr-BLDR_TAG"
