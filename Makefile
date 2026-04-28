@@ -1,18 +1,19 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2026-04-15T16:10:32Z by kres b6d29bf.
+# Generated on 2026-04-28T10:31:25Z by kres e4dc583.
 
 # common variables
 
 SHA := $(shell git describe --match=none --always --abbrev=8 --dirty)
-TAG := $(shell git describe --tag --always --dirty --match v[0-9]\*)
+TAG ?= $(shell git describe --tag --always --dirty --match v[0-9]\*)
 TAG_SUFFIX ?=
-ABBREV_TAG := $(shell git describe --tags >/dev/null 2>/dev/null && git describe --tag --always --match v[0-9]\* --abbrev=0 || echo 'undefined')
+ABBREV_TAG ?= $(shell git describe --tags >/dev/null 2>/dev/null && git describe --tag --always --match v[0-9]\* --abbrev=0 || echo 'undefined')
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 ARTIFACTS := _out
 IMAGE_TAG ?= $(TAG)$(TAG_SUFFIX)
 OPERATING_SYSTEM := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 GOARCH := $(shell uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')
+CI_RELEASE_TAG := $(shell git log --oneline --format=%B -n 1 HEAD^2 -- 2>/dev/null | head -n 1 | sed -r "/^release\(.*\)/ s/^release\((.*)\):.*$$/\\1/; t; Q")
 WITH_DEBUG ?= false
 WITH_RACE ?= false
 REGISTRY ?= ghcr.io
@@ -20,15 +21,15 @@ USERNAME ?= siderolabs
 REGISTRY_AND_USERNAME ?= $(REGISTRY)/$(USERNAME)
 PROTOBUF_GO_VERSION ?= 1.36.11
 GRPC_GO_VERSION ?= 1.6.1
-GRPC_GATEWAY_VERSION ?= 2.28.0
+GRPC_GATEWAY_VERSION ?= 2.29.0
 VTPROTOBUF_VERSION ?= 0.6.0
-GOIMPORTS_VERSION ?= 0.43.0
+GOIMPORTS_VERSION ?= 0.44.0
 GOMOCK_VERSION ?= 0.6.0
 DEEPCOPY_VERSION ?= v0.5.8
 GOLANGCILINT_VERSION ?= v2.11.4
 GOFUMPT_VERSION ?= v0.9.2
 GO_VERSION ?= 1.26.2
-DIS_VULNCHECK_VERSION ?= v0.0.0-20260408104044-a7a2dc044240
+DIS_VULNCHECK_VERSION ?= v0.0.0-20260409114749-05440f84fe69
 GO_BUILDFLAGS ?=
 GO_BUILDTAGS ?= ,
 GO_LDFLAGS ?=
@@ -159,6 +160,14 @@ $(ARTIFACTS):  ## Creates artifacts directory.
 clean:  ## Cleans up all artifacts.
 	@rm -rf $(ARTIFACTS)
 
+.PHONY: ci-temp-release-tag
+ci-temp-release-tag:  ## Generates a temporary release tag for CI run.
+	@if [ -n "$(CI_RELEASE_TAG)" -a -n "$${GITHUB_ENV}" ]; then \
+		echo Setting temporary release tag "$(CI_RELEASE_TAG)"; \
+		echo "TAG=$(CI_RELEASE_TAG)" >> "$${GITHUB_ENV}"; \
+		echo "ABBREV_TAG=$(CI_RELEASE_TAG)" >> "$${GITHUB_ENV}"; \
+	fi
+
 target-%:  ## Builds the specified target defined in the Dockerfile. The build result will only remain in the build cache.
 	@$(BUILD) --target=$* $(COMMON_ARGS) $(TARGET_ARGS) $(CI_ARGS) .
 
@@ -178,7 +187,7 @@ local-%:  ## Builds the specified target defined in the Dockerfile using the loc
 	  done'
 
 .PHONY: check-dirty
-check-dirty:
+check-dirty: generate
 	@if test -n "`git status --porcelain`"; then echo "Source tree is dirty"; git status; git diff; exit 1 ; fi
 
 generate:  ## Generate .proto definitions.
@@ -289,4 +298,16 @@ release-notes: $(ARTIFACTS)
 conformance:
 	@docker pull $(CONFORMANCE_IMAGE)
 	@docker run --rm -it -v $(PWD):/src -w /src $(CONFORMANCE_IMAGE) enforce
+
+.PHONY: renovate-local
+renovate-local:  ## runs renovate locally to check syntax and test configuration
+	@docker run --rm \
+		--user $(shell id -u):$(shell id -g) \
+		-v $(PWD):/src \
+		-w /src \
+		-e GITHUB_TOKEN \
+		-e LOG_LEVEL=debug \
+		-e RENOVATE_PLATFORM=local \
+		-e RENOVATE_DRY_RUN=full \
+	renovate/renovate
 

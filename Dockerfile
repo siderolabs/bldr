@@ -2,16 +2,16 @@
 
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2026-04-15T16:10:32Z by kres b6d29bf.
+# Generated on 2026-04-28T10:31:25Z by kres e4dc583.
 
 ARG TOOLCHAIN=scratch
 
-FROM ghcr.io/siderolabs/ca-certificates:v1.12.0 AS image-ca-certificates
+FROM ghcr.io/siderolabs/ca-certificates:v1.13.0 AS image-ca-certificates
 
-FROM ghcr.io/siderolabs/fhs:v1.12.0 AS image-fhs
+FROM ghcr.io/siderolabs/fhs:v1.13.0 AS image-fhs
 
 # runs markdownlint
-FROM docker.io/oven/bun:1.3.11-alpine AS lint-markdown
+FROM docker.io/oven/bun:1.3.13-alpine AS lint-markdown
 WORKDIR /src
 RUN bun i markdownlint-cli@0.48.0 sentences-per-line@0.5.2
 COPY .markdownlint.json .

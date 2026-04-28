@@ -1,6 +1,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2026-04-15T16:10:32Z by kres b6d29bf.
+# Generated on 2026-04-28T10:31:25Z by kres e4dc583.
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
@@ -66,6 +66,14 @@ jobs:
           driver: remote
           endpoint: tcp://buildkit-amd64.ci.svc.cluster.local:1234
         timeout-minutes: 10
+      - name: CI temp release tag
+        if: github.event_name == 'pull_request'
+        run: |
+          make ci-temp-release-tag
+      - name: Check dirty
+        if: github.event_name == 'pull_request'
+        run: |
+          make check-dirty
       - name: base
         run: |
           make base
@@ -101,7 +109,7 @@ jobs:
           make release-notes
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe # version: v2.6.1
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # version: v3.0.0
         with:
           body_path: _out/RELEASE_NOTES.md
           draft: "true"
