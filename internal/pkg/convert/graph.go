@@ -92,12 +92,14 @@ func (graph *GraphLLB) buildBaseImages() {
 		constants.DefaultBaseImage,
 		llb.WithCustomName(graph.Options.CommonPrefix+"base"),
 	).Run(
-		append(graph.commonRunOptions,
+		append(
+			graph.commonRunOptions,
 			llb.Shlex("apk --no-cache --update add bash"),
 			llb.WithCustomName(graph.Options.CommonPrefix+"base-apkinstall"),
 		)...,
 	).Run(
-		append(graph.commonRunOptions,
+		append(
+			graph.commonRunOptions,
 			llb.Args([]string{"ln", "-svf", "/bin/bash", "/bin/sh"}),
 			llb.WithCustomName(graph.Options.CommonPrefix+"base-symlink"),
 		)...,

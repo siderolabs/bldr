@@ -325,7 +325,8 @@ func Build(ctx context.Context, c client.Client, options *environment.Options) (
 func fetchPkgs(ctx context.Context, c client.Client) (client.Reference, error) {
 	name := fmt.Sprintf("load %s, %ss and %ss", constants.Pkgfile, constants.PkgYaml, constants.VarsYaml)
 
-	src := llb.Local(localNameDockerfile,
+	src := llb.Local(
+		localNameDockerfile,
 		llb.IncludePatterns([]string{
 			constants.Pkgfile,
 			"**/" + constants.PkgYaml,

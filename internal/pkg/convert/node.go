@@ -80,9 +80,11 @@ func (node *NodeLLB) base() llb.State {
 func (node *NodeLLB) install(root llb.State) llb.State {
 	if len(node.Pkg.Install) > 0 {
 		root = root.Run(
-			append(node.Graph.commonRunOptions,
+			append(
+				node.Graph.commonRunOptions,
 				llb.Args(
-					append([]string{"/sbin/apk", "add", "--no-cache"}, node.Pkg.Install...)),
+					append([]string{"/sbin/apk", "add", "--no-cache"}, node.Pkg.Install...),
+				),
 				llb.WithCustomName(node.Prefix+"apk-install"),
 			)...,
 		).Root()
@@ -201,7 +203,8 @@ func (node *NodeLLB) dependencies(ctx context.Context, root llb.State) (llb.Stat
 			// skip copying if the source and destination are "/"
 			stages = append(stages, depState)
 		} else {
-			stages = append(stages,
+			stages = append(
+				stages,
 				llb.Scratch().File(
 					llb.Copy(depState, dep.Src(), dep.Dest(), defaultCopyOptions(node.Graph.Options, false)),
 					llb.WithCustomNamef(node.Prefix+"copy --from %s %s -> %s", srcName, dep.Src(), dep.Dest()),
@@ -250,14 +253,16 @@ func (node *NodeLLB) stepDownload(root llb.State, step v1alpha2.Step) llb.State 
 				Mkdir("/empty", constants.DefaultDirMode),
 			llb.WithCustomName(node.Prefix+"cksum-prepare"),
 		).Run(
-			append(node.Graph.commonRunOptions,
+			append(
+				node.Graph.commonRunOptions,
 				llb.Shlex("sha512sum -c -w /checksums"),
 				llb.WithCustomName(node.Prefix+"cksum-verify"),
 				llb.Network(pb.NetMode_NONE),
 			)...,
 		).Root()
 
-		stages = append(stages,
+		stages = append(
+			stages,
 			llb.Scratch().File(
 				llb.Copy(download, "/", step.TmpDir, defaultCopyOptions(node.Graph.Options, false)).
 					Copy(checksummer, "/empty", "/", defaultCopyOptions(node.Graph.Options, false)), // TODO: this is "fake" dependency on checksummer
@@ -326,7 +331,8 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 				)
 			})...)
 
-			runOptions = append(runOptions,
+			runOptions = append(
+				runOptions,
 				llb.Args([]string{
 					node.Pkg.Shell.Get(),
 					"-c",
@@ -399,7 +405,8 @@ func (node *NodeLLB) finalize(root llb.State) llb.State {
 	stages := make([]llb.State, 0, len(node.Pkg.Finalize))
 
 	for _, fin := range node.Pkg.Finalize {
-		stages = append(stages,
+		stages = append(
+			stages,
 			llb.Scratch().File(
 				llb.Copy(root, fin.From, fin.To, defaultCopyOptions(node.Graph.Options, true)),
 				llb.WithCustomNamef(node.Prefix+"finalize %s -> %s", fin.From, fin.To),

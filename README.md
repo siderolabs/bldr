@@ -371,8 +371,6 @@ Variables are made available to the templating engine when processing `pkg.yaml`
 Default variables:
 
 ```bash
-CFLAGS="-g0 -Os"
-CXXFLAGS="-g0 -Os"
 LDFLAGS="-s"
 VENDOR="talos"
 SYSROOT="/talos"
@@ -387,7 +385,11 @@ BUILD=x86_64-linux-musl
 HOST=x86_64-linux-musl
 ARCH=x86_64
 TARGET=x86_64-talos-linux-musl
+CFLAGS="-O2 -g0 -march=x86-64-v2 -mtune=generic"
+CXXFLAGS="-O2 -g0 -march=x86-64-v2 -mtune=generic"
 ```
+
+For `linux/arm64` `CFLAGS` and `CXXFLAGS` default to `-O2 -g0`.
 
 ### Build flow
 

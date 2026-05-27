@@ -10,13 +10,13 @@ import (
 )
 
 // Default returns default values for environment variables.
+//
+// CFLAGS/CXXFLAGS are platform-specific and contributed by [Platform.TargetVariables].
 func Default() types.Variables {
 	return types.Variables{
-		"CFLAGS":   "-g0 -Os",
-		"CXXFLAGS": "-g0 -Os",
-		"LDFLAGS":  "-s",
-		"VENDOR":   "talos",
-		"SYSROOT":  "/talos",
-		"PATH":     constants.DefaultPath,
+		"LDFLAGS": "-s",
+		"VENDOR":  "talos",
+		"SYSROOT": "/talos",
+		"PATH":    constants.DefaultPath,
 	}
 }

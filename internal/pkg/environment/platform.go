@@ -23,6 +23,7 @@ type Platform struct {
 	Target       string
 	Build        string
 	Host         string
+	CFlags       string
 	LLBPlatform  llb.ConstraintsOpt
 	PlatformSpec specs.Platform
 }
@@ -38,8 +39,10 @@ func (p Platform) BuildVariables() types.Variables {
 // TargetVariables returns target env variables.
 func (p Platform) TargetVariables() types.Variables {
 	return types.Variables{
-		"ARCH":   p.Arch,
-		"TARGET": p.Target,
+		"ARCH":     p.Arch,
+		"TARGET":   p.Target,
+		"CFLAGS":   p.CFlags,
+		"CXXFLAGS": p.CFlags,
 	}
 }
 
@@ -71,6 +74,7 @@ var (
 		Target:       "x86_64-talos-linux-musl",
 		Build:        "x86_64-linux-musl",
 		Host:         "x86_64-linux-musl",
+		CFlags:       "-O2 -g0 -march=x86-64-v2 -mtune=generic",
 		LLBPlatform:  llb.LinuxAmd64,
 		PlatformSpec: platforms.MustParse("linux/amd64"),
 	}
@@ -81,18 +85,9 @@ var (
 		Target:       "aarch64-talos-linux-musl",
 		Build:        "aarch64-linux-musl",
 		Host:         "aarch64-linux-musl",
+		CFlags:       "-O2 -g0",
 		LLBPlatform:  llb.LinuxArm64,
 		PlatformSpec: platforms.MustParse("linux/arm64"),
-	}
-
-	LinuxArmv7 = Platform{
-		ID:           "linux/armv7",
-		Arch:         "armv7",
-		Target:       "armv7-talos-linux-musl",
-		Build:        "armv7-linux-musl",
-		Host:         "armv7-linux-musl",
-		LLBPlatform:  llb.LinuxArmhf,
-		PlatformSpec: platforms.MustParse("linux/arm7"),
 	}
 )
 
@@ -103,7 +98,6 @@ func init() {
 	for _, platform := range []Platform{
 		LinuxAmd64,
 		LinuxArm64,
-		LinuxArmv7,
 	} {
 		Platforms[platform.ID] = platform
 	}
