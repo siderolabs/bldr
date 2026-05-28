@@ -1,3 +1,48 @@
+## [bldr 0.6.0](https://github.com/siderolabs/bldr/releases/tag/v0.6.0) (2026-05-28)
+
+Welcome to the v0.6.0 release of bldr!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/bldr/issues.
+
+### Compiler Flags
+
+The default CFLAGS/CXXFLAGS were updated to use `-O2` optimization level and
+use x86_64 v2 microarchitecture by default. This should improve performance on modern CPUs.
+
+
+### Contributors
+
+* Andrey Smirnov
+* Noel Georgi
+* Rich Theobald
+
+### Changes
+<details><summary>5 commits</summary>
+<p>
+
+* [`c6f11f6`](https://github.com/siderolabs/bldr/commit/c6f11f688cb8fddda3bd4d52b3a30eecf5aac6b8) feat: update CLFAGS for better optimization
+* [`d41dcbe`](https://github.com/siderolabs/bldr/commit/d41dcbec504e27863e2beec31d67d6cdbd0f38fb) chore: bump dependencies
+* [`7c4f8d5`](https://github.com/siderolabs/bldr/commit/7c4f8d550db51fb9c7d94ed3fd3d8e10fd3a2b5b) chore: bump deps
+* [`91cfdae`](https://github.com/siderolabs/bldr/commit/91cfdaeb62ee0225220c03d9498b097fe91415cf) chore: bump dependencies
+* [`a6d5de6`](https://github.com/siderolabs/bldr/commit/a6d5de6898854ce83080afa5224185ad7b065d2d) docs: remove outdated reference
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/anchore/syft**          v1.37.0 -> v1.42.4
+* **github.com/containerd/platforms**  v1.0.0-rc.2 -> v1.0.0-rc.4
+* **github.com/emicklei/dot**          v1.9.2 -> v1.11.0
+* **github.com/moby/buildkit**         v0.26.2 -> v0.30.0
+* **github.com/spf13/cobra**           v1.10.1 -> v1.10.2
+* **go.yaml.in/yaml/v4**               v4.0.0-rc.3 -> v4.0.0-rc.4
+* **golang.org/x/sync**                v0.18.0 -> v0.20.0
+
+Previous release can be found at [v0.5.6](https://github.com/siderolabs/bldr/releases/tag/v0.5.6)
+
 ## [bldr 0.5.6](https://github.com/siderolabs/bldr/releases/tag/v0.5.6) (2025-12-05)
 
 Welcome to the v0.5.6 release of bldr!
