@@ -41,7 +41,7 @@ func (runner CommandRunner) run(t *testing.T, cmd *exec.Cmd, title string) {
 			t.Fatalf("%s failed: %v", title, err)
 		}
 	case "fail":
-		if err != nil {
+		if err == nil {
 			t.Fatalf("%s should have failed, but succeeded", title)
 		}
 	default:

@@ -16,3 +16,13 @@ pre_release = false
 The default CFLAGS/CXXFLAGS were updated to use `-O2` optimization level and
 use x86_64 v2 microarchitecture by default. This should improve performance on modern CPUs.
 """
+
+[notes.buildplatform]
+    title = "Build Platform"
+    description = """
+Packages can now pin the platform their build runs on with the `buildPlatform`
+field, independent of the requested target platform. This enables
+cross-compilation: e.g. building an `arm64` artifact on an `amd64` worker (no
+emulation), where `ARCH`/`TARGET` still describe the target while the build
+executes on `buildPlatform`.
+"""

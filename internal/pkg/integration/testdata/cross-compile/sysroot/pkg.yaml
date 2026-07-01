@@ -1,0 +1,20 @@
+---
+name: sysroot
+variant: alpine
+# A target-arch sysroot dependency: even though the parent `final` package
+# cross-builds on amd64, this dependency carries an explicit `platform: linux/arm64`
+# (set on the dependency reference), so it is re-solved natively on arm64.
+steps:
+- prepare:
+    - mkdir -p /out
+    - touch /out/sysroot
+  test:
+    # re-solved natively on arm64: build == target == arm64
+    - test `uname -m` = "aarch64"
+    - test "${BUILD:-x}" = "aarch64-linux-musl"
+    - test "${HOST:-x}" = "aarch64-linux-musl"
+    - test "${ARCH:-x}" = "aarch64"
+    - test "${TARGET:-x}" = "aarch64-talos-linux-musl"
+finalize:
+  - from: /out
+    to: /sysroot

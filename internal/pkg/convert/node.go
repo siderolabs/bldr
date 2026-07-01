@@ -122,10 +122,36 @@ func (node *NodeLLB) context(root llb.State) llb.State {
 
 func (node *NodeLLB) convertDependency(ctx context.Context, dep solver.PackageDependency) (depState llb.State, srcName string, err error) {
 	if dep.IsInternal() {
-		if dep.Platform != "" && dep.Platform != node.Graph.Options.BuildPlatform.ID {
+		// A dependency is a build input consumed on the platform this build
+		// executes on (BuildPlatform), unless it explicitly overrides its
+		// platform (e.g. a target-arch sysroot). It must be built in a clean
+		// single-platform (build == target) context at that platform.
+		depPlatform := node.Graph.Options.BuildPlatform.ID
+		if dep.Platform != "" {
+			depPlatform = dep.Platform
+		}
+
+		// Building inline shares the current graph's options, which is only
+		// correct when this is not a cross build (BuildPlatform == TargetPlatform)
+		// and the dependency wants that same platform. Otherwise (cross build, or
+		// a platform override) re-solve the dependency at its own platform so it
+		// builds natively there rather than inheriting the parent's target arch.
+		crossBuild := node.Graph.Options.BuildPlatform.ID != node.Graph.Options.TargetPlatform.ID
+
+		if !crossBuild && depPlatform == node.Graph.Options.BuildPlatform.ID {
+			depState, err = NewNodeLLB(dep.Node, node.Graph).Build(ctx)
+			if err != nil {
+				return llb.Scratch(), "", err
+			}
+		} else {
+			platform, ok := environment.Platforms[depPlatform]
+			if !ok {
+				return llb.Scratch(), "", fmt.Errorf("platform %q not supported", depPlatform)
+			}
+
 			var res *client.Result
 
-			res, err = node.Graph.solverFn(ctx, environment.Platforms[dep.Platform], dep.Node.Name)
+			res, err = node.Graph.solverFn(ctx, platform, dep.Node.Name)
 			if err != nil {
 				return llb.Scratch(), "", err
 			}
@@ -138,11 +164,6 @@ func (node *NodeLLB) convertDependency(ctx context.Context, dep solver.PackageDe
 			}
 
 			depState, err = ref.ToState()
-			if err != nil {
-				return llb.Scratch(), "", err
-			}
-		} else {
-			depState, err = NewNodeLLB(dep.Node, node.Graph).Build(ctx)
 			if err != nil {
 				return llb.Scratch(), "", err
 			}

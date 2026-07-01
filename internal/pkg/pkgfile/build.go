@@ -134,6 +134,20 @@ func solveTarget(
 			return nil, fmt.Errorf("failed to resolve packages for platform %s and target %s: %w", platform, target, err)
 		}
 
+		// A package may pin the platform it is built on independently of the
+		// target platform (e.g. cross-compile an arm64 artifact on an amd64
+		// node). TargetPlatform is left untouched, so the output image is still
+		// labeled with the requested target and ARCH/TARGET reflect it, while
+		// BUILD/HOST and LLB exec placement follow the build platform.
+		if buildPlatform := graph.Root.Pkg.BuildPlatform; buildPlatform != "" {
+			p, ok := environment.Platforms[buildPlatform]
+			if !ok {
+				return nil, fmt.Errorf("package %q: buildPlatform %q is not supported", graph.Root.Name, buildPlatform)
+			}
+
+			options.BuildPlatform = p
+		}
+
 		def, err := convert.MarshalLLB(ctx, graph, solveTarget(platformContextCache, c, cacheImports), &options)
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal LLB for platform %s and target %s: %w", platform, target, err)

@@ -1,0 +1,30 @@
+---
+name: final
+variant: alpine
+# Pin the build to amd64 while the requested target platform is arm64: the build
+# runs on an amd64 worker (no emulation) yet ARCH/TARGET describe arm64, so the
+# recipe can cross-compile. See README "buildPlatform".
+buildPlatform: linux/amd64
+dependencies:
+  # Build-time helper with no platform override: re-solved natively on the build
+  # platform (amd64). Its rootfs (/buildhelper/...) is merged into this build.
+  - stage: buildhelper
+  # Target-arch sysroot pinned to arm64: re-solved natively on arm64 even though
+  # this package cross-builds on amd64. Its rootfs (/sysroot/...) is merged in.
+  - stage: sysroot
+    platform: linux/arm64
+steps:
+- test:
+    # exec runs on the build platform (amd64), not the arm64 target
+    - test `uname -m` = "x86_64"
+    - test "${BUILD:-x}" = "x86_64-linux-musl"
+    - test "${HOST:-x}" = "x86_64-linux-musl"
+    # ARCH/TARGET still describe the requested target platform (arm64)
+    - test "${ARCH:-x}" = "aarch64"
+    - test "${TARGET:-x}" = "aarch64-talos-linux-musl"
+    # outputs of both dependencies (built on different platforms) are present
+    - test -f /buildhelper/buildhelper
+    - test -f /sysroot/sysroot
+finalize:
+  - from: /
+    to: /

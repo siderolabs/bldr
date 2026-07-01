@@ -1,0 +1,21 @@
+---
+name: buildhelper
+variant: alpine
+# A build-time dependency of the cross-compiled `final` package. It has no
+# `platform` override, so it is re-solved natively on the *build* platform
+# (amd64) rather than inheriting the parent's arm64 target. This exercises the
+# cross-build subgraph path in convertDependency.
+steps:
+- prepare:
+    - mkdir -p /out
+    - touch /out/buildhelper
+  test:
+    # re-solved natively on the build platform (amd64): build == target == amd64
+    - test `uname -m` = "x86_64"
+    - test "${BUILD:-x}" = "x86_64-linux-musl"
+    - test "${HOST:-x}" = "x86_64-linux-musl"
+    - test "${ARCH:-x}" = "x86_64"
+    - test "${TARGET:-x}" = "x86_64-talos-linux-musl"
+finalize:
+  - from: /out
+    to: /buildhelper

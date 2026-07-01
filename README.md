@@ -232,9 +232,14 @@ On the root level, following properties are available:
   - `alpine`: Alpine Linux 3.16 image with `bash` package pre-installed
   - `scratch`: scratch (empty) image
   Default variant is `alpine`.
-- `install`: (*list*, *optional*): list of Alpine packages to be installed as part of the build.
+- `install` (*list*, *optional*): list of Alpine packages to be installed as part of the build.
   These packages are usually build dependencies.
-- `shell`: (*str*, *optional*): path to the shell to execute build step instructions, defaults to `/bin/sh`.
+- `shell` (*str*, *optional*): path to the shell to execute build step instructions, defaults to `/bin/sh`.
+- `buildPlatform` (*str*, *optional*): pin the platform the build runs on, independent of the requested target platform.
+  If not set, the build runs on the target platform (the usual native build).
+  When set (e.g. `linux/amd64`), the build steps execute on that platform while the requested target platform still determines the `ARCH`/`TARGET`/`CFLAGS` variables and the architecture of the produced image.
+  This enables cross-compilation: for example, building an `arm64` artifact on an `amd64` worker (no emulation), where the recipe reads `$BUILD` (`x86_64-linux-musl`) and `$TARGET` (`aarch64-...-musl`) to drive a cross-compiler.
+  It applies to the whole subgraph rooted at the package, so a cross-compiled package's build-time dependencies should be *external* images (they are pulled for the build platform).
 
 ### `dependencies`
 

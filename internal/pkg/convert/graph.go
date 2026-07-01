@@ -88,10 +88,18 @@ func (graph *GraphLLB) buildBaseImages() {
 		return addEnv(addPkg(root))
 	}
 
+	// Pin the base image to the build platform, like `FROM --platform=$BUILDPLATFORM`.
+	// This stamps the build platform onto every op derived from the base (RUN,
+	// COPY, …) so buildkit schedules them on the build-platform worker/node — the
+	// basis for cross-compilation. For a native build, build == target, so this is
+	// a no-op; for a cross build it keeps the heavy work on the build platform
+	// while dependencies pinned to the target platform are pulled as-is.
+	buildPlatform := graph.Options.BuildPlatform.PlatformSpec
+
 	graph.BaseImages[v1alpha2.Alpine] = graph.baseImageProcessor(llb.Image(
 		constants.DefaultBaseImage,
 		llb.WithCustomName(graph.Options.CommonPrefix+"base"),
-	).Run(
+	).Platform(buildPlatform).Run(
 		append(
 			graph.commonRunOptions,
 			llb.Shlex("apk --no-cache --update add bash"),
@@ -105,14 +113,17 @@ func (graph *GraphLLB) buildBaseImages() {
 		)...,
 	).Root())
 
-	graph.BaseImages[v1alpha2.Scratch] = graph.baseImageProcessor(llb.Scratch())
+	graph.BaseImages[v1alpha2.Scratch] = graph.baseImageProcessor(llb.Scratch().Platform(buildPlatform))
 }
 
 func (graph *GraphLLB) buildChecksummer() {
+	// Pin to the build platform: the checksum step runs `sha512sum` (an exec), so
+	// it must run on the build-platform worker rather than be emulated on the
+	// target one.
 	graph.Checksummer = llb.Image(
 		constants.StageXBusyboxImage,
 		llb.WithCustomName(graph.Options.CommonPrefix+"cksum"),
-	)
+	).Platform(graph.Options.BuildPlatform.PlatformSpec)
 }
 
 func (graph *GraphLLB) buildLocalContext() {
