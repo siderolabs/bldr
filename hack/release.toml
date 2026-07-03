@@ -5,17 +5,10 @@ project_name = "bldr"
 github_repo = "siderolabs/bldr"
 match_deps = "^github.com/(siderolabs/[a-zA-Z0-9-]+)$"
 
-previous = "v0.5.6"
+previous = "v0.6.0"
 pre_release = false
 
 [notes]
-
-[notes.cflags]
-    title = "Compiler Flags"
-    description = """
-The default CFLAGS/CXXFLAGS were updated to use `-O2` optimization level and
-use x86_64 v2 microarchitecture by default. This should improve performance on modern CPUs.
-"""
 
 [notes.buildplatform]
     title = "Build Platform"

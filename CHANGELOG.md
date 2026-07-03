@@ -1,3 +1,55 @@
+## [bldr 0.6.1](https://github.com/siderolabs/bldr/releases/tag/v0.6.1) (2026-07-03)
+
+Welcome to the v0.6.1 release of bldr!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/bldr/issues.
+
+### Build Platform
+
+Packages can now pin the platform their build runs on with the `buildPlatform`
+field, independent of the requested target platform. This enables
+cross-compilation: e.g. building an `arm64` artifact on an `amd64` worker (no
+emulation), where `ARCH`/`TARGET` still describe the target while the build
+executes on `buildPlatform`.
+
+
+### Contributors
+
+* Andrey Smirnov
+* Mark Glants
+
+### Changes
+<details><summary>3 commits</summary>
+<p>
+
+* [`7364273`](https://github.com/siderolabs/bldr/commit/7364273ce6ad64d140aaea4242ed6b126f0d0f92) feat: add buildPlatform to pin a package's build platform
+* [`a9fb31d`](https://github.com/siderolabs/bldr/commit/a9fb31d1ce92a3f21ea96351bb895ec1b1735730) chore: bump dependencies
+* [`7618c55`](https://github.com/siderolabs/bldr/commit/7618c5576901debe5a92afd3b2ed0bb4129995d2) chore: bump Go dependencies and rekres
+</p>
+</details>
+
+### Changes from siderolabs/gen
+<details><summary>1 commit</summary>
+<p>
+
+* [`c526410`](https://github.com/siderolabs/gen/commit/c526410f8c26b75ab386877036d4855098f9c429) fix: skip unknown-key check for types with custom YAML unmarshaler
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/anchore/syft**    v1.42.4 -> v1.46.0
+* **github.com/moby/buildkit**   v0.30.0 -> v0.31.1
+* **github.com/siderolabs/gen**  v0.8.6 -> v0.8.7
+* **go.yaml.in/yaml/v4**         v4.0.0-rc.4 -> v4.0.0-rc.6
+* **golang.org/x/sync**          v0.20.0 -> v0.21.0
+
+Previous release can be found at [v0.6.0](https://github.com/siderolabs/bldr/releases/tag/v0.6.0)
+
+
 ## [bldr 0.6.0](https://github.com/siderolabs/bldr/releases/tag/v0.6.0) (2026-05-28)
 
 Welcome to the v0.6.0 release of bldr!
