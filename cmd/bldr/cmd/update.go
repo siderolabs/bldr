@@ -62,6 +62,10 @@ then this command will try to bump every changed variable in the diff:
 	},
 }
 
+var updateCmdFlags struct {
+	buildArgs []string
+}
+
 func diffUpdater(ctx context.Context) {
 	fmt.Fprintf(os.Stderr, "reading git diff from stdin\n")
 
@@ -96,7 +100,7 @@ func diffUpdater(ctx context.Context) {
 	}
 }
 
-//nolint:gocognit
+//nolint:gocognit,gocyclo,cyclop
 func singleVariableUpdater(ctx context.Context, varsPath, varName string) {
 	const phase1Repl = "XXXXXXXXXXXXX^^^^YYYYYYYYYYYYYY"
 
@@ -111,9 +115,17 @@ func singleVariableUpdater(ctx context.Context, varsPath, varName string) {
 	} {
 		options.TargetPlatform = targetPlatform
 
+		context := options.GetVariables().Copy()
+
+		for _, buildArg := range updateCmdFlags.buildArgs {
+			name, value, _ := strings.Cut(buildArg, "=")
+
+			context["BUILD_ARG_"+name] = value
+		}
+
 		loaderHooked := solver.FilesystemPackageLoader{
 			Root:    pkgRoot,
-			Context: options.GetVariables(),
+			Context: context,
 			HookOnVariables: func(path string, vars types.Variables) {
 				if path == varsPath {
 					if _, ok := vars[varName]; ok {
@@ -128,7 +140,7 @@ func singleVariableUpdater(ctx context.Context, varsPath, varName string) {
 
 		loaderClean := solver.FilesystemPackageLoader{
 			Root:    pkgRoot,
-			Context: options.GetVariables(),
+			Context: context,
 		}
 
 		packagesHooked, err := solver.NewPackages(&loaderHooked)
@@ -242,5 +254,6 @@ func downloadAndChecksum(ctx context.Context, url string) (v1alpha2.Source, erro
 }
 
 func init() {
+	updateCmd.Flags().StringSliceVar(&updateCmdFlags.buildArgs, "build-arg", nil, "Build arguments to pass similar to docker buildx")
 	rootCmd.AddCommand(updateCmd)
 }
