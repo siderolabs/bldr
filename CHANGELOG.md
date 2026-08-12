@@ -1,3 +1,33 @@
+## [bldr 0.6.2](https://github.com/siderolabs/bldr/releases/tag/v0.6.2) (2026-08-12)
+
+Welcome to the v0.6.2 release of bldr!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/bldr/issues.
+
+### Contributors
+
+* Andrey Smirnov
+
+### Changes
+<details><summary>1 commit</summary>
+<p>
+
+* [`f606fd0`](https://github.com/siderolabs/bldr/commit/f606fd06751d7e79dfaf0f13e03b4833cf68df0a) fix: add support for build args in `bldr update`
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/anchore/syft**    v1.46.0 -> v1.51.0
+* **github.com/cheggaaa/pb/v3**  v3.1.7 -> v3.2.0
+* **github.com/moby/buildkit**   v0.31.1 -> v0.32.2
+* **golang.org/x/sync**          v0.21.0 -> v0.22.0
+
+Previous release can be found at [v0.6.1](https://github.com/siderolabs/bldr/releases/tag/v0.6.1)
+
 ## [bldr 0.6.1](https://github.com/siderolabs/bldr/releases/tag/v0.6.1) (2026-07-03)
 
 Welcome to the v0.6.1 release of bldr!
