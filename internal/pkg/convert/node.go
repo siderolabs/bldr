@@ -28,6 +28,16 @@ import (
 const (
 	tmpDir = "/tmp/build"
 	pkgDir = "/pkg"
+
+	// emptyDir is a marker directory used to build "fake" dependencies on a stage whose
+	// filesystem changes should be discarded (see stepScripts and stepDownload).
+	//
+	// It is deliberately nested one level below the root: BuildKit computes a content-based
+	// cache key for the source selector of a copy, and cache/contenthash scans the *parent*
+	// directory of the selector. With a top-level "/empty" that parent is the root of the
+	// stage, so BuildKit recursively walks the entire rootfs of the build container just to
+	// hash a directory which is always empty.
+	emptyDir = "/.bldr/empty"
 )
 
 func defaultCopyOptions(options *environment.Options, reproducible bool) *llb.CopyInfo {
@@ -271,7 +281,7 @@ func (node *NodeLLB) stepDownload(root llb.State, step v1alpha2.Step) llb.State 
 		checksummer := node.Graph.Checksummer.File(
 			llb.Mkfile("/checksums", 0o644, source.ToSHA512Sum()).
 				Copy(download, "/", "/", defaultCopyOptions(node.Graph.Options, false)).
-				Mkdir("/empty", constants.DefaultDirMode),
+				Mkdir(emptyDir, constants.DefaultDirMode, llb.WithParents(true)),
 			llb.WithCustomName(node.Prefix+"cksum-prepare"),
 		).Run(
 			append(
@@ -286,7 +296,7 @@ func (node *NodeLLB) stepDownload(root llb.State, step v1alpha2.Step) llb.State 
 			stages,
 			llb.Scratch().File(
 				llb.Copy(download, "/", step.TmpDir, defaultCopyOptions(node.Graph.Options, false)).
-					Copy(checksummer, "/empty", "/", defaultCopyOptions(node.Graph.Options, false)), // TODO: this is "fake" dependency on checksummer
+					Copy(checksummer, emptyDir, "/", defaultCopyOptions(node.Graph.Options, false)), // TODO: this is "fake" dependency on checksummer
 				llb.WithCustomName(node.Prefix+"download finalize"),
 			),
 		)
@@ -372,11 +382,13 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 
 		if script.Detached {
 			scriptRoot = scriptRoot.File(
-				llb.Mkdir("/empty", constants.DefaultDirMode),
+				llb.Mkdir(emptyDir, constants.DefaultDirMode, llb.WithParents(true)),
+				llb.WithCustomNamef("%s%s-%d-detach", node.Prefix, script.Desc, i),
 			)
 
 			root = root.File(
-				llb.Copy(scriptRoot, "/empty", "/", defaultCopyOptions(node.Graph.Options, false)),
+				llb.Copy(scriptRoot, emptyDir, "/", defaultCopyOptions(node.Graph.Options, false)),
+				llb.WithCustomNamef("%s%s-%d-discard", node.Prefix, script.Desc, i),
 			)
 		} else {
 			root = scriptRoot
