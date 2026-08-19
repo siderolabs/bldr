@@ -1,3 +1,30 @@
+## [bldr 0.6.3](https://github.com/siderolabs/bldr/releases/tag/v0.6.3) (2026-08-19)
+
+Welcome to the v0.6.3 release of bldr!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/bldr/issues.
+
+### Contributors
+
+* Andrey Smirnov
+
+### Changes
+<details><summary>1 commit</summary>
+<p>
+
+* [`2dacbf7`](https://github.com/siderolabs/bldr/commit/2dacbf722f363c10b43597f98eac7afa031701a9) fix: avoid full rootfs scan for detached step markers
+</p>
+</details>
+
+### Dependency Changes
+
+This release has no dependency changes
+
+Previous release can be found at [v0.6.2](https://github.com/siderolabs/bldr/releases/tag/v0.6.2)
+
 ## [bldr 0.6.2](https://github.com/siderolabs/bldr/releases/tag/v0.6.2) (2026-08-12)
 
 Welcome to the v0.6.2 release of bldr!
