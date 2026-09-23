@@ -398,19 +398,19 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 	return root
 }
 
-func (node *NodeLLB) stepSBOM(root llb.State, step v1alpha2.Step) llb.State {
+func (node *NodeLLB) stepSBOM(root llb.State, step v1alpha2.Step) (llb.State, error) {
 	if step.SBOM.OutputPath == "" {
-		return root
+		return root, nil
 	}
 
 	sbomDoc, err := sbom.CreatePackageSBOM(node.Pkg, step.SBOM)
 	if err != nil {
-		return root
+		return llb.Scratch(), fmt.Errorf("creating SBOM: %w", err)
 	}
 
 	sbomJSON, err := sbom.ToSpdxJSON(*sbomDoc, node.Graph.Options.SourceDateEpoch)
 	if err != nil {
-		return root
+		return llb.Scratch(), fmt.Errorf("encoding SBOM: %w", err)
 	}
 
 	root = root.File(
@@ -421,17 +421,16 @@ func (node *NodeLLB) stepSBOM(root llb.State, step v1alpha2.Step) llb.State {
 		llb.Mkfile(step.SBOM.OutputPath, 0o644, []byte(sbomJSON)),
 	)
 
-	return root
+	return root, nil
 }
 
-func (node *NodeLLB) step(root llb.State, i int, step v1alpha2.Step) llb.State {
+func (node *NodeLLB) step(root llb.State, i int, step v1alpha2.Step) (llb.State, error) {
 	root = node.stepTmpDir(root, &step)
 	root = node.stepDownload(root, step)
 	root = node.stepEnvironment(root, step)
 	root = node.stepScripts(root, i, step)
-	root = node.stepSBOM(root, step)
 
-	return root
+	return node.stepSBOM(root, step)
 }
 
 func (node *NodeLLB) finalize(root llb.State) llb.State {
@@ -467,7 +466,10 @@ func (node *NodeLLB) Build(ctx context.Context) (llb.State, error) {
 	root = node.context(root)
 
 	for i, step := range node.Pkg.Steps {
-		root = node.step(root, i, step)
+		root, err = node.step(root, i, step)
+		if err != nil {
+			return llb.Scratch(), fmt.Errorf("package %q step %d: %w", node.Name, i, err)
+		}
 	}
 
 	root = node.finalize(root)

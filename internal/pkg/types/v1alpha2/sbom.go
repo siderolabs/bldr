@@ -12,4 +12,15 @@ type SBOMStep struct {
 	CPEs       []string `yaml:"cpes,omitempty"`
 	PURL       string   `yaml:"purl,omitempty"`
 	Licenses   []string `yaml:"licenses,omitempty"`
+
+	// CustomLicenses are additional declared licenses, combined with Licenses using AND.
+	CustomLicenses []CustomLicense `yaml:"customLicenses,omitempty"`
+}
+
+// CustomLicense provides the text of a license not on the SPDX license list.
+type CustomLicense struct {
+	// ID is an SPDX LicenseRef- identifier, unique within the SBOM step.
+	ID string `yaml:"id"`
+	// Text is the full, non-empty license text, preserved verbatim in the SBOM.
+	Text string `yaml:"text"`
 }

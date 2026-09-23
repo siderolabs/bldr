@@ -351,6 +351,28 @@ Each instruction is executed as LLB stage, so in terms of caching it's better to
 Each instruction is executed as a shell script, so any complex shell constructs can be used.
 Scripts are executed with options `set -eou pipefail`.
 
+### SBOM licenses
+
+A step's `sbom.licenses` list accepts SPDX license identifiers and expressions.
+For licenses not on the SPDX license list, use `sbom.customLicenses` to supply the full license text:
+
+```yaml
+steps:
+  - sbom:
+      name: example
+      licenses:
+        - BSD-3-Clause
+      customLicenses:
+        - id: LicenseRef-Custom
+          text: |
+            Replace this example with the complete license text.
+```
+
+Each custom license requires a unique `LicenseRef-` identifier (suffix characters: letters, digits, dots, or hyphens) and non-blank `text`.
+Custom licenses are additional declared licenses, combined with `licenses` using `AND`; do not repeat them in `licenses`.
+The SPDX output includes their identifiers in `licenseDeclared` and their verbatim text in `hasExtractedLicensingInfos`.
+Existing `licenses` entries are unchanged; a string-only `LicenseRef-` entry does not supply extracted license text.
+
 ### `finalize`
 
 Step `finalize` performs final copying of the build artifacts into scratch image which will be output of the build.
