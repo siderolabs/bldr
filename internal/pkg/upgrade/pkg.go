@@ -19,7 +19,7 @@ func convertDeps(stageNames []string, old []*v1alpha1.Dependency) v1alpha2.Depen
 	newDep := v1alpha2.Dependencies{}
 
 	for _, dep := range old {
-		src := strings.SplitN(dep.Image, ":", 2)[0]
+		src, _, _ := strings.Cut(dep.Image, ":")
 		parts := strings.Split(src, "/")
 		src = parts[len(parts)-1]
 
