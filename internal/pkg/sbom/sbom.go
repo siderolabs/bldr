@@ -162,6 +162,8 @@ func CreatePackageSBOM(bldrPkg *v1alpha2.Pkg, sbomMetadata v1alpha2.SBOMStep) (*
 		Licenses: licenses,
 	}
 
+	// Assign the ID before copying the package into the collection and relationships.
+	syftPkg.SetID()
 	sbomDoc.Artifacts.Packages.Add(syftPkg)
 
 	addPkgSources(sbomDoc, bldrPkg, syftPkg)

@@ -6,6 +6,7 @@ package sbom_test
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -16,6 +17,75 @@ import (
 	"github.com/siderolabs/bldr/internal/pkg/sbom"
 	"github.com/siderolabs/bldr/internal/pkg/types/v1alpha2"
 )
+
+func TestPackageSBOMRelationshipEndpoints(t *testing.T) {
+	bldrPkg := &v1alpha2.Pkg{
+		Name: "libtpms",
+		Steps: v1alpha2.Steps{
+			{
+				Sources: v1alpha2.Sources{
+					{
+						URL:    "https://example.com/libtpms-0.10.1.tar.gz",
+						SHA256: strings.Repeat("a", 64),
+						SHA512: strings.Repeat("b", 128),
+					},
+				},
+			},
+		},
+	}
+
+	doc, err := sbom.CreatePackageSBOM(bldrPkg, v1alpha2.SBOMStep{Version: "0.10.1"})
+	require.NoError(t, err)
+
+	encoded, err := sbom.ToSpdxJSON(*doc, time.Unix(0, 0).UTC())
+	require.NoError(t, err)
+
+	var spdx struct {
+		ID       string `json:"SPDXID"`
+		Packages []struct {
+			ID string `json:"SPDXID"`
+		} `json:"packages"`
+		Files []struct {
+			ID string `json:"SPDXID"`
+		} `json:"files"`
+		Relationships []struct {
+			From string `json:"spdxElementId"`
+			To   string `json:"relatedSpdxElement"`
+			Type string `json:"relationshipType"`
+		} `json:"relationships"`
+	}
+
+	require.NoError(t, json.Unmarshal([]byte(encoded), &spdx))
+	require.NotEmpty(t, spdx.ID)
+	require.NotEmpty(t, spdx.Packages)
+	require.Len(t, spdx.Files, 1)
+	require.NotEmpty(t, spdx.Relationships)
+
+	declared := map[string]struct{}{spdx.ID: {}}
+
+	for _, pkg := range spdx.Packages {
+		require.NotEmpty(t, pkg.ID)
+		declared[pkg.ID] = struct{}{}
+	}
+
+	for _, file := range spdx.Files {
+		require.NotEmpty(t, file.ID)
+		declared[file.ID] = struct{}{}
+	}
+
+	var sourceRelationships int
+
+	for _, relationship := range spdx.Relationships {
+		assert.Contains(t, declared, relationship.From, "undeclared %s relationship origin", relationship.Type)
+		assert.Contains(t, declared, relationship.To, "undeclared %s relationship target", relationship.Type)
+
+		if relationship.Type == "CONTAINS" && relationship.To == spdx.Files[0].ID {
+			sourceRelationships++
+		}
+	}
+
+	assert.Equal(t, 1, sourceRelationships, "source archive must be linked to its package")
+}
 
 func TestCustomLicenses(t *testing.T) {
 	const recipe = `name: libtpms
