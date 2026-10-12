@@ -1,0 +1,6 @@
+ignore_ttl: 168h # 7 days, each entry must be revalidated after this time, and either removed or renewed (with a new date)
+
+ignore:
+  - id: GO-2025-4020
+    reason: 'DoS risk due to unrestricted RAR dictionary sizes in github.com/nwaples/rardecode -- we dont process RAR files'
+    date: 2026-10-21

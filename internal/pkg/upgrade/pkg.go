@@ -17,7 +17,7 @@ func convertDeps(stageNames []string, old []*v1alpha1.Dependency) v1alpha2.Depen
 	newDep := v1alpha2.Dependencies{}
 
 	for _, dep := range old {
-		src := strings.SplitN(dep.Image, ":", 2)[0]
+		src, _, _ := strings.Cut(dep.Image, ":")
 		parts := strings.Split(src, "/")
 		src = parts[len(parts)-1]
 
@@ -40,7 +40,7 @@ func convertDeps(stageNames []string, old []*v1alpha1.Dependency) v1alpha2.Depen
 }
 
 func convertSteps(old []*v1alpha1.Step) []v1alpha2.Step {
-	newSteps := []v1alpha2.Step{}
+	newSteps := []v1alpha2.Step{} //nolint:prealloc
 
 	for _, step := range old {
 		newStep := v1alpha2.Step{}
@@ -72,7 +72,7 @@ func convertSteps(old []*v1alpha1.Step) []v1alpha2.Step {
 }
 
 func convertFinalize(old []*v1alpha1.Finalize) []v1alpha2.Finalize {
-	newFinalize := []v1alpha2.Finalize{}
+	newFinalize := []v1alpha2.Finalize{} //nolint:prealloc
 	for _, f := range old {
 		newFinalize = append(newFinalize, v1alpha2.Finalize(*f))
 	}

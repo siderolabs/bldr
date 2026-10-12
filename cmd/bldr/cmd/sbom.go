@@ -59,6 +59,7 @@ and outputs a Software Bill of Materials (SBOM) for it in SPDX format.
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		fmt.Println(s)
 	},
 }

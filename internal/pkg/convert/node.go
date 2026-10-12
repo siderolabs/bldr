@@ -29,15 +29,9 @@ const (
 	tmpDir = "/tmp/build"
 	pkgDir = "/pkg"
 
-	// emptyDir is a marker directory used to build "fake" dependencies on a stage whose
-	// filesystem changes should be discarded (see stepScripts and stepDownload).
-	//
-	// It is deliberately nested one level below the root: BuildKit computes a content-based
-	// cache key for the source selector of a copy, and cache/contenthash scans the *parent*
-	// directory of the selector. With a top-level "/empty" that parent is the root of the
-	// stage, so BuildKit recursively walks the entire rootfs of the build container just to
-	// hash a directory which is always empty.
-	emptyDir = "/.bldr/empty"
+	// verifyMount is where the download stage is mounted into the checksummer container
+	// (see stepDownload).
+	verifyMount = "/.bldr/verify"
 )
 
 func defaultCopyOptions(options *environment.Options, reproducible bool) *llb.CopyInfo {
@@ -254,26 +248,34 @@ func (node *NodeLLB) stepDownload(root llb.State, step v1alpha2.Step) llb.State 
 			llb.WithCustomNamef(node.Prefix+"download %s -> %s", source.URL, source.Destination),
 		)
 
-		checksummer := node.Graph.Checksummer.File(
-			llb.Mkfile("/checksums", 0o644, source.ToSHA512Sum()).
-				Copy(download, "/", "/", defaultCopyOptions(node.Graph.Options, false)).
-				Mkdir(emptyDir, constants.DefaultDirMode, llb.WithParents(true)),
+		stage := llb.Scratch().File(
+			llb.Copy(download, "/", step.TmpDir, defaultCopyOptions(node.Graph.Options, false)),
+			llb.WithCustomName(node.Prefix+"download finalize"),
+		)
+
+		// Verify the checksum with the download stage mounted into the checksummer container,
+		// and take the mount (not the container rootfs) as the result. The command writes
+		// nothing, so the result is the download stage itself, but it now depends on the
+		// verification having succeeded.
+		//
+		// This has to be an exec rather than a copy from a marker directory: a copy gets a
+		// content-based cache key for its source, and that key is identical across all
+		// packages and builds, so every historical result links to it and BuildKit spends
+		// one synchronous cache DB write per such result on each lookup. An exec is keyed by
+		// its definition only.
+		verify := node.Graph.Checksummer.File(
+			llb.Mkfile("/checksums", 0o644, source.ToSHA512Sum()),
 			llb.WithCustomName(node.Prefix+"cksum-prepare"),
 		).Run(
 			append(node.Graph.commonRunOptions,
 				llb.Shlex("sha512sum -c -w /checksums"),
+				llb.Dir(path.Join(verifyMount, step.TmpDir)),
 				llb.WithCustomName(node.Prefix+"cksum-verify"),
 				llb.Network(pb.NetMode_NONE),
 			)...,
-		).Root()
-
-		stages = append(stages,
-			llb.Scratch().File(
-				llb.Copy(download, "/", step.TmpDir, defaultCopyOptions(node.Graph.Options, false)).
-					Copy(checksummer, emptyDir, "/", defaultCopyOptions(node.Graph.Options, false)), // TODO: this is "fake" dependency on checksummer
-				llb.WithCustomName(node.Prefix+"download finalize"),
-			),
 		)
+
+		stages = append(stages, verify.AddMount(verifyMount, stage))
 	}
 
 	return root.WithOutput(llb.Merge(stages, llb.WithCustomName(node.Prefix+"download")).Output())
@@ -354,15 +356,29 @@ func (node *NodeLLB) stepScripts(root llb.State, i int, step v1alpha2.Step) llb.
 		}
 
 		if script.Detached {
-			scriptRoot = scriptRoot.File(
-				llb.Mkdir(emptyDir, constants.DefaultDirMode, llb.WithParents(true)),
-				llb.WithCustomNamef("%s%s-%d-detach", node.Prefix, script.Desc, i),
-			)
+			// Discard the detached result, but keep the dependency on it, by running a no-op
+			// with the result mounted read-only. The mount target is the step's tmp dir, which
+			// already exists, so the exec leaves no new directory behind in the step root.
+			//
+			// An exec is keyed by its definition only. A copy from a marker directory would get
+			// a content-based cache key which is identical across all packages and builds, and
+			// BuildKit links every historical result to such a key on each lookup (see
+			// stepDownload).
+			runOptions := append([]llb.RunOption(nil), node.Graph.commonRunOptions...)
 
-			root = root.File(
-				llb.Copy(scriptRoot, emptyDir, "/", defaultCopyOptions(node.Graph.Options, false)),
+			runOptions = append(
+				runOptions,
+				llb.Args([]string{node.Pkg.Shell.Get(), "-c", "true"}),
+				llb.AddMount(step.TmpDir, scriptRoot, llb.Readonly),
+				llb.Network(pb.NetMode_NONE),
 				llb.WithCustomNamef("%s%s-%d-discard", node.Prefix, script.Desc, i),
 			)
+
+			if node.Graph.Options.NoCache {
+				runOptions = append(runOptions, llb.IgnoreCache)
+			}
+
+			root = root.Run(runOptions...).Root()
 		} else {
 			root = scriptRoot
 		}
