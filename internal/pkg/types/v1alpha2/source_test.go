@@ -49,3 +49,35 @@ func TestSourceValidateChecksums(t *testing.T) {
 	assert.Equal(t, expectedSHA256, actualSHA256)
 	assert.Equal(t, expectedSHA512, actualSHA512)
 }
+
+func TestSourceValidateDestination(t *testing.T) {
+	for _, test := range []struct {
+		destination string
+		valid       bool
+	}{
+		{destination: "go1.12.5.src.tar.gz", valid: true},
+		{destination: "", valid: false},
+		{destination: ".", valid: false},
+		{destination: "..", valid: false},
+		{destination: "/artifact", valid: false},
+		{destination: "../artifact", valid: false},
+		{destination: "sub/artifact", valid: false},
+	} {
+		t.Run(test.destination, func(t *testing.T) {
+			source := v1alpha2.Source{
+				URL:         "https://example.com/artifact",
+				Destination: test.destination,
+				SHA256:      strings.Repeat("0", 64),
+				SHA512:      strings.Repeat("0", 128),
+			}
+
+			err := source.Validate()
+
+			if test.valid {
+				assert.NoError(t, err)
+			} else {
+				assert.ErrorContains(t, err, "source.destination")
+			}
+		})
+	}
+}

@@ -14,6 +14,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/hashicorp/go-multierror"
 )
@@ -55,8 +56,14 @@ func (source *Source) Validate() error {
 		multiErr = multierror.Append(multiErr, fmt.Errorf("error parsing source.url %q: %w", source.URL, err))
 	}
 
-	if source.Destination == "" {
+	switch {
+	case source.Destination == "":
 		multiErr = multierror.Append(multiErr, errors.New("source.destination can't be empty"))
+	case source.Destination == "." || source.Destination == ".." || strings.ContainsRune(source.Destination, '/'):
+		// The destination is both the filename the download is stored under and the path
+		// written into the sha512sum checksum file, which is verified relative to the
+		// step's tmp dir, so it must be a plain filename.
+		multiErr = multierror.Append(multiErr, fmt.Errorf("source.destination %q should be a plain filename without path separators", source.Destination))
 	}
 
 	switch len(source.SHA256) {
