@@ -1,3 +1,32 @@
+## [bldr 0.6.5](https://github.com/siderolabs/bldr/releases/tag/v0.6.5) (2026-10-13)
+
+Welcome to the v0.6.5 release of bldr!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/bldr/issues.
+
+### Contributors
+
+* Andrey Smirnov
+
+### Changes
+<details><summary>1 commit</summary>
+<p>
+
+* [`6f19942`](https://github.com/siderolabs/bldr/commit/6f199423198d2db132f27c72eb2edc66cbabf154) fix: replace copy steps from emptydir
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/anchore/syft**   v1.52.0 -> v1.54.1
+* **github.com/moby/buildkit**  v0.33.0 -> v0.34.0
+* **golang.org/x/sync**         v0.23.0 -> v0.24.0
+
+Previous release can be found at [v0.6.4](https://github.com/siderolabs/bldr/releases/tag/v0.6.4)
+
 ## [bldr 0.6.3](https://github.com/siderolabs/bldr/releases/tag/v0.6.3) (2026-08-19)
 
 Welcome to the v0.6.3 release of bldr!
